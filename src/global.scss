@@ -10,6 +10,7 @@
  */
 
 /* Core CSS required for Ionic components to work properly */
+@use "tailwindcss";
 @import "@ionic/angular/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
@@ -35,3 +36,24 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
+
+
+
+@theme 
+{
+
+    //--WORKOUTS PAGE--
+
+    // backgrounds
+    --color-main-background: #252525;
+    --color-workout-background: #363636;
+    --color-musclegroup-background: #3F3F3F;
+
+    // button states
+    --color-musclegroup-complete: #4C8145;
+    --color-workout-finish: #743737;
+    --color-workout-finish-pressed: #C37A7A;
+    
+
+
+}
