@@ -10,7 +10,9 @@
  */
 
 /* Core CSS required for Ionic components to work properly */
+
 @use "tailwindcss";
+@import url('https://googleapis.com');
 @import "@ionic/angular/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
@@ -41,19 +43,45 @@
 
 @theme 
 {
+    //--HOTBAR--
+    --color-hotbar-background:#414141;
+    --color-hotbar-button:#2F2F2F;
+    --color-hotbar-button-pressed:#464646;
+
+
+    --font-lexend: "Lexend Giga", sans-serif;
+
+
+
 
     //--WORKOUTS PAGE--
 
-    // backgrounds
+    // main page
     --color-main-background: #252525;
     --color-workout-background: #363636;
-    --color-musclegroup-background: #3F3F3F;
+    --color-musclegroup-card: #3F3F3F;
+    --color-musclegroup-card-pressed: #636363;
+
 
     // button states
     --color-musclegroup-complete: #4C8145;
     --color-workout-finish: #743737;
     --color-workout-finish-pressed: #C37A7A;
-    
+    --color-return-button: #353535;
+    --color-return-button-presed: #525252;
+
+    // muscle group
+    --color-musclegroup-background: #3A3A3A;
+    --color-exercise-card: #535353;
+    --color-exercise-card-pressed: #8F8F8F;
+
+    // exercise
+    --color-exercise-background: #535353;
+    --color-set-card: #6C6C6C;
+    --color-set-card-pressed: #979797;
+    --color-set-complete-button: #5D7D59;
+    --color-set-complete-button-pressed: #99B595;
+    --color-set-input-background: #353535;
 
 
 }
