@@ -68,7 +68,7 @@
     --color-workout-finish: #743737;
     --color-workout-finish-pressed: #C37A7A;
     --color-return-button: #353535;
-    --color-return-button-presed: #525252;
+    --color-return-button-pressed: #525252;
 
     // muscle group
     --color-musclegroup-background: #3A3A3A;
@@ -86,4 +86,48 @@
     --radius-general: 10px;
 
 
+}
+
+
+ion-tab-button {
+  --background-focused: transparent;
+  --background-focused-opacity: 0;
+  --background-hover: var(--color-hotbar-button-pressed);
+  --color-selected: white;
+}
+
+ion-tab-button::part(native) {
+  background: var(--color-hotbar-button);
+  border-radius: 10px;
+  transition: background-color 200ms ease;
+}
+
+ion-tab-button.tab-selected::part(native) {
+  background: var(--color-hotbar-button-pressed);
+}
+
+ion-tab-button::part(native):hover {
+  background: var(--color-hotbar-button-pressed);
+}
+
+ion-tab-button::part(native) {
+  @apply bg-hotbar-button rounded-general p-3 transition-colors duration-200;
+}
+
+ion-tab-button.tab-selected::part(native) {
+  @apply bg-hotbar-button-pressed text-white;
+}
+
+ion-tab-button::part(native):hover {
+  @apply bg-hotbar-button-pressed;
+}
+
+
+// SETTINGS BUTTON CLASS
+
+.settings-btn 
+{
+  --background: var(--color-set-card);
+  --color: white;
+  --border-radius: var(--radius-general);
 }
