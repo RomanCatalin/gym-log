@@ -1,21 +1,17 @@
 <ion-tabs>
   <ion-router-outlet></ion-router-outlet>
 
-  <ion-tab-bar slot="bottom">
-    <div class="flex font-lexend justify-center items-center gap-1.5 w-auto h-auto min-w-100">
-      
-      <ion-tab-button tab="statistics">
-        <ion-label>STATISTICS</ion-label>
-      </ion-tab-button>
+  <ion-tab-bar slot="bottom" class="custom-tab-bar font-lexend">
+    <ion-tab-button tab="statistics">
+      <ion-label>STATISTICS</ion-label>
+    </ion-tab-button>
 
-      <ion-tab-button tab="workout">
-        <ion-label>WORKOUT</ion-label>
-      </ion-tab-button>
+    <ion-tab-button tab="workout">
+      <ion-label>WORKOUT</ion-label>
+    </ion-tab-button>
 
-      <ion-tab-button tab="settings">
-        <ion-label>SETTINGS</ion-label>
-      </ion-tab-button>
-
-    </div>
+    <ion-tab-button tab="settings">
+      <ion-label>SETTINGS</ion-label>
+    </ion-tab-button>
   </ion-tab-bar>
 </ion-tabs>

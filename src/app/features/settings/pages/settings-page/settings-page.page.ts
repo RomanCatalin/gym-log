@@ -10,11 +10,16 @@ import { IonButton, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/a
   standalone: true,
   imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButton]
 })
-export class SettingsPagePage implements OnInit {
+export class SettingsPagePage implements OnInit 
+{
 
   constructor() { }
 
-  ngOnInit() {
+  ngOnInit() { }
+
+  onWorkoutTemplateClick()
+  {
+    console.log('Workout Template Clicked');
   }
 
 }

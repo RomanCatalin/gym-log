@@ -46,6 +46,7 @@
     //--HOTBAR--
     --color-hotbar-background:#414141;
     --color-hotbar-button:#2F2F2F;
+    --color-hotbar-selected:#333333;
     --color-hotbar-button-pressed:#464646;
 
 
@@ -89,40 +90,6 @@
 }
 
 
-ion-tab-button {
-  --background-focused: transparent;
-  --background-focused-opacity: 0;
-  --background-hover: var(--color-hotbar-button-pressed);
-  --color-selected: white;
-}
-
-ion-tab-button::part(native) {
-  background: var(--color-hotbar-button);
-  border-radius: 10px;
-  transition: background-color 200ms ease;
-}
-
-ion-tab-button.tab-selected::part(native) {
-  background: var(--color-hotbar-button-pressed);
-}
-
-ion-tab-button::part(native):hover {
-  background: var(--color-hotbar-button-pressed);
-}
-
-ion-tab-button::part(native) {
-  @apply bg-hotbar-button rounded-general p-3 transition-colors duration-200;
-}
-
-ion-tab-button.tab-selected::part(native) {
-  @apply bg-hotbar-button-pressed text-white;
-}
-
-ion-tab-button::part(native):hover {
-  @apply bg-hotbar-button-pressed;
-}
-
-
 // SETTINGS BUTTON CLASS
 
 .settings-btn 
@@ -130,4 +97,56 @@ ion-tab-button::part(native):hover {
   --background: var(--color-set-card);
   --color: white;
   --border-radius: var(--radius-general);
+}
+
+ion-content {
+  pointer-events: auto;
+}
+
+ion-router-outlet {
+  pointer-events: none !important;
+}
+
+ion-router-outlet > * {
+  pointer-events: auto !important;
+}
+
+
+// HOTBAR CLASSES
+
+ion-tab-bar.custom-tab-bar {
+  --background: var(--color-hotbar-background); 
+  --border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.45rem;
+}
+
+
+ion-tab-button {
+  --background: transparent;
+  --background-focused: transparent;
+  --background-focused-opacity: 0;
+  --color-selected: white;
+  font-size: 0.78rem;
+
+  font-family: inherit;
+  
+  &::part(native) {
+    background-color: var(--color-hotbar-button);
+    border-radius: var(--radius-general);
+    padding: 0.75rem;
+    transition: var(--color-hotbar-button-pressed) 200ms ease;
+  }
+
+  &.tab-selected::part(native) {
+    background-color: var(--color-hotbar-selected);
+    color: white;
+  }
+
+  &::part(native):hover {
+    background-color: var(--color-hotbar-selected);
+  }
 }
