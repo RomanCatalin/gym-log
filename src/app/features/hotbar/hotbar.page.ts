@@ -9,7 +9,7 @@ import { IonContent, IonHeader, IonTab, IonTitle, IonToolbar, IonTabs, IonIcon, 
   templateUrl: './hotbar.page.html',
   styleUrls: ['./hotbar.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonTab, IonTabs, IonIcon, IonLabel, IonTabButton, IonTabBar, IonRouterOutlet]
+  imports: [ CommonModule, FormsModule, IonTabs, IonLabel, IonTabButton, IonTabBar, IonRouterOutlet]
 })
 export class HotbarPage implements OnInit {
 

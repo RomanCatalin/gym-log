@@ -1,8 +1,7 @@
 import { Routes } from '@angular/router';
 import { HotbarPage } from './hotbar.page';
 
-export const routes: Routes = 
-[
+export const routes: Routes = [
   {
     path: '',
     component: HotbarPage, 
@@ -21,8 +20,8 @@ export const routes: Routes =
         loadComponent: () =>
           import('../settings/pages/settings-page/settings-page.page').then(m => m.SettingsPagePage),
       },
-        {
-        path: 'settings/workout-templates',
+      {
+        path: 'workout-templates',
         loadComponent: () =>
           import('../settings/pages/workout-templates-page/workout-templates-page.page').then(m => m.WorkoutTemplatesPagePage),
       },
