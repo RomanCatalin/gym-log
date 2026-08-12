@@ -21,6 +21,11 @@ export const routes: Routes =
         loadComponent: () =>
           import('../settings/pages/settings-page/settings-page.page').then(m => m.SettingsPagePage),
       },
+        {
+        path: 'settings/workout-templates',
+        loadComponent: () =>
+          import('../settings/pages/workout-templates-page/workout-templates-page.page').then(m => m.WorkoutTemplatesPagePage),
+      },
       {
         path: '',
         redirectTo: 'workout',

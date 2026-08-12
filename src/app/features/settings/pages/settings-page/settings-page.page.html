@@ -1,14 +1,20 @@
 <ion-content [fullscreen]="true" class="settings-content">
   <div class="p-5 min-h-full bg-main-background pt-12">
 
-    <div class="bg-workout-background rounded-general p-4">
+    <div class="bg-workout-background rounded-general p-4 pb-10">
       <div class="px-1.5 pt-0.2 pb-7 text-left gap-2.5 text-[32px] text-white font-lexend">
         SETTINGS
       </div>
 
       <div class="bg-musclegroup-card rounded-general py-4 px-2 flex flex-col gap-5 relative z-10">
-        <ion-button expand="block" (click)="onWorkoutTemplateClick()" class="settings-btn font-lexend">
+        <ion-button expand="block" (click)="goToWorkoutTemplates()" class="settings-btn font-lexend">
           WORKOUT TEMPLATES
+        </ion-button>
+        <ion-button expand="block"  class="settings-btn font-lexend">
+          PREFERENCES
+        </ion-button>
+        <ion-button expand="block"  class="settings-btn font-lexend">
+          LEAVE FEEDBACK
         </ion-button>
       </div>
 

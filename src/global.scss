@@ -90,15 +90,6 @@
 }
 
 
-// SETTINGS BUTTON CLASS
-
-.settings-btn 
-{
-  --background: var(--color-set-card);
-  --color: white;
-  --border-radius: var(--radius-general);
-}
-
 ion-content {
   pointer-events: auto;
 }
@@ -149,4 +140,17 @@ ion-tab-button {
   &::part(native):hover {
     background-color: var(--color-hotbar-selected);
   }
+}
+
+// SETTINGS PAGE STYLING
+
+.settings-btn 
+{
+  --background: var(--color-set-card);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 16px;      /* Vertical top */
+  --padding-bottom: 16px;   /* Vertical bottom */
+  --padding-start: 24px;    /* Horizontal left */
+  --padding-end: 24px;      /* Horizontal right */
 }
