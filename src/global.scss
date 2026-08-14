@@ -69,7 +69,7 @@
     --color-musclegroup-complete: #4C8145;
     --color-workout-finish: #743737;
     --color-workout-finish-pressed: #C37A7A;
-    --color-return-button: #353535;
+    --color-return-button: #313131;
     --color-return-button-pressed: #525252;
 
     // muscle group
@@ -86,6 +86,14 @@
     --color-set-input-background: #353535;
 
     --radius-general: 10px;
+
+
+
+    //--WORKOUT TEMPLATES PAGE--
+    --color-templates-background: #363636;
+    --color-templates-card: #3F3F3F;
+    --color-templates-card-pressed: #636363;
+
 
 
 }
@@ -106,7 +114,8 @@ ion-router-outlet > * {
 
 // HOTBAR CLASSES
 
-ion-tab-bar.custom-tab-bar {
+ion-tab-bar.custom-tab-bar
+{
   --background: var(--color-hotbar-background); 
   --border: none;
   display: flex;
@@ -115,7 +124,6 @@ ion-tab-bar.custom-tab-bar {
   gap: 0.375rem;
   padding: 0.5rem 0.45rem;
 }
-
 
 ion-tab-button {
   --background: transparent;
@@ -150,8 +158,46 @@ ion-tab-button {
   --background: var(--color-set-card);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 16px;      /* Vertical top */
-  --padding-bottom: 16px;   /* Vertical bottom */
+  --padding-top: 20px;      /* Vertical top */
+  --padding-bottom: 20px;   /* Vertical bottom */
   --padding-start: 24px;    /* Horizontal left */
   --padding-end: 24px;      /* Horizontal right */
+}
+
+.return-btn 
+{
+  --background: var(--color-return-button);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 14px;      /* Vertical top */
+  --padding-bottom: 14px;   /* Vertical bottom */
+  --padding-start: 14px;    /* Horizontal left */
+  --padding-end: 14px;      /* Horizontal right */
+}
+
+.input-add-btn 
+{
+  --background: var(--color-return-button);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 11px;      /* Vertical top */
+  --padding-bottom: 11px;   /* Vertical bottom */
+  --padding-start: 11px;    /* Horizontal left */
+  --padding-end: 11px;      /* Horizontal right */
+  --box-shadow:none;
+}
+
+.musclegroup-card-template
+{
+  --background: var(--color-musclegroup-card);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 20px;      /* Vertical top */
+  --padding-bottom: 20px;   /* Vertical bottom */
+  --padding-start: 20px;    /* Horizontal left */
+  --padding-end: 20px;      /* Horizontal right */
+}
+
+ion-icon {
+  color: white;
 }

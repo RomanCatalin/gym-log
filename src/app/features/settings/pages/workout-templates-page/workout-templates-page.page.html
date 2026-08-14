@@ -1,13 +1,209 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>workout-templates-page</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">workout-templates-page</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="min-h-full bg-main-background p-5 pt-12 font-lexend text-white">
+
+    <div class="bg-workout-background rounded-general p-4 pb-10">
+
+      @if (viewState === 1)
+      {
+        <!-- Header -->
+        <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
+          <div class="text-[28px] text-white font-lexend">
+            WORKOUTS
+          </div>
+
+          <ion-button (click)="goBack()" class="return-btn">
+            <ion-icon name="return-up-back-outline"></ion-icon>
+          </ion-button>
+        </div>
+
+        <!-- Lista de Workouts -->
+        <div class="flex flex-col gap-5">
+          @for (wk of workoutService.workouts; track wk.id) {
+            <ion-button (click)="goToLevel2(wk)" class="musclegroup-card-template font-lexend">
+              <span class="text-base tracking-wide uppercase">
+                {{ wk.name }}
+                <ion-icon name="pencil-outline" class="absolute pl-2 text-base pt-[4px]"></ion-icon>
+              </span>
+
+            </ion-button>
+          }
+          <div class="bg-musclegroup-card rounded-general p-2 py-3 flex gap-3 items-center shadow-sm/30">
+            <input
+              [(ngModel)]="newWorkoutName"
+              placeholder="ARMS"
+              class="bg-return-button rounded-general text-white uppercase text-sm tracking-wide outline-none w-full px-4 py-2 font-lexend placeholder:text-white/30"
+            />
+
+            <ion-button (click)="addWorkout()" class="font-lexend input-add-btn">
+              <ion-icon name="add" class=""></ion-icon>
+            </ion-button>
+
+          </div>
+        </div>
+      }
+
+
+
+
+
+      @if (viewState === 2 && selectedWorkout)
+      {
+        <!-- Header -->
+        <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
+          <h1 class="text-2xl tracking-widest uppercase m-0 font-normal">
+            {{ selectedWorkout.name }}
+          </h1>
+
+          <button
+            (click)="goBack()"
+            class="bg-return-button active:bg-return-button-pressed transition-colors rounded-general w-11 h-11 flex justify-center items-center"
+          >
+            <ion-icon name="return-up-back-outline" class="text-xl"></ion-icon>
+          </button>
+        </div>
+
+        <!-- Lista Grupe de Mușchi -->
+        <div class="flex flex-col gap-3">
+          @for (mg of selectedWorkout.muscleGroups; track mg.id) {
+            <button
+              (click)="goToLevel3(mg)"
+              class="bg-musclegroup-card active:bg-musclegroup-card-pressed transition-colors rounded-general py-4 px-5 w-full flex justify-center items-center text-sm tracking-wide uppercase"
+            >
+              {{ mg.name }}
+            </button>
+          }
+        </div>
+
+        <!-- Add Group -->
+        <div class="flex gap-2 mt-5">
+          <div class="bg-set-input-background rounded-general flex-1 relative flex items-center pr-3">
+            <select
+              [(ngModel)]="selectedNewGroup"
+              class="w-full bg-transparent appearance-none text-white px-5 py-4 outline-none text-sm tracking-wide uppercase"
+            >
+              <option value="" disabled selected hidden>
+                CARDIO
+              </option>
+
+              @for (group of availableGroups; track group) {
+                <option [value]="group" class="text-black">
+                  {{ group }}
+                </option>
+              }
+            </select>
+
+            <ion-icon
+              name="chevron-down-outline"
+              class="pointer-events-none opacity-50 absolute right-4 text-lg"
+            ></ion-icon>
+          </div>
+
+          <button
+            (click)="addGroup()"
+            class="bg-musclegroup-card active:bg-musclegroup-card-pressed transition-colors rounded-general w-14 flex justify-center items-center text-2xl font-light"
+          >
+            +
+          </button>
+        </div>
+
+        <!-- Delete Workout -->
+        <button
+          (click)="deleteWorkout()"
+          class="bg-workout-finish active:bg-workout-finish-pressed transition-colors rounded-general py-4 px-5 w-full text-sm tracking-widest uppercase mt-5"
+        >
+          DELETE WORKOUT
+        </button>
+      }
+
+      @if (viewState === 3 && selectedMuscleGroup)
+      {
+        <!-- Header -->
+        <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
+          <h1 class="text-2xl tracking-widest uppercase m-0 font-normal">
+            {{ selectedWorkout?.name }}
+          </h1>
+
+          <button
+            (click)="goToLevel1()"
+            class="bg-return-button active:bg-return-button-pressed transition-colors rounded-general w-11 h-11 flex justify-center items-center"
+          >
+            <ion-icon name="return-up-back-outline" class="text-xl"></ion-icon>
+          </button>
+        </div>
+
+        <!-- Muscle Group -->
+        <div class="flex justify-between items-center bg-musclegroup-background rounded-general py-4 px-5 relative">
+          <h2 class="text-sm tracking-wide uppercase m-0 flex-1 text-center pr-4">
+            {{ selectedMuscleGroup.name }}
+          </h2>
+
+          <button
+            (click)="goBack()"
+            class="absolute right-5 flex justify-center items-center opacity-70 active:opacity-100"
+          >
+            <ion-icon name="return-up-back-outline" class="text-lg"></ion-icon>
+          </button>
+        </div>
+
+        <!-- Exercises -->
+        <div class="flex flex-col gap-3 mt-5">
+          @for (ex of selectedMuscleGroup.exercises; track ex.id) {
+            <div class="bg-exercise-card rounded-general flex items-center pl-5 overflow-hidden h-14">
+              <span class="text-sm tracking-wide uppercase flex-1">
+                {{ ex.name }}
+              </span>
+
+              <button
+                (click)="deleteExercise(ex.id)"
+                class="bg-workout-finish active:bg-workout-finish-pressed w-14 h-full flex justify-center items-center transition-colors"
+              >
+                <ion-icon name="close-outline" class="text-2xl"></ion-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Add Exercise -->
+        <div class="flex gap-2 mt-5">
+          <div class="bg-set-input-background rounded-general flex-1 relative flex items-center pr-3">
+            <select
+              [(ngModel)]="selectedNewExercise"
+              class="w-full bg-transparent appearance-none text-white px-5 py-4 outline-none text-sm tracking-wide uppercase"
+            >
+              <option value="" disabled selected hidden>
+                EXERCISE
+              </option>
+
+              @for (ex of currentAvailableExercises; track ex) {
+                <option [value]="ex" class="text-black">
+                  {{ ex }}
+                </option>
+              }
+            </select>
+
+            <ion-icon
+              name="chevron-down-outline"
+              class="pointer-events-none opacity-50 absolute right-4 text-lg"
+            ></ion-icon>
+          </div>
+
+          <button
+            (click)="addExercise()"
+            class="bg-musclegroup-card active:bg-musclegroup-card-pressed transition-colors rounded-general w-14 flex justify-center items-center text-2xl font-light"
+          >
+            +
+          </button>
+        </div>
+
+        <!-- Delete Group -->
+        <button
+          (click)="deleteGroup()"
+          class="bg-workout-finish active:bg-workout-finish-pressed transition-colors rounded-general py-4 px-5 w-full text-sm tracking-widest uppercase mt-5"
+        >
+          DELETE GROUP
+        </button>
+      }
+
+    </div>
+  </div>
 </ion-content>
