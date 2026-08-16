@@ -93,6 +93,7 @@
     --color-templates-background: #363636;
     --color-templates-card: #3F3F3F;
     --color-templates-card-pressed: #636363;
+    --color-templates-musclegroup-card: #434343;
 
 
 
@@ -187,7 +188,7 @@ ion-tab-button {
   --box-shadow:none;
 }
 
-.musclegroup-card-template
+.workout-card-template
 {
   --background: var(--color-musclegroup-card);
   --color: white;
@@ -196,6 +197,35 @@ ion-tab-button {
   --padding-bottom: 20px;   /* Vertical bottom */
   --padding-start: 20px;    /* Horizontal left */
   --padding-end: 20px;      /* Horizontal right */
+}
+
+.musclegroup-card-template
+{
+  --background: var(--color-templates-musclegroup-card);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 20px;      /* Vertical top */
+  --padding-bottom: 20px;   /* Vertical bottom */
+  --padding-start: 20px;    /* Horizontal left */
+  --padding-end: 20px;      /* Horizontal right */
+}
+
+.workout-delete-template
+{
+  --background: var(--color-workout-finish);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 20px;      /* Vertical top */
+  --padding-bottom: 20px;   /* Vertical bottom */
+  --padding-start: 20px;    /* Horizontal left */
+  --padding-end: 20px;      /* Horizontal right */
+}
+
+.exercise-delete-template {
+  --background: var(--color-workout-finish);
+  --box-shadow:none;
+  width: 3.5rem; 
+  height: 100%;
 }
 
 ion-icon {
