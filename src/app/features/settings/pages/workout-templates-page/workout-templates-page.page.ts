@@ -89,6 +89,7 @@ goBack() {
   addWorkout() {
     if (this.newWorkoutName.trim()) {
       this.workoutService.workouts.push({ id: Date.now().toString(), name: this.newWorkoutName.toUpperCase(), muscleGroups: [] });
+      this.workoutService.saveTemplates();
       this.newWorkoutName = '';
     }
   }
@@ -96,6 +97,7 @@ goBack() {
   addGroup() {
     if (this.selectedWorkout && this.selectedNewGroup) {
       this.selectedWorkout.muscleGroups.push({ id: Date.now().toString(), name: this.selectedNewGroup, exercises: [] });
+      this.workoutService.saveTemplates();
       this.selectedNewGroup = '';
     }
   }
@@ -103,6 +105,7 @@ goBack() {
   addExercise() {
     if (this.selectedMuscleGroup && this.selectedNewExercise) {
       this.selectedMuscleGroup.exercises.push({ id: Date.now().toString(), name: this.selectedNewExercise });
+      this.workoutService.saveTemplates();
       this.selectedNewExercise = '';
     }
   }
@@ -110,6 +113,7 @@ goBack() {
   deleteWorkout() {
     if (this.selectedWorkout) {
       this.workoutService.workouts = this.workoutService.workouts.filter(w => w.id !== this.selectedWorkout?.id);
+      this.workoutService.saveTemplates();
       this.goBack();
     }
   }
@@ -117,6 +121,7 @@ goBack() {
   deleteGroup() {
     if (this.selectedWorkout && this.selectedMuscleGroup) {
       this.selectedWorkout.muscleGroups = this.selectedWorkout.muscleGroups.filter(g => g.id !== this.selectedMuscleGroup?.id);
+      this.workoutService.saveTemplates();
       this.goBack();
     }
   }
@@ -124,6 +129,7 @@ goBack() {
   deleteExercise(exerciseId: string) {
     if (this.selectedMuscleGroup) {
       this.selectedMuscleGroup.exercises = this.selectedMuscleGroup.exercises.filter(e => e.id !== exerciseId);
+      this.workoutService.saveTemplates();
     }
   }
 }

@@ -1,20 +1,302 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { 
+  IonContent, IonIcon, AlertController, IonButton 
+} from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { returnUpBackOutline, chevronDownOutline, add } from 'ionicons/icons';
+import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
 
 @Component({
-  selector: 'app-workout-page',
-  templateUrl: './workout-page.page.html',
-  styleUrls: ['./workout-page.page.scss'],
+  selector: 'app-workout',
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton],
+  templateUrl: './workout-page.page.html',
 })
-export class WorkoutPagePage implements OnInit {
+export class WorkoutPagePage implements OnDestroy {
+  workoutService = inject(WorkoutService);
+  private alertController = inject(AlertController);
+  private cdr = inject(ChangeDetectorRef);
+  private ngZone = inject(NgZone);
+  recentWorkoutsLimit = 3;
 
-  constructor() { }
 
-  ngOnInit() {
+  viewState: 1 | 2 | 3 = 1;
+  activeMuscleGroup: WorkoutMuscleGroup | null = null;
+  activeExercise: WorkoutExercise | null = null;
+
+
+  newGroupName = '';
+  newExerciseName = '';
+  newReps: number | null = null;
+  newWeight: number | null = null;
+
+
+  timerInterval: any;
+  timerDisplay = '00:00';
+  selectedTemplateId = '';
+
+  constructor() {
+    addIcons({ returnUpBackOutline, chevronDownOutline, add });
   }
 
+  ngOnDestroy() {
+    this.stopTimer();
+  }
+
+  
+
+  async confirmStartWorkout(event: any) {
+    const templateId = event.target.value;
+    if (!templateId) return;
+
+    const template = this.workoutService.workouts.find(w => w.id === templateId);
+    if (!template) return;
+
+    const alert = await this.alertController.create({
+      header: 'Start Workout',
+      message: `Are you sure you want to start ${template.name}?`,
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            this.selectedTemplateId = ''; 
+          }
+        },
+        {
+          text: 'Start',
+          handler: () => {
+            this.workoutService.startWorkout(template.name, template.muscleGroups);
+            this.startTimer();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  startTimer() 
+  {
+    this.stopTimer();
+    this.timerInterval = setInterval(() => {
+      this.ngZone.run(() => {
+        if (this.workoutService.currentActiveWorkout) {
+          const diff = Math.floor((Date.now() - this.workoutService.currentActiveWorkout.startTime) / 1000);
+          const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+          const seconds = (diff % 60).toString().padStart(2, '0');
+          this.timerDisplay = `${minutes}:${seconds}`;
+          
+          this.cdr.detectChanges();
+        }
+      });
+    }, 1000);
+  }
+
+  stopTimer() {
+    if (this.timerInterval) {
+      clearInterval(this.timerInterval);
+    }
+  }
+
+  goBack() {
+    if (this.viewState === 3) {
+      this.viewState = 2;
+      this.activeExercise = null;
+    } else if (this.viewState === 2) {
+      this.viewState = 1;
+      this.activeMuscleGroup = null;
+    }
+  }
+
+  goToGroup(group: WorkoutMuscleGroup) 
+  {
+    this.activeMuscleGroup = group;
+    this.viewState = 2;
+  }
+
+  goToExercise(exercise: WorkoutExercise) 
+  {
+    this.activeExercise = exercise;
+    this.viewState = 3;
+  }
+
+
+  addGroup() 
+  {
+    if (this.newGroupName.trim() && this.workoutService.currentActiveWorkout) 
+    {
+      this.workoutService.currentActiveWorkout.muscleGroups.push({
+        id: Date.now().toString(),
+        name: this.newGroupName.toUpperCase(),
+        isCustom: true,
+        isCompleted: false,
+        exercises: []
+      });
+      this.newGroupName = '';
+    }
+  }
+
+  addExercise() 
+  {
+    if (this.newExerciseName.trim() && this.activeMuscleGroup) 
+    {
+      this.activeMuscleGroup.exercises.push({
+        id: Date.now().toString(),
+        name: this.newExerciseName.toUpperCase(),
+        isCustom: true,
+        isCompleted: false,
+        sets: []
+      });
+      this.newExerciseName = '';
+    }
+  }
+
+  addSet() 
+  {
+    if (this.newReps && this.newWeight && this.activeExercise) 
+    {
+      this.activeExercise.sets.push({
+        reps: this.newReps,
+        weight: this.newWeight
+      });
+      this.newReps = null;
+      this.newWeight = null;
+    }
+  }
+
+  completeExercise() 
+  {
+    if (this.activeExercise && this.activeMuscleGroup) {
+      this.activeExercise.isCompleted = true;
+
+      const allDone = this.activeMuscleGroup.exercises.every(ex => ex.isCompleted);
+      if (allDone && this.activeMuscleGroup.exercises.length > 0) 
+      {
+        this.activeMuscleGroup.isCompleted = true;
+      }
+
+      this.goBack(); 
+    }
+  }
+
+  async endWorkout() 
+  {
+    if (!this.workoutService.currentActiveWorkout) return;
+    const incompleteGroups = this.workoutService.currentActiveWorkout.muscleGroups.filter(mg => !mg.isCompleted);
+    
+    let message = 'Are you sure you want to end this workout?';
+    if (incompleteGroups.length > 0)
+    {
+      message = `You have unfinished muscle groups. ${message}`;
+    }
+
+    const alert = await this.alertController.create({
+      header: 'End Workout',
+      message: message,
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Confirm',
+          handler: () => {
+            this.workoutService.endWorkout();
+            this.stopTimer();
+            this.timerDisplay = '00:00';
+            this.selectedTemplateId = '';
+            this.viewState = 1;
+            this.activeMuscleGroup = null;
+            this.activeExercise = null;
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+  
+  availableGroups = ['CARDIO', 'CHEST', 'TRICEPS', 'SHOULDERS', 'BACK', 'LEGS', 'BICEPS'];
+
+  exercisesByGroup: Record<string, string[]> = 
+  {
+    'CARDIO': ['TREADMILL', 'CYCLING', 'STAIRMASTER', 'ROWING'],
+    'CHEST': ['BENCH PRESS', 'INCLINE PRESS', 'PEC DECK', 'DIPS', 'CABLE CROSSOVER', 'PUSH UPS'],
+    'TRICEPS': ['PUSH DOWNS', 'TRICEP EXTENSIONS', 'SKULLCRUSHERS', 'DIPS', 'CLOSE GRIP BENCH PRESS', 'OVERHEAD TRICEP EXTENSIONS'],
+    'SHOULDERS': ['SHOULDER PRESS', 'DUMBBELL LATERAL RAISES', 'CABLE LATERAL RAISES', 'DUMBBELL FRONT RAISES'],
+    'BACK': ['PULL UPS', 'BARBELL ROW', 'LAT PULLDOWN', 'DEADLIFT', 'SEATED ROW', 'FACE PULLS', 'T-BAR ROW', 'DUMBBELL ROW'],
+    'LEGS': ['SQUATS', 'LEG PRESS', 'LUNGES', 'CALF RAISE'],
+    'BICEPS': ['BARBELL CURLS', 'HAMMER CURLS', 'PREACHER CURLS', 'BAYESIAN CURLS', 'DUMBBELL CURLS']
+  }
+
+  get availableGroupsForDropdown(): string[] 
+  {
+    if (!this.workoutService.currentActiveWorkout) return this.availableGroups;
+    const existingGroupNames = this.workoutService.currentActiveWorkout.muscleGroups.map(mg => mg.name.toUpperCase());
+    return this.availableGroups.filter(group => !existingGroupNames.includes(group));
+  }
+
+  get availableExercisesForDropdown(): string[] {
+    if (!this.workoutService.currentActiveWorkout || !this.activeMuscleGroup) return [];
+    const existingExerciseNames = this.activeMuscleGroup.exercises.map(ex => ex.name.toUpperCase());
+    const allExercisesForGroup = this.exercisesByGroup[this.activeMuscleGroup.name.toUpperCase()] || [];
+    return allExercisesForGroup.filter(ex => !existingExerciseNames.includes(ex));
+  }
+
+  restrictInput(event: any, field: 'newReps' | 'newWeight') 
+  {
+    let inputVal = event.target.value.toString();
+
+    inputVal = inputVal.replace('-', '');
+
+    if (inputVal === '0' || (inputVal.startsWith('0') && !inputVal.startsWith('0.'))) {
+      inputVal = '';
+    }
+
+    const parts = inputVal.split('.');
+    
+    if (parts[0] && parts[0].length > 3) {
+      parts[0] = parts[0].substring(0, 3);
+    }
+
+    if (parts[1] !== undefined && parts[1].length > 1) {
+      parts[1] = parts[1].substring(0, 1);
+    }
+
+    let finalStr = parts[0];
+    if (parts.length > 1) {
+      finalStr += '.' + (parts[1] !== undefined ? parts[1] : '');
+    }
+
+    event.target.value = finalStr;
+    if (finalStr === '' || finalStr === '.') {
+      this[field] = null;
+    } else {
+      this[field] = parseFloat(finalStr);
+    }
+  }
+
+  get recentWorkouts() 
+  {
+    return [
+      { 
+        id: '101', 
+        name: 'PUSH', 
+        date: new Date(Date.now() - 86400000), 
+        durationDisplay: '01:15:20' 
+      },
+      { 
+        id: '102', 
+        name: 'PULL', 
+        date: new Date(Date.now() - 172800000), 
+        durationDisplay: '00:58:10' 
+      },
+      { 
+        id: '103', 
+        name: 'LEGS', 
+        date: new Date(Date.now() - 345600000), 
+        durationDisplay: '01:30:05' 
+      }
+    ].slice(0, this.recentWorkoutsLimit);
+  }
 }

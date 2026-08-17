@@ -67,8 +67,9 @@
 
     // button states
     --color-musclegroup-complete: #4C8145;
-    --color-workout-finish: #743737;
-    --color-workout-finish-pressed: #C37A7A;
+    --color-workout-finish: #4C8145;
+    --color-workout-finish-pressed: #64985D;
+    --color-workout-delete: #7d3b3b;
     --color-return-button: #313131;
     --color-return-button-pressed: #525252;
 
@@ -199,6 +200,17 @@ ion-tab-button {
   --padding-end: 20px;      /* Horizontal right */
 }
 
+.exercise-card
+{
+  --background:var(--color-exercise-card);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 20px;      /* Vertical top */
+  --padding-bottom: 20px;   /* Vertical bottom */
+  --padding-start: 20px;    /* Horizontal left */
+  --padding-end: 20px;      /* Horizontal right */
+}
+
 .musclegroup-card-template
 {
   --background: var(--color-templates-musclegroup-card);
@@ -212,7 +224,7 @@ ion-tab-button {
 
 .workout-delete-template
 {
-  --background: var(--color-workout-finish);
+  --background: var(--color-workout-delete);
   --color: white;
   --border-radius: var(--radius-general);
   --padding-top: 20px;      /* Vertical top */
@@ -222,11 +234,42 @@ ion-tab-button {
 }
 
 .exercise-delete-template {
-  --background: var(--color-workout-finish);
+  --background: var(--color-workout-delete);
   --box-shadow:none;
   width: 3.5rem; 
   height: 100%;
 }
+
+/* Suprascrie fundalul când este aplicată clasa de completat */
+.completed-workout-btn {
+  --background: var(--color-workout-finish); /* Culoarea verde definită de tine */
+  --color: white; /* Pentru a asigura contrastul textului */
+}
+
+.set-add-btn
+{
+  --background: #5A818F;
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 15px;      /* Vertical top */
+  --padding-bottom: 15px;   /* Vertical bottom */
+  --padding-start: 20px;    /* Horizontal left */
+  --padding-end: 20px;      /* Horizontal right */
+}
+
+
+.set-complete-btn
+{
+  --background: var(--color-workout-finish);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 15px;      /* Vertical top */
+  --padding-bottom: 15px;   /* Vertical bottom */
+  --padding-start: 20px;    /* Horizontal left */
+  --padding-end: 20px;      /* Horizontal right */
+}
+
+
 
 ion-icon {
   color: white;
