@@ -1,13 +1,114 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>statistics-page</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">statistics-page</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div class="min-h-full bg-main-background p-5 pt-12 font-lexend text-white">
+  <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
+    
+    <div class="text-[28px] text-white px-1.5 uppercase tracking-wide">
+      STATISTICS
+    </div>
+
+    <div class="flex flex-col gap-4 mt-4">
+  
+      <div class="flex flex-col gap-2">
+        <div class="text-white/70 text-sm px-1.5 uppercase tracking-widest">Show Stats For</div>
+        <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
+          <select [(ngModel)]="selectedStatType" (change)="onStatTypeChange()" class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-5 py-4 font-lexend">
+            @for (type of statTypes; track type) 
+            {
+              <option [value]="type" class="text-white">{{ type }}</option>
+            }
+          </select>
+          <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-5 text-lg"></ion-icon>
+        </div>
+      </div>
+
+      @if (selectedStatType !== 'TOTAL WEIGHT LIFTED') {
+        <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
+          <select [(ngModel)]="selectedSubItem" class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-5 py-4 font-lexend">
+            <option value="" disabled selected hidden class="text-black/30">SELECT ITEM</option>
+            @for (item of availableSubItems; track item) {
+              <option [value]="item" class="text-white">{{ item }}</option>
+            }
+          </select>
+          <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-5 text-lg"></ion-icon>
+        </div>
+      }
+    </div>
+
+
+    <div class="bg-templates-musclegroup-card rounded-general p-4 flex flex-col gap-2 shadow-sm/30 mt-8 select-none">
+      <div class="text-[16px] text-white/90 font-lexend uppercase text-center tracking-widest pb-2">
+        {{ selectedStatType === 'TOTAL WEIGHT LIFTED' ? 'Total Progress' : selectedSubItem }}
+      </div>
+      
+      <div class="w-full overflow-hidden">
+        <svg [attr.viewBox]="chartConfig.viewBox" class="w-full h-auto drop-shadow-md">
+          
+          <line x1="20" y1="40" x2="380" y2="40" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+          <line x1="20" y1="110" x2="380" y2="110" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+          <line x1="20" y1="180" x2="380" y2="180" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+
+          @for (seg of chartConfig.segments; track $index) 
+          {
+            <line 
+              [attr.x1]="seg.x1" 
+              [attr.y1]="seg.y1" 
+              [attr.x2]="seg.x2" 
+              [attr.y2]="seg.y2" 
+              [attr.stroke]="seg.color" 
+              stroke-width="3" 
+              stroke-linecap="round" 
+              class="transition-all duration-300"
+            />
+          }
+
+          @for (pt of chartConfig.points; track pt.date; let i = $index) 
+          {
+            
+           <g (click)="selectPoint(i)" class="cursor-pointer">
+              
+              <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="25" fill="transparent" />
+              
+              <circle 
+                [attr.cx]="pt.x" 
+                [attr.cy]="pt.y" 
+                [attr.r]="activePointIndex === i ? 7 : 5" 
+                [attr.fill]="activePointIndex === i ? '#ffffff' : '#2b3036'" 
+                stroke="#9ca3af" 
+                stroke-width="2.5" 
+                class="transition-all duration-300"
+              />
+
+              <text 
+                [attr.x]="pt.x" 
+                [attr.y]="pt.y - 15" 
+                [attr.fill]="activePointIndex === i ? '#ffffff' : 'rgba(255,255,255,0.7)'"
+                font-size="12" 
+                font-family="Lexend, sans-serif" 
+                font-weight="bold"
+                [attr.text-anchor]="pt.textAnchor"
+                class="transition-all duration-300"
+              >
+                {{ pt.value }}kg
+              </text>
+
+              @if (activePointIndex === i) {
+                <text 
+                  [attr.x]="pt.x" 
+                  [attr.y]="pt.y + 22" 
+                  fill="#9ca3af" 
+                  font-size="11" 
+                  font-family="Lexend, sans-serif" 
+                  font-weight="bold"
+                  [attr.text-anchor]="pt.textAnchor"
+                >
+                  {{ pt.date }}
+                </text>
+              }
+            </g>
+          }
+        </svg>
+      </div>
+    </div>
+  </div>
+  </div>
 </ion-content>

@@ -276,27 +276,26 @@ export class WorkoutPagePage implements OnDestroy {
     }
   }
 
-  get recentWorkouts() 
-  {
-    return [
-      { 
-        id: '101', 
-        name: 'PUSH', 
-        date: new Date(Date.now() - 86400000), 
-        durationDisplay: '01:15:20' 
-      },
-      { 
-        id: '102', 
-        name: 'PULL', 
-        date: new Date(Date.now() - 172800000), 
-        durationDisplay: '00:58:10' 
-      },
-      { 
-        id: '103', 
-        name: 'LEGS', 
-        date: new Date(Date.now() - 345600000), 
-        durationDisplay: '01:30:05' 
-      }
-    ].slice(0, this.recentWorkoutsLimit);
+  get recentWorkouts() {
+    const history = this.workoutService.workoutHistory;
+    if (!history || history.length === 0) return [];
+
+    const sortedHistory = [...history].sort((a, b) => b.startTime - a.startTime);
+    return sortedHistory.slice(0, this.recentWorkoutsLimit).map(workout => {
+      
+      const totalSeconds = workout.durationSeconds || 0;
+      const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+      const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+      const seconds = (totalSeconds % 60).toString().padStart(2, '0');
+      
+      const durationDisplay = hours === '00' ? `${minutes}:${seconds}` : `${hours}:${minutes}:${seconds}`;
+
+      return { 
+        id: workout.id, 
+        name: workout.name, 
+        date: new Date(workout.startTime), 
+        durationDisplay: durationDisplay 
+      };
+    });
   }
 }
