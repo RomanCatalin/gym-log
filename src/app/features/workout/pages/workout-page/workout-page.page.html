@@ -7,13 +7,19 @@
         <div class="flex flex-col gap-4">
           <div class="text-[28px] text-white font-lexend px-1.5 pb-2">START A WORKOUT</div>
           <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
-            <select [(ngModel)]="selectedTemplateId" (change)="confirmStartWorkout($event)" class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-5 py-4 font-lexend">
-              <option value="" disabled selected hidden class="text-white/30">SELECT TEMPLATE</option>
+            <ion-select 
+              [(ngModel)]="selectedTemplateId" 
+              (ionChange)="confirmStartWorkout($event)" 
+              interface="popover"
+              fill="none"
+              [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+              placeholder="SELECT TEMPLATE"
+              class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+
               @for (wk of workoutService.workouts; track wk.id) {
-                <option [value]="wk.id" class="text-white">{{ wk.name }}</option>
+                <ion-select-option [value]="wk.id">{{ wk.name }}</ion-select-option>
               }
-            </select>
-            <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-5 text-lg"></ion-icon>
+            </ion-select>
           </div>
         </div>
        @if (recentWorkouts.length > 0) {
@@ -24,11 +30,17 @@
               </div>
               <div class="rounded-general relative w-9 h-9 flex justify-center items-center active:opacity-70 transition-opacity">
                 <ion-icon name="chevron-down-outline" class="text-white text-lg pointer-events-none"></ion-icon>
-                <select [(ngModel)]="recentWorkoutsLimit" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer appearance-none bg-musclegroup-card">
-                  <option [ngValue]="1" class="text-white">Last 1</option>
-                  <option [ngValue]="3" class="text-white">Last 3</option>
-                  <option [ngValue]="5" class="text-white">Last 5</option>
-                </select>
+                  <ion-select 
+                      [(ngModel)]="recentWorkoutsLimit" 
+                      interface="popover"
+                      fill="none"
+                      [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                      class="w-36 bg-workout-background text-white uppercase text-sm  outline-none px-2 py-2 font-lexend rounded-general mr-6">
+
+                      <ion-select-option [value]="1">Last 1</ion-select-option>
+                      <ion-select-option [value]="3">Last 3</ion-select-option>
+                      <ion-select-option [value]="5">Last 5</ion-select-option>
+                    </ion-select>
               </div>
             </div>
 
@@ -78,30 +90,28 @@
               </ion-button>
             }
 
-          <div class="bg-templates-musclegroup-card rounded-general p-2 py-3 flex gap-3 items-center shadow-sm/30">
+            <div class="bg-templates-musclegroup-card rounded-general p-2 py-3 flex gap-3 items-center shadow-sm/30">
 
-            <div class="bg-return-button rounded-general flex-1 relative flex items-center">
-              <select 
-                [(ngModel)]="newGroupName" 
-                class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-4 py-2 font-lexend rounded-general"
-              >
-                <option value="" disabled selected hidden class="text-white/30">
-                  MUSCLE GROUP
-                </option>
-                @for (group of availableGroupsForDropdown; track group) {
-                  <option [value]="group" class="text-white">
-                    {{ group }}
-                  </option>
-                }
-              </select>
-              <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-4 text-lg"></ion-icon>
+              <div class="bg-return-button rounded-general flex-1 flex items-stretch">
+                <ion-select 
+                  [(ngModel)]="newGroupName" 
+                  interface="popover"
+                  fill="none"
+                  [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                  placeholder="MUSCLE GROUP"
+                  class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
+
+                  @for (group of availableGroupsForDropdown; track group) {
+                    <ion-select-option [value]="group">{{ group }}</ion-select-option>
+                  }
+                </ion-select>
+              </div>
+
+              <ion-button (click)="addGroup()" class="font-lexend input-add-btn shrink-0"> 
+                <ion-icon name="add"></ion-icon>
+              </ion-button>
+
             </div>
-
-            <ion-button (click)="addGroup()" class="font-lexend input-add-btn shrink-0"> 
-              <ion-icon name="add"></ion-icon>
-            </ion-button>
-
-          </div>
 
             <ion-button (click)="endWorkout()" class="workout-delete-template font-lexend">
               END WORKOUT
@@ -127,21 +137,20 @@
           }
 
           <div class="bg-exercise-card rounded-general p-2 py-2.5 flex gap-3 items-center shadow-sm/30">
-            <div class="bg-return-button rounded-general flex-1 relative flex items-center">
-              <select 
+
+            <div class="bg-return-button rounded-general flex-1 flex items-stretch">
+              <ion-select 
                 [(ngModel)]="newExerciseName" 
-                class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-4 py-2 font-lexend rounded-general"
-              >
-                <option value="" disabled selected hidden class="text-white/30">
-                  EXERCISE
-                </option>
+                interface="popover"
+                fill="none"
+                [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                placeholder="EXERCISE"
+                class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
+
                 @for (exercise of availableExercisesForDropdown; track exercise) {
-                  <option [value]="exercise" class="text-white">
-                    {{ exercise }}
-                  </option>
+                  <ion-select-option [value]="exercise">{{ exercise }}</ion-select-option>
                 }
-              </select>
-              <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-4 text-lg"></ion-icon>
+              </ion-select>
             </div>
 
             <ion-button (click)="addExercise()" class="font-lexend input-add-btn shrink-0"> 

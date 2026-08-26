@@ -73,22 +73,22 @@
           }
         <div class="bg-musclegroup-card rounded-general p-2 py-3 flex gap-3 items-center shadow-sm/30">
 
-          <div class="bg-return-button rounded-general flex-1 relative flex items-center">
-            <select [(ngModel)]="selectedNewGroup" class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-4 py-2 font-lexend rounded-general">
-              <option value="" disabled selected hidden class="text-white/30">
-                MUSCLE GROUP
-              </option>
-              @for (group of availableGroups; track group) 
-              {
-                <option [value]="group" class="text-white">
-                  {{ group }}
-                </option>
+          <div class="bg-return-button rounded-general flex-1 flex items-stretch">
+            <ion-select 
+              [(ngModel)]="selectedNewGroup" 
+              interface="popover"
+              fill="none"
+              [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+              placeholder="MUSCLE GROUP"
+              class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
+
+              @for (group of availableGroups; track group) {
+                <ion-select-option [value]="group">{{ group }}</ion-select-option>
               }
-            </select>
-            <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-4 text-lg"></ion-icon>
+            </ion-select>
           </div>
 
-          <ion-button (click)="addGroup()" class="font-lexend input-add-btn"> 
+          <ion-button (click)="addGroup()" class="font-lexend input-add-btn shrink-0"> 
             <ion-icon name="add"></ion-icon>
           </ion-button>
 
@@ -140,27 +140,28 @@
         
 
         <!-- Add Exercise -->
-          <div class="bg-exercise-card rounded-general p-2 py-2 flex gap-3 items-center shadow-sm/30">
-            <div class="bg-set-input-background rounded-general flex-1 relative flex items-center">
-              <select [(ngModel)]="selectedNewExercise" class="w-full bg-set-input-background appearance-none text-white uppercase text-sm tracking-wide outline-none px-4 py-2 font-lexend rounded-general">
-                <option value="" disabled selected hidden>
-                  EXERCISE
-                </option>
+<div class="bg-exercise-card rounded-general p-2 py-2 flex gap-3 items-center shadow-sm/30">
 
-                @for (ex of currentAvailableExercises; track ex)
-                {
-                  <option [value]="ex" class="text-white">
-                    {{ ex }}
-                  </option>
-                }
-              </select>
-              <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-4 text-lg"></ion-icon>
-            </div>
+  <div class="bg-set-input-background rounded-general flex-1 flex items-stretch">
+    <ion-select 
+      [(ngModel)]="selectedNewExercise" 
+      interface="popover"
+      fill="none"
+      [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+      placeholder="EXERCISE"
+      class="w-full bg-set-input-background text-white uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
 
-            <ion-button (click)="addExercise()" class="font-lexend input-add-btn"> 
-              <ion-icon name="add"></ion-icon>
-            </ion-button>
-          </div>
+      @for (ex of currentAvailableExercises; track ex) {
+        <ion-select-option [value]="ex">{{ ex }}</ion-select-option>
+      }
+    </ion-select>
+  </div>
+
+  <ion-button (click)="addExercise()" class="font-lexend input-add-btn shrink-0"> 
+    <ion-icon name="add"></ion-icon>
+  </ion-button>
+
+</div>
 
         <!-- Delete Group -->
           <ion-button (click)="deleteGroup()" class="workout-delete-template font-lexend">

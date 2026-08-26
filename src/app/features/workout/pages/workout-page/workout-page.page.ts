@@ -2,7 +2,7 @@ import { Component, inject, OnDestroy, ChangeDetectorRef, NgZone } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
-  IonContent, IonIcon, AlertController, IonButton 
+  IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption, IonItem, IonLabel, IonInput
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline, chevronDownOutline, add } from 'ionicons/icons';
@@ -11,7 +11,7 @@ import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'sr
 @Component({
   selector: 'app-workout',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton],
+  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonItem, IonLabel, IonInput],
   templateUrl: './workout-page.page.html',
 })
 export class WorkoutPagePage implements OnDestroy {
@@ -45,38 +45,43 @@ export class WorkoutPagePage implements OnDestroy {
     this.stopTimer();
   }
 
-  
-
   async confirmStartWorkout(event: any) {
-    const templateId = event.target.value;
-    if (!templateId) return;
+  const templateId = event?.detail?.value;
+  if (!templateId) return;
 
-    const template = this.workoutService.workouts.find(w => w.id === templateId);
-    if (!template) return;
+  const template = this.workoutService.workouts.find(w => w.id === templateId);
+  if (!template) return;
 
-    const alert = await this.alertController.create({
-      header: 'Start Workout',
-      message: `Are you sure you want to start ${template.name}?`,
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => {
+  const alert = await this.alertController.create({
+    header: 'Start Workout',
+    message: `Are you sure you want to start ${template.name}?`,
+    cssClass: 'custom-alert', // 👈 AICI ADAUGĂ CLASA
+    buttons: [
+      {
+        text: 'Cancel',
+        role: 'cancel',
+        handler: () => {
+          this.ngZone.run(() => {
             this.selectedTemplateId = ''; 
-          }
-        },
-        {
-          text: 'Start',
-          handler: () => {
+          });
+        }
+      },
+      {
+        text: 'Start',
+        handler: () => {
+          this.ngZone.run(() => {
             this.workoutService.startWorkout(template.name, template.muscleGroups);
             this.startTimer();
-          }
+            this.selectedTemplateId = '';
+            this.cdr.detectChanges();
+          });
         }
-      ]
-    });
+      }
+    ]
+  });
 
-    await alert.present();
-  }
+  await alert.present();
+}
 
   startTimer() 
   {

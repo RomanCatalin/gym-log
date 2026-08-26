@@ -11,8 +11,13 @@
 
 /* Core CSS required for Ionic components to work properly */
 
-@use "tailwindcss";
-@import url('https://googleapis.com');
+/* Înlocuiește @use "tailwindcss"; cu @import "tailwindcss"; pentru compilatorul SCSS */
+@import "tailwindcss";
+
+/* Corectează importul fontului Lexend sau elimină-l dacă este importat în index.html */
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
+
+/* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
 
 /* Basic CSS for apps built with Ionic */
@@ -20,7 +25,6 @@
 @import "@ionic/angular/css/structure.css";
 @import "@ionic/angular/css/typography.css";
 @import "@ionic/angular/css/display.css";
-
 /* Optional CSS utils that can be commented out */
 @import "@ionic/angular/css/padding.css";
 @import "@ionic/angular/css/float-elements.css";
@@ -55,17 +59,13 @@
 
 
 
-
-    //--WORKOUTS PAGE--
-
-    // main page
     --color-main-background: #252525;
     --color-workout-background: #363636;
     --color-musclegroup-card: #3F3F3F;
     --color-musclegroup-card-pressed: #636363;
 
 
-    // button states
+
     --color-musclegroup-complete: #4C8145;
     --color-workout-finish: #4C8145;
     --color-workout-finish-pressed: #64985D;
@@ -73,12 +73,12 @@
     --color-return-button: #313131;
     --color-return-button-pressed: #525252;
 
-    // muscle group
+
     --color-musclegroup-background: #3A3A3A;
     --color-exercise-card: #535353;
     --color-exercise-card-pressed: #8F8F8F;
 
-    // exercise
+
     --color-exercise-background: #535353;
     --color-set-card: #6C6C6C;
     --color-set-card-pressed: #979797;
@@ -90,7 +90,6 @@
 
 
 
-    //--WORKOUT TEMPLATES PAGE--
     --color-templates-background: #363636;
     --color-templates-card: #3F3F3F;
     --color-templates-card-pressed: #636363;
@@ -114,7 +113,6 @@ ion-router-outlet > * {
 }
 
 
-// HOTBAR CLASSES
 
 ion-tab-bar.custom-tab-bar
 {
@@ -153,17 +151,16 @@ ion-tab-button {
   }
 }
 
-// SETTINGS PAGE STYLING
 
 .settings-btn 
 {
   --background: var(--color-set-card);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 20px;      /* Vertical top */
-  --padding-bottom: 20px;   /* Vertical bottom */
-  --padding-start: 24px;    /* Horizontal left */
-  --padding-end: 24px;      /* Horizontal right */
+  --padding-top: 20px;     
+  --padding-bottom: 20px; 
+  --padding-start: 24px;   
+  --padding-end: 24px;     
 }
 
 .return-btn 
@@ -171,10 +168,10 @@ ion-tab-button {
   --background: var(--color-return-button);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 14px;      /* Vertical top */
-  --padding-bottom: 14px;   /* Vertical bottom */
-  --padding-start: 14px;    /* Horizontal left */
-  --padding-end: 14px;      /* Horizontal right */
+  --padding-top: 14px;     
+  --padding-bottom: 14px;   
+  --padding-start: 14px;   
+  --padding-end: 14px;    
 }
 
 .input-add-btn 
@@ -182,10 +179,10 @@ ion-tab-button {
   --background: var(--color-return-button);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 11px;      /* Vertical top */
-  --padding-bottom: 11px;   /* Vertical bottom */
-  --padding-start: 11px;    /* Horizontal left */
-  --padding-end: 11px;      /* Horizontal right */
+  --padding-top: 11px;      
+  --padding-bottom: 11px;   
+  --padding-start: 11px;  
+  --padding-end: 11px;    
   --box-shadow:none;
 }
 
@@ -194,10 +191,10 @@ ion-tab-button {
   --background: var(--color-musclegroup-card);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 20px;      /* Vertical top */
-  --padding-bottom: 20px;   /* Vertical bottom */
-  --padding-start: 20px;    /* Horizontal left */
-  --padding-end: 20px;      /* Horizontal right */
+  --padding-top: 20px;     
+  --padding-bottom: 20px;  
+  --padding-start: 20px;    
+  --padding-end: 20px;     
 }
 
 .exercise-card
@@ -205,10 +202,10 @@ ion-tab-button {
   --background:var(--color-exercise-card);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 20px;      /* Vertical top */
-  --padding-bottom: 20px;   /* Vertical bottom */
-  --padding-start: 20px;    /* Horizontal left */
-  --padding-end: 20px;      /* Horizontal right */
+  --padding-top: 20px;     
+  --padding-bottom: 20px;  
+  --padding-start: 20px;    
+  --padding-end: 20px;     
 }
 
 .musclegroup-card-template
@@ -216,10 +213,10 @@ ion-tab-button {
   --background: var(--color-templates-musclegroup-card);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 20px;      /* Vertical top */
-  --padding-bottom: 20px;   /* Vertical bottom */
-  --padding-start: 20px;    /* Horizontal left */
-  --padding-end: 20px;      /* Horizontal right */
+  --padding-top: 20px;     
+  --padding-bottom: 20px; 
+  --padding-start: 20px;  
+  --padding-end: 20px;     
 }
 
 .workout-delete-template
@@ -227,10 +224,10 @@ ion-tab-button {
   --background: var(--color-workout-delete);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 20px;      /* Vertical top */
-  --padding-bottom: 20px;   /* Vertical bottom */
-  --padding-start: 20px;    /* Horizontal left */
-  --padding-end: 20px;      /* Horizontal right */
+  --padding-top: 20px;    
+  --padding-bottom: 20px;   
+  --padding-start: 20px;  
+  --padding-end: 20px;     
 }
 
 .exercise-delete-template {
@@ -240,10 +237,9 @@ ion-tab-button {
   height: 100%;
 }
 
-/* Suprascrie fundalul când este aplicată clasa de completat */
 .completed-workout-btn {
-  --background: var(--color-workout-finish); /* Culoarea verde definită de tine */
-  --color: white; /* Pentru a asigura contrastul textului */
+  --background: var(--color-workout-finish); 
+  --color: white; 
 }
 
 .set-add-btn
@@ -251,10 +247,10 @@ ion-tab-button {
   --background: #5A818F;
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 15px;      /* Vertical top */
-  --padding-bottom: 15px;   /* Vertical bottom */
-  --padding-start: 20px;    /* Horizontal left */
-  --padding-end: 20px;      /* Horizontal right */
+  --padding-top: 15px;     
+  --padding-bottom: 15px; 
+  --padding-start: 20px;  
+  --padding-end: 20px;      
 }
 
 
@@ -263,14 +259,97 @@ ion-tab-button {
   --background: var(--color-workout-finish);
   --color: white;
   --border-radius: var(--radius-general);
-  --padding-top: 15px;      /* Vertical top */
-  --padding-bottom: 15px;   /* Vertical bottom */
-  --padding-start: 20px;    /* Horizontal left */
-  --padding-end: 20px;      /* Horizontal right */
+  --padding-top: 15px;     
+  --padding-bottom: 15px;  
+  --padding-start: 20px;   
+  --padding-end: 20px;     
+}
+
+ion-select {
+  --highlight-color-focused: #ffffff !important;
+  --ion-color-primary: #ffffff !important;
+  --border-color: transparent;
+  --padding-start: 0;
+  --padding-end: 0;
+  color: #ffffff !important;
+  
+  &::part(icon) {
+    color: #ffffff !important;
+    opacity: 1 !important;
+    
+  }
 }
 
 
+ion-popover.custom-template-popover {
+  --background: #313131;
+  --color: white;
+  --width: calc(100% - 2rem);
+  --max-width: 400px;
+
+  &::part(content) {
+    background: #313131;
+    color: white;
+    border-radius: 0 0 12px 12px !important; 
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    overflow: hidden; 
+  }
+
+  ion-select-popover {
+    ion-list {
+      background: transparent !important;
+    }
+
+    ion-item {
+      --background: transparent !important;
+      --color: white !important;
+      --ripple-color: rgba(255, 255, 255, 0.1);
+      font-family: inherit;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+    }
+  }
+  
+}
+
+
+.custom-alert 
+{
+  --background: #2a2a2a; 
+  --color: #ffffff;    
+  
+
+  .alert-wrapper {
+    --background: #2a2a2a !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  }
+
+  .alert-title {
+    color: #ffffff !important;
+    font-family: 'Lexend';
+    font-weight: 600;
+  }
+
+  .alert-message {
+    color:rgb(194, 194, 194) !important;
+    font-family: 'Lexend', sans-serif;
+  }
+
+  .alert-button {
+    color: #3b82f6 !important; 
+    font-family: 'Lexend', sans-serif;
+    font-weight: 500;
+    text-transform: uppercase;
+  }
+}
 
 ion-icon {
   color: white;
+}
+
+html,
+body,
+ion-app {
+  background: #242424 !important;
 }

@@ -11,25 +11,35 @@
       <div class="flex flex-col gap-2">
         <div class="text-white/70 text-sm px-1.5 uppercase tracking-widest">Show Stats For</div>
         <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
-          <select [(ngModel)]="selectedStatType" (change)="onStatTypeChange()" class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-5 py-4 font-lexend">
-            @for (type of statTypes; track type) 
-            {
-              <option [value]="type" class="text-white">{{ type }}</option>
+          <ion-select 
+            [(ngModel)]="selectedStatType" 
+            (ionChange)="onStatTypeChange()" 
+            interface="popover"
+            fill="none"
+            [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+            class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+
+            @for (type of statTypes; track type) {
+              <ion-select-option [value]="type">{{ type }}</ion-select-option>
             }
-          </select>
-          <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-5 text-lg"></ion-icon>
+          </ion-select>
         </div>
       </div>
 
       @if (selectedStatType !== 'TOTAL WEIGHT LIFTED') {
         <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
-          <select [(ngModel)]="selectedSubItem" class="w-full bg-return-button appearance-none text-white uppercase text-sm tracking-wide outline-none px-5 py-4 font-lexend">
-            <option value="" disabled selected hidden class="text-black/30">SELECT ITEM</option>
+          <ion-select 
+            [(ngModel)]="selectedSubItem" 
+            interface="popover"
+            fill="none"
+            [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+            placeholder="SELECT ITEM"
+            class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+
             @for (item of availableSubItems; track item) {
-              <option [value]="item" class="text-white">{{ item }}</option>
+              <ion-select-option [value]="item">{{ item }}</ion-select-option>
             }
-          </select>
-          <ion-icon name="chevron-down-outline" class="pointer-events-none opacity-50 absolute right-5 text-lg"></ion-icon>
+          </ion-select>
         </div>
       }
     </div>
