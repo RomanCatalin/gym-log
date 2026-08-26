@@ -14,6 +14,7 @@ export class AppComponent implements OnInit {
     if (Capacitor.getPlatform() === 'android') {
       await StatusBar.setStyle({ style: Style.Dark });
       await EdgeToEdge.setBackgroundColor({ color: '#191919' });
+      await EdgeToEdge.setNavigationBarColor({ color: '#191919' });
     }
   }
 }
