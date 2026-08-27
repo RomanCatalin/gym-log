@@ -56,7 +56,7 @@ export class WorkoutPagePage implements OnDestroy
 
   const alert = await this.alertController.create({
     header: 'Start Workout',
-    message: `Are you sure you want to start ${template.name}?`,
+    message: `Are you sure you want to start a ${template.name} workout?`,
     cssClass: 'custom-alert', 
     buttons: [
       {
