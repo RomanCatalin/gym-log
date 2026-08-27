@@ -11,11 +11,7 @@
 
 /* Core CSS required for Ionic components to work properly */
 
-/* Înlocuiește @use "tailwindcss"; cu @import "tailwindcss"; pentru compilatorul SCSS */
 @import "tailwindcss";
-
-/* Corectează importul fontului Lexend sau elimină-l dacă este importat în index.html */
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;600;700&display=swap');
 
 /* Core CSS required for Ionic components to work properly */
 @import "@ionic/angular/css/core.css";
@@ -43,28 +39,28 @@
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import '@ionic/angular/css/palettes/dark.system.css';
 
-
+@font-face {
+  font-family: 'Lexend Giga';
+  src: url('assets/fonts/LexendGiga-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
 
 @theme 
 {
-    //--HOTBAR--
+
     --color-hotbar-background:#414141;
     --color-hotbar-button:#2F2F2F;
     --color-hotbar-selected:#333333;
     --color-hotbar-button-pressed:#464646;
     --color-statusbar-background:#191919;
 
-
     --font-lexend: "Lexend Giga", sans-serif;
-
-
 
     --color-main-background: #252525;
     --color-workout-background: #363636;
     --color-musclegroup-card: #3F3F3F;
     --color-musclegroup-card-pressed: #636363;
-
-
 
     --color-musclegroup-complete: #4C8145;
     --color-workout-finish: #4C8145;
@@ -73,11 +69,9 @@
     --color-return-button: #313131;
     --color-return-button-pressed: #525252;
 
-
     --color-musclegroup-background: #3A3A3A;
     --color-exercise-card: #535353;
     --color-exercise-card-pressed: #8F8F8F;
-
 
     --color-exercise-background: #535353;
     --color-set-card: #6C6C6C;
@@ -88,14 +82,10 @@
 
     --radius-general: 10px;
 
-
-
     --color-templates-background: #363636;
     --color-templates-card: #3F3F3F;
     --color-templates-card-pressed: #636363;
     --color-templates-musclegroup-card: #434343;
-
-
 
 }
 
@@ -327,18 +317,18 @@ ion-popover.custom-template-popover {
 
   .alert-title {
     color: #ffffff !important;
-    font-family: 'Lexend';
-    font-weight: 600;
+    font-family: 'Lexend Giga';
+    font-weight: 500;
   }
 
   .alert-message {
     color:rgb(194, 194, 194) !important;
-    font-family: 'Lexend', sans-serif;
+    font-family: 'Lexend Giga', sans-serif;
   }
 
   .alert-button {
     color: #3b82f6 !important; 
-    font-family: 'Lexend', sans-serif;
+    font-family: 'Lexend Giga', sans-serif;
     font-weight: 500;
     text-transform: uppercase;
   }
@@ -351,5 +341,12 @@ ion-icon {
 html,
 body,
 ion-app {
-  background: #242424 !important;
+  background: #191919 !important;
+  font-family: "Lexend Giga", sans-serif !important;
 }
+
+:root {
+  --ion-font-family: "Lexend Giga", sans-serif;
+}
+
+

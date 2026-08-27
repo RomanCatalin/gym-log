@@ -51,7 +51,7 @@ export class WorkoutService {
         );
       `;
       
-      console.log('⏳ [DB] Se execută schema tabelelor...');
+      console.log('[DB] Se execută schema tabelelor...');
       await this.db.execute(schema);
       
       this.isDbReady = true;
@@ -88,7 +88,7 @@ export class WorkoutService {
       return;
     }
     try {
-      console.log('⏳ [DB] Se încarcă template-urile...');
+      console.log('[DB] Se încarcă template-urile...');
       const res = await this.db.query('SELECT data FROM templates');
       if (res.values && res.values.length > 0) {
         this.workouts = res.values.map(row => JSON.parse(row.data));

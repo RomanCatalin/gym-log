@@ -1,9 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  IonContent, IonList, IonItem, IonLabel, IonInput, 
-  IonButton, IonSelect, IonSelectOption, IonIcon 
+import { IonContent, IonButton, IonSelect, IonSelectOption, IonIcon 
 } from '@ionic/angular/standalone';
 import { WorkoutService, Workout, MuscleGroup } from 'src/app/services/workout-service';
 import { addIcons } from 'ionicons';
@@ -13,7 +11,7 @@ import { Router } from '@angular/router';
 @Component({
   selector: 'app-workout-templates-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonList, IonItem, IonLabel, IonInput, IonButton, IonSelect, IonSelectOption, IonIcon],
+  imports: [CommonModule, FormsModule, IonContent, IonButton, IonSelect, IonSelectOption, IonIcon],
   templateUrl: './workout-templates-page.page.html',
 })
 export class WorkoutTemplatesPagePage {

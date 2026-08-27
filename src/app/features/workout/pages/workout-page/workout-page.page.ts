@@ -1,9 +1,7 @@
 import { Component, inject, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { 
-  IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption, IonItem, IonLabel, IonInput
-} from '@ionic/angular/standalone';
+import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline, chevronDownOutline, add } from 'ionicons/icons';
 import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
@@ -11,15 +9,16 @@ import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'sr
 @Component({
   selector: 'app-workout',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonItem, IonLabel, IonInput],
+  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption],
   templateUrl: './workout-page.page.html',
 })
-export class WorkoutPagePage implements OnDestroy {
+export class WorkoutPagePage implements OnDestroy 
+{
   workoutService = inject(WorkoutService);
   private alertController = inject(AlertController);
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
-  recentWorkoutsLimit = 3;
+  readonly recentWorkoutsLimit = 6;
 
 
   viewState: 1 | 2 | 3 = 1;
@@ -37,15 +36,18 @@ export class WorkoutPagePage implements OnDestroy {
   timerDisplay = '00:00';
   selectedTemplateId = '';
 
+
   constructor() {
     addIcons({ returnUpBackOutline, chevronDownOutline, add });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy() 
+  {
     this.stopTimer();
   }
 
-  async confirmStartWorkout(event: any) {
+  async confirmStartWorkout(event: any) 
+  {
   const templateId = event?.detail?.value;
   if (!templateId) return;
 
@@ -55,7 +57,7 @@ export class WorkoutPagePage implements OnDestroy {
   const alert = await this.alertController.create({
     header: 'Start Workout',
     message: `Are you sure you want to start ${template.name}?`,
-    cssClass: 'custom-alert', // 👈 AICI ADAUGĂ CLASA
+    cssClass: 'custom-alert', 
     buttons: [
       {
         text: 'Cancel',
@@ -182,7 +184,6 @@ export class WorkoutPagePage implements OnDestroy {
       {
         this.activeMuscleGroup.isCompleted = true;
       }
-
       this.goBack(); 
     }
   }
@@ -201,6 +202,7 @@ export class WorkoutPagePage implements OnDestroy {
     const alert = await this.alertController.create({
       header: 'End Workout',
       message: message,
+      cssClass: 'custom-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
         {
@@ -281,13 +283,14 @@ export class WorkoutPagePage implements OnDestroy {
     }
   }
 
-  get recentWorkouts() {
+  get recentWorkouts() 
+  {
     const history = this.workoutService.workoutHistory;
     if (!history || history.length === 0) return [];
 
     const sortedHistory = [...history].sort((a, b) => b.startTime - a.startTime);
     return sortedHistory.slice(0, this.recentWorkoutsLimit).map(workout => {
-      
+  
       const totalSeconds = workout.durationSeconds || 0;
       const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
       const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
@@ -303,4 +306,6 @@ export class WorkoutPagePage implements OnDestroy {
       };
     });
   }
+
+
 }

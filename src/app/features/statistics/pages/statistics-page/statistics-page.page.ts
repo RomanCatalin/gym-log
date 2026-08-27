@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonIcon, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonContent, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronDownOutline } from 'ionicons/icons';
 import { WorkoutService, ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise } from 'src/app/services/workout-service';
@@ -11,7 +11,7 @@ import { WorkoutService, ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise } fr
   templateUrl: './statistics-page.page.html',
   styleUrls: ['./statistics-page.page.scss'],
   standalone: true,
-  imports: [IonContent, IonIcon, IonSelect, IonSelectOption, CommonModule, FormsModule]
+  imports: [IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule]
 })
 export class StatisticsPagePage {
   workoutService = inject(WorkoutService);

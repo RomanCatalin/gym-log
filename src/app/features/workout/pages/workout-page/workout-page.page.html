@@ -29,18 +29,6 @@
                 Recent Workouts
               </div>
               <div class="rounded-general relative w-9 h-9 flex justify-center items-center active:opacity-70 transition-opacity">
-                <ion-icon name="chevron-down-outline" class="text-white text-lg pointer-events-none"></ion-icon>
-                  <ion-select 
-                      [(ngModel)]="recentWorkoutsLimit" 
-                      interface="popover"
-                      fill="none"
-                      [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-                      class="w-36 bg-workout-background text-white uppercase text-sm  outline-none px-2 py-2 font-lexend rounded-general mr-6">
-
-                      <ion-select-option [value]="1">Last 1</ion-select-option>
-                      <ion-select-option [value]="3">Last 3</ion-select-option>
-                      <ion-select-option [value]="5">Last 5</ion-select-option>
-                    </ion-select>
               </div>
             </div>
 
@@ -165,7 +153,7 @@
       {
       <div class="flex flex-col gap-4 bg-templates-musclegroup-card rounded-general p-2 px-3 pb-6 font-lexend shadow-sm/30">
         <div class="flex justify-between items-center px-1 pb-2 pt-1">
-          <div class="text-[20px] text-white font-lexend uppercase">
+          <div class="text-[22px] text-gray-200 font-lexend uppercase">
             {{ activeMuscleGroup.name }}
           </div>
           <ion-button (click)="goBack()" class="return-btn">
@@ -175,7 +163,7 @@
 
         <div class="bg-exercise-card rounded-general p-4 flex flex-col gap-3 shadow-sm/30 relative">
           
-          <div class="text-[16px] text-white font-lexend uppercase text-center tracking-widest pb-2">
+          <div class="text-[18px] text-white font-lexend uppercase text-center tracking-widest pb-0.5">
             {{ activeExercise.name }}
           </div>
           @for (set of activeExercise.sets; track $index) {
