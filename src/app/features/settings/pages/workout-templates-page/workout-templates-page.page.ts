@@ -84,50 +84,50 @@ goBack() {
     this.viewState = 3;
   }
 
-  addWorkout() {
+  async addWorkout() {
     if (this.newWorkoutName.trim()) {
       this.workoutService.workouts.push({ id: Date.now().toString(), name: this.newWorkoutName.toUpperCase(), muscleGroups: [] });
-      this.workoutService.saveTemplates();
+      await this.workoutService.saveTemplates();
       this.newWorkoutName = '';
     }
   }
 
-  addGroup() {
+  async addGroup() {
     if (this.selectedWorkout && this.selectedNewGroup) {
       this.selectedWorkout.muscleGroups.push({ id: Date.now().toString(), name: this.selectedNewGroup, exercises: [] });
-      this.workoutService.saveTemplates();
+      await this.workoutService.saveTemplates();
       this.selectedNewGroup = '';
     }
   }
 
-  addExercise() {
+  async addExercise() {
     if (this.selectedMuscleGroup && this.selectedNewExercise) {
       this.selectedMuscleGroup.exercises.push({ id: Date.now().toString(), name: this.selectedNewExercise });
-      this.workoutService.saveTemplates();
+      await this.workoutService.saveTemplates();
       this.selectedNewExercise = '';
     }
   }
 
-  deleteWorkout() {
+  async deleteWorkout() {
     if (this.selectedWorkout) {
       this.workoutService.workouts = this.workoutService.workouts.filter(w => w.id !== this.selectedWorkout?.id);
-      this.workoutService.saveTemplates();
+      await this.workoutService.saveTemplates();
       this.goBack();
     }
   }
 
-  deleteGroup() {
+  async deleteGroup() {
     if (this.selectedWorkout && this.selectedMuscleGroup) {
       this.selectedWorkout.muscleGroups = this.selectedWorkout.muscleGroups.filter(g => g.id !== this.selectedMuscleGroup?.id);
-      this.workoutService.saveTemplates();
+      await this.workoutService.saveTemplates();
       this.goBack();
     }
   }
 
-  deleteExercise(exerciseId: string) {
+  async deleteExercise(exerciseId: string) {
     if (this.selectedMuscleGroup) {
       this.selectedMuscleGroup.exercises = this.selectedMuscleGroup.exercises.filter(e => e.id !== exerciseId);
-      this.workoutService.saveTemplates();
+      await this.workoutService.saveTemplates();
     }
   }
 }

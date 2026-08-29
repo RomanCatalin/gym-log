@@ -83,7 +83,7 @@ export class WorkoutPagePage implements OnDestroy
   });
 
   await alert.present();
-}
+  }
 
   startTimer() 
   {
@@ -102,17 +102,22 @@ export class WorkoutPagePage implements OnDestroy
     }, 1000);
   }
 
-  stopTimer() {
+  stopTimer() 
+  {
     if (this.timerInterval) {
       clearInterval(this.timerInterval);
     }
   }
 
-  goBack() {
-    if (this.viewState === 3) {
+  goBack() 
+  {
+    if (this.viewState === 3) 
+    {
       this.viewState = 2;
       this.activeExercise = null;
-    } else if (this.viewState === 2) {
+    } 
+    else if (this.viewState === 2) 
+    {
       this.viewState = 1;
       this.activeMuscleGroup = null;
     }
@@ -127,8 +132,11 @@ export class WorkoutPagePage implements OnDestroy
   goToExercise(exercise: WorkoutExercise) 
   {
     this.activeExercise = exercise;
-    this.viewState = 3;
   }
+
+  collapseExercise() {
+  this.activeExercise = null;
+}
 
 
   addGroup() 
@@ -184,7 +192,7 @@ export class WorkoutPagePage implements OnDestroy
       {
         this.activeMuscleGroup.isCompleted = true;
       }
-      this.goBack(); 
+      this.collapseExercise();
     }
   }
 
@@ -208,14 +216,17 @@ export class WorkoutPagePage implements OnDestroy
         {
           text: 'Confirm',
           handler: () => {
-            this.workoutService.endWorkout();
+          this.ngZone.run(async () => {
+            await this.workoutService.endWorkout();
             this.stopTimer();
             this.timerDisplay = '00:00';
             this.selectedTemplateId = '';
             this.viewState = 1;
             this.activeMuscleGroup = null;
             this.activeExercise = null;
-          }
+            this.cdr.detectChanges();
+          });
+        }
         }
       ]
     });

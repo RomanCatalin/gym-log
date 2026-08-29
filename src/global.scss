@@ -246,7 +246,7 @@ ion-tab-button {
 
 .set-complete-btn
 {
-  --background: var(--color-workout-finish);
+  --background: #607d60;
   --color: white;
   --border-radius: var(--radius-general);
   --padding-top: 15px;     
@@ -267,6 +267,16 @@ ion-select {
     color: #ffffff !important;
     opacity: 1 !important;
     
+  }
+
+  &::part(text) {
+    white-space: normal !important;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    min-width: 0;
+    line-height: 1.25;
   }
 }
 

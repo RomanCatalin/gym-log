@@ -24,19 +24,18 @@ export class WorkoutService {
   private sqlite: SQLiteConnection;
   private db!: SQLiteDBConnection;
   public isDbReady = false;
+  private dbReady: Promise<void>;
 
-  constructor() {
-    console.log('🚀 [WorkoutService] Constructor apelat');
+  constructor() 
+  {
     this.sqlite = new SQLiteConnection(CapacitorSQLite);
-    this.initDatabase();
+    this.dbReady=this.initDatabase();
   }
 
   async initDatabase() {
-    try {
-      console.log('[DB] Se încearcă crearea conexiunii SQLite...');
+    try
+     {
       this.db = await this.sqlite.createConnection('fitness_db', false, 'no-encryption', 1, false);
-      
-      console.log('[DB] Se deschide baza de date...');
       await this.db.open();
 
       const schema = `
@@ -50,24 +49,26 @@ export class WorkoutService {
           data TEXT NOT NULL
         );
       `;
-      
-      console.log('[DB] Se execută schema tabelelor...');
       await this.db.execute(schema);
       
+      
       this.isDbReady = true;
-      console.log('[DB] Baza de date este pregătită (isDbReady = true)');
-
       await this.loadTemplates();
       await this.loadHistory();
       
-    } catch (error) {
-      console.error('[DB] Eroare critică la inițializarea bazei de date SQLite:', error);
+    } 
+    catch (error) 
+    {
+      console.error('Eroare la inițializarea bazei de date SQLite:', error);
     }
   }
 
-  async saveTemplates() {
-    if (!this.isDbReady) {
-      console.warn('[DB] saveTemplates sărit: baza de date nu este gata.');
+  async saveTemplates() 
+  {
+    await this.dbReady;
+    if (!this.isDbReady) 
+    {
+      console.warn('saveTemplates sărit: baza de date nu este gata.');
       return;
     }
     try {
@@ -76,51 +77,53 @@ export class WorkoutService {
         const dataStr = JSON.stringify(workout);
         await this.db.query('INSERT INTO templates (id, data) VALUES (?, ?)', [workout.id, dataStr]);
       }
-      console.log('[DB] Template-urile au fost salvate cu succes.');
+      console.log('Template-urile au fost salvate cu succes.');
     } catch (error) {
-      console.error('[DB] Eroare la salvarea template-urilor:', error);
+      console.error('Eroare la salvarea template-urilor:', error);
     }
   }
 
   async loadTemplates() {
     if (!this.isDbReady) {
-      console.warn('⚠️ [DB] loadTemplates sărit: baza de date nu este gata.');
+      console.warn('loadTemplates sărit: baza de date nu este gata.');
       return;
     }
-    try {
-      console.log('[DB] Se încarcă template-urile...');
+    try 
+    {
       const res = await this.db.query('SELECT data FROM templates');
       if (res.values && res.values.length > 0) {
         this.workouts = res.values.map(row => JSON.parse(row.data));
-        console.log(`[DB] S-au încărcat ${this.workouts.length} template-uri.`);
+        console.log(`S-au încărcat ${this.workouts.length} template-uri.`);
       } else {
-        console.log('[DB] Nu există template-uri salvate.');
+        console.log(' Nu există template-uri salvate.');
       }
     } catch (error) {
-      console.error('[DB] Eroare la încărcarea template-urilor:', error);
+      console.error('Eroare la încărcarea template-urilor:', error);
     }
   }
 
   async loadHistory() {
     if (!this.isDbReady) {
-      console.warn('[DB] loadHistory sărit: baza de date nu este gata.');
+      console.warn('loadHistory sărit: baza de date nu este gata.');
       return;
     }
     try {
-      console.log('[DB] Se încarcă istoricul antrenamentelor...');
+      console.log('Se încarcă istoricul antrenamentelor...');
       const res = await this.db.query('SELECT data FROM history ORDER BY startTime ASC');
       if (res.values && res.values.length > 0) {
         this.workoutHistory = res.values.map(row => JSON.parse(row.data));
-        console.log(`[DB] S-au încărcat ${this.workoutHistory.length} intrări în istoric.`);
+        console.log(`S-au încărcat ${this.workoutHistory.length} intrări în istoric.`);
       } else {
-        console.log('[DB] Istoricul de antrenamente este gol.');
+        console.log('Istoricul de antrenamente este gol.');
       }
     } catch (error) {
-      console.error('[DB] Eroare la încărcarea istoricului:', error);
+      console.error('Eroare la încărcarea istoricului:', error);
     }
   }
 
-  async addWorkoutToHistoryDB(workout: ActiveWorkout) {
+  async addWorkoutToHistoryDB(workout: ActiveWorkout) 
+  {
+    await this.dbReady;
     if (!this.isDbReady) return;
     try {
       const dataStr = JSON.stringify(workout);
@@ -128,9 +131,9 @@ export class WorkoutService {
         'INSERT INTO history (id, startTime, data) VALUES (?, ?, ?)',
         [workout.id, workout.startTime, dataStr]
       );
-      console.log('[DB] Antrenament nou adăugat în istoric cu succes.');
+      console.log('Antrenament nou adăugat în istoric cu succes.');
     } catch (error) {
-      console.error('[DB] Eroare la salvarea antrenamentului nou în SQLite:', error);
+      console.error('Eroare la salvarea antrenamentului nou în SQLite:', error);
     }
   }
 
@@ -159,7 +162,7 @@ export class WorkoutService {
         muscleGroups: clonedGroups
       };
       
-      console.log('🏋️‍♂️ [Workout] Antrenament pornit cu succes:', templateName);
+      console.log('Workout pornit cu succes:', templateName);
     }
 
   endWorkout() {
@@ -169,7 +172,7 @@ export class WorkoutService {
     
       this.workoutHistory.push(this.currentActiveWorkout);
       this.addWorkoutToHistoryDB(this.currentActiveWorkout);
-      console.log('🏁 [Workout] Antrenament încheiat și salvat.');
+      console.log('Workout încheiat și salvat.');
       this.currentActiveWorkout = null;
     }
   }
