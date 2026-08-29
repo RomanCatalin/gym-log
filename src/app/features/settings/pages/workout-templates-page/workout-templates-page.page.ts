@@ -1,12 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonButton, IonSelect, IonSelectOption, IonIcon 
-} from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonSelect, IonSelectOption, IonIcon } from '@ionic/angular/standalone';
 import { WorkoutService, Workout, MuscleGroup } from 'src/app/services/workout-service';
 import { addIcons } from 'ionicons';
 import { arrowRedoOutline, pencilOutline, chevronDownOutline, closeOutline, returnUpBackOutline, add } from 'ionicons/icons';
 import { Router } from '@angular/router';
+import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
+
 
 @Component({
   selector: 'app-workout-templates-page',
@@ -35,25 +36,27 @@ export class WorkoutTemplatesPagePage {
   selectedNewGroup = '';
   selectedNewExercise = '';
 
-  availableGroups = ['CARDIO', 'CHEST', 'TRICEPS', 'SHOULDERS', 'BACK', 'LEGS', 'BICEPS'];
-
-  exercisesByGroup: Record<string, string[]> = 
+  exercisesByGroup: Record<string, string[]> = EXERCISES_BY_GROUP;
+ 
+  get availableGroups(): string[] 
   {
-    'CARDIO': ['TREADMILL', 'CYCLING', 'STAIRMASTER', 'ROWING'],
-    'CHEST': ['BENCH PRESS', 'INCLINE PRESS', 'PEC DECK', 'DIPS', 'CABLE CROSSOVER', 'PUSH UPS'],
-    'TRICEPS': ['PUSH DOWNS', 'TRICEP EXTENSIONS', 'SKULLCRUSHERS', 'DIPS', 'CLOSE GRIP BENCH PRESS', 'OVERHEAD TRICEP EXTENSIONS'],
-    'SHOULDERS': ['SHOULDER PRESS', 'DUMBBELL LATERAL RAISES', 'CABLE LATERAL RAISES', 'DUMBBELL FRONT RAISES'],
-    'BACK': ['PULL UPS', 'BARBELL ROW', 'LAT PULLDOWN', 'DEADLIFT', 'SEATED ROW', 'FACE PULLS', 'T-BAR ROW', 'DUMBBELL ROW'],
-    'LEGS': ['SQUATS', 'LEG PRESS', 'LUNGES', 'CALF RAISE'],
-    'BICEPS': ['BARBELL CURLS', 'HAMMER CURLS', 'PREACHER CURLS','BAYESIAN CURLS', 'DUMBBELL CURLS']
-  };
-
-  get currentAvailableExercises(): string[] {
-    if (!this.selectedMuscleGroup) return [];
-    return this.exercisesByGroup[this.selectedMuscleGroup.name] || [];
+    if (!this.selectedWorkout?.muscleGroups) return ALL_MUSCLE_GROUPS;
+    const existingNames = this.selectedWorkout.muscleGroups.map(mg => mg.name.toUpperCase());
+    return ALL_MUSCLE_GROUPS.filter(group => !existingNames.includes(group.toUpperCase()));
   }
 
-goBack() {
+
+  get currentAvailableExercises(): string[] 
+  {
+    if (!this.selectedMuscleGroup) return [];
+    const groupName = this.selectedMuscleGroup.name.toUpperCase();
+    const allExercises = this.exercisesByGroup[groupName] || [];
+
+    const existingNames = this.selectedMuscleGroup.exercises.map(ex => ex.name);
+    return allExercises.filter(ex => !existingNames.includes(ex));
+  }
+
+  goBack() {
     if (this.viewState === 3) {
       this.viewState = 2;
       this.selectedMuscleGroup = null;

@@ -5,6 +5,7 @@ import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOp
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline, chevronDownOutline, add } from 'ionicons/icons';
 import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
+import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
 
 @Component({
   selector: 'app-workout',
@@ -234,19 +235,10 @@ export class WorkoutPagePage implements OnDestroy
     await alert.present();
   }
   
-  availableGroups = ['CARDIO', 'CHEST', 'TRICEPS', 'SHOULDERS', 'BACK', 'LEGS', 'BICEPS'];
+  availableGroups = ALL_MUSCLE_GROUPS;
 
-  exercisesByGroup: Record<string, string[]> = 
-  {
-    'CARDIO': ['TREADMILL', 'CYCLING', 'STAIRMASTER', 'ROWING'],
-    'CHEST': ['BENCH PRESS', 'INCLINE PRESS', 'PEC DECK', 'DIPS', 'CABLE CROSSOVER', 'PUSH UPS'],
-    'TRICEPS': ['PUSH DOWNS', 'TRICEP EXTENSIONS', 'SKULLCRUSHERS', 'DIPS', 'CLOSE GRIP BENCH PRESS', 'OVERHEAD TRICEP EXTENSIONS'],
-    'SHOULDERS': ['SHOULDER PRESS', 'DUMBBELL LATERAL RAISES', 'CABLE LATERAL RAISES', 'DUMBBELL FRONT RAISES'],
-    'BACK': ['PULL UPS', 'BARBELL ROW', 'LAT PULLDOWN', 'DEADLIFT', 'SEATED ROW', 'FACE PULLS', 'T-BAR ROW', 'DUMBBELL ROW'],
-    'LEGS': ['SQUATS', 'LEG PRESS', 'LUNGES', 'CALF RAISE'],
-    'BICEPS': ['BARBELL CURLS', 'HAMMER CURLS', 'PREACHER CURLS', 'BAYESIAN CURLS', 'DUMBBELL CURLS']
-  }
-
+  exercisesByGroup: Record<string, string[]> = EXERCISES_BY_GROUP;
+ 
   get availableGroupsForDropdown(): string[] 
   {
     if (!this.workoutService.currentActiveWorkout) return this.availableGroups;
@@ -254,11 +246,13 @@ export class WorkoutPagePage implements OnDestroy
     return this.availableGroups.filter(group => !existingGroupNames.includes(group));
   }
 
-  get availableExercisesForDropdown(): string[] {
+  get availableExercisesForDropdown(): string[] 
+  {
     if (!this.workoutService.currentActiveWorkout || !this.activeMuscleGroup) return [];
     const existingExerciseNames = this.activeMuscleGroup.exercises.map(ex => ex.name.toUpperCase());
-    const allExercisesForGroup = this.exercisesByGroup[this.activeMuscleGroup.name.toUpperCase()] || [];
-    return allExercisesForGroup.filter(ex => !existingExerciseNames.includes(ex));
+    const groupName = this.activeMuscleGroup.name.toUpperCase().trim();
+    const allExercisesForGroup = this.exercisesByGroup[groupName] || [];
+    return allExercisesForGroup.filter(ex => !existingExerciseNames.includes(ex.toUpperCase().trim()));
   }
 
   restrictInput(event: any, field: 'newReps' | 'newWeight') 
