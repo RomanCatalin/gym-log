@@ -17,16 +17,13 @@ export const routes: Routes = [
       },
       {
         path: 'settings',
-        children: [
-          {
-            path: '',
-            loadComponent: () => import('../settings/pages/settings-page/settings-page.page').then(m => m.SettingsPagePage),
-          },
-          {
-            path: 'workout-templates',
-            loadComponent: () => import('../settings/pages/workout-templates-page/workout-templates-page.page').then(m => m.WorkoutTemplatesPagePage),
-          }
-        ]
+        loadComponent: () =>
+          import('../settings/pages/settings-page/settings-page.page').then(m => m.SettingsPagePage),
+      },
+      {
+        path: 'workout-templates',
+        loadComponent: () =>
+          import('../settings/pages/workout-templates-page/workout-templates-page.page').then(m => m.WorkoutTemplatesPagePage),
       },
       {
         path: '',
