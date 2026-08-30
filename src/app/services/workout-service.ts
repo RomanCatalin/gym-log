@@ -24,7 +24,8 @@ export class WorkoutService {
   private sqlite: SQLiteConnection;
   private db!: SQLiteDBConnection;
   public isDbReady = false;
-  private dbReady: Promise<void>;
+  public dbReady: Promise<void>;
+  pendingActiveWorkout: ActiveWorkout | null = null;
 
   constructor() 
   {
@@ -48,6 +49,10 @@ export class WorkoutService {
           startTime INTEGER NOT NULL,
           data TEXT NOT NULL
         );
+         CREATE TABLE IF NOT EXISTS active_workout (
+          id TEXT PRIMARY KEY,
+          data TEXT NOT NULL
+        );
       `;
       await this.db.execute(schema);
       
@@ -55,6 +60,7 @@ export class WorkoutService {
       this.isDbReady = true;
       await this.loadTemplates();
       await this.loadHistory();
+      await this.loadActiveWorkout();
       
     } 
     catch (error) 
@@ -161,19 +167,76 @@ export class WorkoutService {
         startTime: Date.now(),
         muscleGroups: clonedGroups
       };
+
+      this.saveActiveWorkout();
       
       console.log('Workout pornit cu succes:', templateName);
     }
 
-  endWorkout() {
+  async endWorkout() 
+  {
     if (this.currentActiveWorkout) {
       this.currentActiveWorkout.endTime = Date.now();
       this.currentActiveWorkout.durationSeconds = Math.floor((this.currentActiveWorkout.endTime - this.currentActiveWorkout.startTime) / 1000);
     
       this.workoutHistory.push(this.currentActiveWorkout);
-      this.addWorkoutToHistoryDB(this.currentActiveWorkout);
+      await this.addWorkoutToHistoryDB(this.currentActiveWorkout);
+      await this.clearActiveWorkout();
       console.log('Workout încheiat și salvat.');
       this.currentActiveWorkout = null;
     }
   }
+
+  async saveActiveWorkout() 
+  {
+  await this.dbReady;
+  if (!this.isDbReady || !this.currentActiveWorkout) return;
+  try {
+    await this.db.execute('DELETE FROM active_workout');
+    await this.db.query(
+      'INSERT INTO active_workout (id, data) VALUES (?, ?)',
+      ['current', JSON.stringify(this.currentActiveWorkout)]
+    );
+  } catch (error) {
+    console.error('Eroare la salvarea antrenamentului activ:', error);
+  }
+}
+
+async loadActiveWorkout() 
+{
+  if (!this.isDbReady) return;
+  try {
+    const res = await this.db.query('SELECT data FROM active_workout WHERE id = ?', ['current']);
+    if (res.values && res.values.length > 0) {
+      this.pendingActiveWorkout = JSON.parse(res.values[0].data);
+    }
+  } catch (error) {
+    console.error('Eroare la încărcarea antrenamentului activ:', error);
+  }
+}
+
+async clearActiveWorkout() 
+{
+  await this.dbReady;
+  if (!this.isDbReady) return;
+  try {
+    await this.db.execute('DELETE FROM active_workout');
+  } catch (error) {
+    console.error('Eroare la ștergerea antrenamentului activ:', error);
+  }
+}
+
+resumeActiveWorkout() 
+{
+  if (this.pendingActiveWorkout) {
+    this.currentActiveWorkout = this.pendingActiveWorkout;
+    this.pendingActiveWorkout = null;
+  }
+}
+
+async discardActiveWorkout() 
+{
+  this.pendingActiveWorkout = null;
+  await this.clearActiveWorkout();
+}
 }

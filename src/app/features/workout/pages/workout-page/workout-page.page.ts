@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, inject, OnDestroy, ChangeDetectorRef, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
@@ -13,7 +13,7 @@ import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/
   imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption],
   templateUrl: './workout-page.page.html',
 })
-export class WorkoutPagePage implements OnDestroy 
+export class WorkoutPagePage implements OnInit, OnDestroy 
 {
   workoutService = inject(WorkoutService);
   private alertController = inject(AlertController);
@@ -38,8 +38,18 @@ export class WorkoutPagePage implements OnDestroy
   selectedTemplateId = '';
 
 
-  constructor() {
+  constructor() 
+  {
     addIcons({ returnUpBackOutline, chevronDownOutline, add });
+  }
+
+  async ngOnInit() 
+  {
+    await this.workoutService.dbReady;
+    if (this.workoutService.pendingActiveWorkout && !this.workoutService.currentActiveWorkout) 
+    {
+      await this.promptResumeWorkout();
+    }
   }
 
   ngOnDestroy() 
@@ -140,7 +150,7 @@ export class WorkoutPagePage implements OnDestroy
 }
 
 
-  addGroup() 
+  async addGroup() 
   {
     if (this.newGroupName.trim() && this.workoutService.currentActiveWorkout) 
     {
@@ -152,10 +162,11 @@ export class WorkoutPagePage implements OnDestroy
         exercises: []
       });
       this.newGroupName = '';
+      await this.workoutService.saveActiveWorkout();
     }
   }
 
-  addExercise() 
+  async addExercise() 
   {
     if (this.newExerciseName.trim() && this.activeMuscleGroup) 
     {
@@ -167,10 +178,11 @@ export class WorkoutPagePage implements OnDestroy
         sets: []
       });
       this.newExerciseName = '';
+      await this.workoutService.saveActiveWorkout();
     }
   }
 
-  addSet() 
+  async addSet() 
   {
     if (this.newReps && this.newWeight && this.activeExercise) 
     {
@@ -180,10 +192,11 @@ export class WorkoutPagePage implements OnDestroy
       });
       this.newReps = null;
       this.newWeight = null;
+      await this.workoutService.saveActiveWorkout();
     }
   }
 
-  completeExercise() 
+  async completeExercise() 
   {
     if (this.activeExercise && this.activeMuscleGroup) {
       this.activeExercise.isCompleted = true;
@@ -194,6 +207,7 @@ export class WorkoutPagePage implements OnDestroy
         this.activeMuscleGroup.isCompleted = true;
       }
       this.collapseExercise();
+      await this.workoutService.saveActiveWorkout();
     }
   }
 
@@ -311,6 +325,44 @@ export class WorkoutPagePage implements OnDestroy
       };
     });
   }
+
+  async promptResumeWorkout() {
+  const pending = this.workoutService.pendingActiveWorkout;
+  if (!pending) return;
+
+  const alert = await this.alertController.create({
+    header: 'Resume Workout?',
+    message: `You have an unfinished "${pending.name}" workout. Continue where you left off?`,
+    cssClass: 'custom-alert',
+    backdropDismiss: false,
+    buttons: [
+      {
+        text: 'Discard',
+        role: 'cancel',
+        handler: () => {
+          this.ngZone.run(async () => {
+            await this.workoutService.discardActiveWorkout();
+          });
+        }
+      },
+      {
+        text: 'Continue',
+        handler: () => {
+          this.ngZone.run(() => {
+            this.workoutService.resumeActiveWorkout();
+            this.viewState = 1;
+            this.activeMuscleGroup = null;
+            this.activeExercise = null;
+            this.startTimer();
+            this.cdr.detectChanges();
+          });
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
 
 
 }
