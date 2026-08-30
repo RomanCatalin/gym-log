@@ -11,9 +11,9 @@ import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/
   selector: 'app-workout',
   standalone: true,
   imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption],
-  templateUrl: './workout-page.page.html',
+  templateUrl: './workout.page.html',
 })
-export class WorkoutPagePage implements OnInit, OnDestroy 
+export class WorkoutPage implements OnInit, OnDestroy 
 {
   workoutService = inject(WorkoutService);
   private alertController = inject(AlertController);
@@ -332,7 +332,7 @@ export class WorkoutPagePage implements OnInit, OnDestroy
 
   const alert = await this.alertController.create({
     header: 'Resume Workout?',
-    message: `You have an unfinished "${pending.name}" workout. Continue where you left off?`,
+    message: `You have an unfinished ${pending.name} workout. Continue where you left off?`,
     cssClass: 'custom-alert',
     backdropDismiss: false,
     buttons: [

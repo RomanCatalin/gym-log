@@ -10,12 +10,12 @@ import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/
 
 
 @Component({
-  selector: 'app-workout-templates-page',
+  selector: 'app-workout-templates',
   standalone: true,
   imports: [CommonModule, FormsModule, IonContent, IonButton, IonSelect, IonSelectOption, IonIcon],
-  templateUrl: './workout-templates-page.page.html',
+  templateUrl: './workout-templates.page.html',
 })
-export class WorkoutTemplatesPagePage {
+export class WorkoutTemplatesPage {
   workoutService = inject(WorkoutService);
   private router = inject(Router);
   constructor() {

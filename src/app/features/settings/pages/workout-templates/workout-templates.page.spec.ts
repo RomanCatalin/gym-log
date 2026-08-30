@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { WorkoutTemplatesPagePage } from './workout-templates-page.page';
+import { WorkoutTemplatesPagePage } from './workout-templates.page';
 
 describe('WorkoutTemplatesPagePage', () => {
   let component: WorkoutTemplatesPagePage;

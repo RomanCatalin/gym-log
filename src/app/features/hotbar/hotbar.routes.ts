@@ -8,7 +8,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'workout',
-        loadComponent: () => import('../workout/pages/workout-page/workout-page.page').then(m => m.WorkoutPagePage),
+        loadComponent: () => import('../workout/pages/workout/workout.page').then(m => m.WorkoutPage),
       },
       {
         path: 'statistics',
@@ -18,12 +18,17 @@ export const routes: Routes = [
       {
         path: 'settings',
         loadComponent: () =>
-          import('../settings/pages/settings-page/settings-page.page').then(m => m.SettingsPagePage),
+          import('../settings/pages/settings/settings.page').then(m => m.SettingsPage),
       },
       {
         path: 'workout-templates',
         loadComponent: () =>
-          import('../settings/pages/workout-templates-page/workout-templates-page.page').then(m => m.WorkoutTemplatesPagePage),
+          import('../settings/pages/workout-templates/workout-templates.page').then(m => m.WorkoutTemplatesPage),
+      },
+      {
+        path: 'preferences',
+        loadComponent: () =>
+          import('../settings/pages/preferences/preferences.page').then(m => m.PreferencesPage),
       },
       {
         path: '',

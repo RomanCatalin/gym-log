@@ -5,13 +5,13 @@ import { IonButton, IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/a
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-settings-page',
-  templateUrl: './settings-page.page.html',
-  styleUrls: ['./settings-page.page.scss'],
+  selector: 'app-settings',
+  templateUrl: './settings.page.html',
+  styleUrls: ['./settings.page.scss'],
   standalone: true,
   imports: [IonContent, CommonModule, FormsModule, IonButton]
 })
-export class SettingsPagePage implements OnInit 
+export class SettingsPage implements OnInit 
 {
   private router = inject(Router);
   constructor() { }
