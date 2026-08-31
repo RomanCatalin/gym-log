@@ -239,4 +239,27 @@ async discardActiveWorkout()
   this.pendingActiveWorkout = null;
   await this.clearActiveWorkout();
 }
+
+async clearAllData() 
+{
+  await this.dbReady;
+  if (!this.isDbReady) return;
+  try 
+  {
+    await this.db.execute('DELETE FROM templates');
+    await this.db.execute('DELETE FROM history');
+    await this.db.execute('DELETE FROM active_workout');
+
+    this.workouts = [];
+    this.workoutHistory = [];
+    this.currentActiveWorkout = null;
+    this.pendingActiveWorkout = null;
+
+    console.log('Toate datele au fost șterse.');
+  } 
+  catch (error) 
+  {
+    console.error('Eroare la ștergerea tuturor datelor:', error);
+  }
+}
 }

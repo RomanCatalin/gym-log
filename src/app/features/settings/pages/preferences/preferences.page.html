@@ -1,13 +1,83 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>preferences</ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content [fullscreen]="true" class="settings-content">
+  <div class="p-5 min-h-full bg-main-background pt-12">
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">preferences</ion-title>
-    </ion-toolbar>
-  </ion-header>
+    <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
+      <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
+        <div class="text-[24px] text-white font-lexend">
+          PREFERENCES
+        </div>
+        <ion-button (click)="goBack()" class="return-btn">
+          <ion-icon name="return-up-back-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="bg-musclegroup-card rounded-general p-4 flex flex-col gap-4 shadow-sm/30">
+        <div class="flex justify-between items-center">
+          <span class="text-white font-lexend uppercase tracking-wide">UI Theme</span>
+          <div class="bg-return-button rounded-general">
+            <ion-select
+              [(ngModel)]="preferencesService.theme"
+              (ionChange)="onThemeChange($event)"
+              interface="popover"
+              fill="none"
+              [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+              class="text-white uppercase text-sm tracking-wide outline-none px-4 py-0 font-lexend rounded-general">
+              <ion-select-option value="dark">DARK</ion-select-option>
+            </ion-select>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-musclegroup-card rounded-general p-4 mt-4 flex flex-col gap-4 shadow-sm/30">
+        <div class="flex justify-between items-center">
+          <span class="text-white font-lexend uppercase tracking-wide">Rest Time</span>
+          <div class="bg-return-button rounded-general">
+            <ion-select
+              [(ngModel)]="preferencesService.restTimeSeconds"
+              (ionChange)="onRestTimeChange($event)"
+              interface="popover"
+              fill="none"
+              [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+              class="text-white uppercase text-sm tracking-wide outline-none px-4 py-0.5 font-lexend rounded-general">
+              @for (option of restTimeOptions; track option.value) {
+                <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+              }
+            </ion-select>
+          </div>
+        </div>
+
+        <div class="flex justify-between items-center mt-2">
+          <span class="text-white font-lexend uppercase tracking-wide">Toggle Alert</span>
+          <ion-toggle
+            [(ngModel)]="preferencesService.alertEnabled"
+            (ionChange)="onAlertToggle($event)"
+            class="settings-toggle">
+          </ion-toggle>
+        </div>
+
+        @if (preferencesService.alertEnabled) 
+        {
+          <div class="flex flex-col gap-5 pl-2 mt-2">
+            <div class="flex justify-between items-center">
+              <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">Sound</span>
+              <ion-toggle [(ngModel)]="preferencesService.soundEnabled" (ionChange)="onSoundToggle($event)" class="settings-toggle"></ion-toggle>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">Vibration</span>
+              <ion-toggle [(ngModel)]="preferencesService.vibrationEnabled" (ionChange)="onVibrationToggle($event)" class="settings-toggle"></ion-toggle>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">Notification</span>
+              <ion-toggle [(ngModel)]="preferencesService.notificationEnabled" (ionChange)="onNotificationToggle($event)" class="settings-toggle"></ion-toggle>
+            </div>
+          </div>
+        }
+      </div>
+
+      <ion-button (click)="confirmClearData()" class="workout-delete-template font-lexend mt-8 flex">
+        CLEAR DATA
+      </ion-button>
+    </div>
+
+  </div>
 </ion-content>

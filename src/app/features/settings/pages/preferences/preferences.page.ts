@@ -1,20 +1,91 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonHeader, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonContent, IonHeader, IonTitle, IonToolbar, IonIcon, IonSelectOption, IonSelect, IonToggle, AlertController, IonButton } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { returnUpBackOutline } from 'ionicons/icons';
+import { Router } from '@angular/router';
+import { PreferencesService } from 'src/app/services/preferences-service';
+import { WorkoutService } from 'src/app/services/workout-service';
 
 @Component({
   selector: 'app-preferences',
   templateUrl: './preferences.page.html',
   styleUrls: ['./preferences.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule]
+  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonIcon, IonSelect, IonSelectOption, IonToggle, IonButton]
 })
 export class PreferencesPage implements OnInit {
 
-  constructor() { }
+  constructor() 
+  {
+    addIcons({ returnUpBackOutline });
+  }
 
-  ngOnInit() {
+  async ngOnInit() {
+    await this.preferencesService.ready;
+  }
+  preferencesService = inject(PreferencesService);
+  private workoutService = inject(WorkoutService);
+  private router = inject(Router);
+  private alertController = inject(AlertController);
+
+  restTimeOptions = 
+  [
+    { label: '30 SECONDS', value: 30 },
+    { label: '1 MINUTE', value: 60 },
+    { label: '1:30 MINUTES', value: 90 },
+    { label: '2 MINUTES', value: 120 },
+    { label: '3 MINUTES', value: 180 },
+    { label: '5 MINUTES', value: 300 },
+  ];
+
+
+
+  goBack() {
+    this.router.navigate(['/settings']);
+  }
+
+  onThemeChange(event: any) {
+    this.preferencesService.setTheme(event.detail.value);
+  }
+
+  onRestTimeChange(event: any) {
+    this.preferencesService.setRestTimeSeconds(event.detail.value);
+  }
+
+  onAlertToggle(event: any) {
+    this.preferencesService.setAlertEnabled(event.detail.checked);
+  }
+
+  onSoundToggle(event: any) {
+    this.preferencesService.setSoundEnabled(event.detail.checked);
+  }
+
+  onVibrationToggle(event: any) {
+    this.preferencesService.setVibrationEnabled(event.detail.checked);
+  }
+
+  onNotificationToggle(event: any) {
+    this.preferencesService.setNotificationEnabled(event.detail.checked);
+  }
+
+  async confirmClearData() {
+    const alert = await this.alertController.create({
+      header: 'Clear All Data',
+      message: 'This will permanently delete all workout templates, history, and any in-progress workout. This cannot be undone.',
+      cssClass: 'custom-alert',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Clear Data',
+          handler: () => {
+            this.workoutService.clearAllData();
+          }
+        }
+      ]
+    });
+    await alert.present();
   }
 
 }

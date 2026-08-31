@@ -348,6 +348,15 @@ ion-icon {
   color: white;
 }
 
+ion-toggle.settings-toggle 
+{
+  --track-background: #535353;
+  --track-background-checked: var(--color-workout-finish);
+  --handle-background: #ffffff;
+  --handle-background-checked: #ffffff;
+}
+
+
 html,
 body,
 ion-app {

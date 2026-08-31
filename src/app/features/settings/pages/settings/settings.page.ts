@@ -18,7 +18,13 @@ export class SettingsPage implements OnInit
 
   ngOnInit() { }
 
-  goToWorkoutTemplates() {
+  goToWorkoutTemplates() 
+  {
     this.router.navigate(['/workout-templates']);
+  }
+
+  goToPreferences() 
+  {
+  this.router.navigate(['/preferences']);
   }
 }
