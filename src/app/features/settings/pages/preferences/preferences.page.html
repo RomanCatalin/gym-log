@@ -38,7 +38,7 @@
               interface="popover"
               fill="none"
               [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-              class="text-white uppercase text-sm tracking-wide outline-none px-4 py-0.5 font-lexend rounded-general">
+              class="text-white uppercase text-sm tracking-wide outline-none px-4 py-0.5 font-lexend rounded-general w-38">
               @for (option of restTimeOptions; track option.value) {
                 <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
               }
@@ -74,9 +74,6 @@
         }
       </div>
 
-      <ion-button (click)="confirmClearData()" class="workout-delete-template font-lexend mt-8 flex">
-        CLEAR DATA
-      </ion-button>
     </div>
 
   </div>

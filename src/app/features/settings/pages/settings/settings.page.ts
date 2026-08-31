@@ -25,6 +25,11 @@ export class SettingsPage implements OnInit
 
   goToPreferences() 
   {
-  this.router.navigate(['/preferences']);
+    this.router.navigate(['/preferences']);
+  }
+
+  goToDataBackup()
+  {
+    this.router.navigate(['/databackup']);
   }
 }

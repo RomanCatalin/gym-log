@@ -70,22 +70,5 @@ export class PreferencesPage implements OnInit {
     this.preferencesService.setNotificationEnabled(event.detail.checked);
   }
 
-  async confirmClearData() {
-    const alert = await this.alertController.create({
-      header: 'Clear All Data',
-      message: 'This will permanently delete all workout templates, history, and any in-progress workout. This cannot be undone.',
-      cssClass: 'custom-alert',
-      buttons: [
-        { text: 'Cancel', role: 'cancel' },
-        {
-          text: 'Clear Data',
-          handler: () => {
-            this.workoutService.clearAllData();
-          }
-        }
-      ]
-    });
-    await alert.present();
-  }
 
 }

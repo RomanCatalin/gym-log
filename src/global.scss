@@ -87,6 +87,8 @@
     --color-templates-card-pressed: #636363;
     --color-templates-musclegroup-card: #434343;
 
+    --color-import-button: #8F7B5A;
+
 }
 
 
@@ -219,6 +221,18 @@ ion-tab-button {
   --padding-start: 20px;  
   --padding-end: 20px;     
 }
+
+.import-button
+{
+  --background: var(--color-import-button);
+  --color: white;
+  --border-radius: var(--radius-general);
+  --padding-top: 10px;    
+  --padding-bottom: 10px;   
+  --padding-start: 16px;  
+  --padding-end: 16px;     
+}
+
 
 .exercise-delete-template {
   --background: var(--color-workout-delete);

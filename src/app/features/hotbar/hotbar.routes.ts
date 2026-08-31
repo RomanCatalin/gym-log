@@ -31,6 +31,11 @@ export const routes: Routes = [
           import('../settings/pages/preferences/preferences.page').then(m => m.PreferencesPage),
       },
       {
+        path: 'databackup',
+        loadComponent: () =>
+          import('../settings/pages/databackup/databackup.page').then(m => m.DatabackupPage),
+      },
+      {
         path: '',
         redirectTo: 'workout',
         pathMatch: 'full',

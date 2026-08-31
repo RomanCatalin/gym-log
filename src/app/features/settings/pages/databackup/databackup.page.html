@@ -1,0 +1,70 @@
+<ion-content [fullscreen]="true" class="settings-content">
+  <div class="p-5 min-h-full bg-main-background pt-12">
+
+    <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
+      <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
+        <div class="text-[22px] text-white font-lexend">
+          DATA & BACKUP
+        </div>
+        <ion-button (click)="goBack()" class="return-btn">
+          <ion-icon name="return-up-back-outline"></ion-icon>
+        </ion-button>
+      </div>
+
+      <div class="bg-musclegroup-card rounded-general p-4 flex flex-col gap-4 shadow-sm/30">
+        <div class="flex justify-between items-center">
+          <span class="text-white font-lexend uppercase tracking-wide">AUTOMATIC BACKUP</span>
+          <ion-toggle
+            [(ngModel)]="preferencesService.dataBackupEnabled"
+            (ionChange)="onDataBackupToggle($event)"
+            class="settings-toggle">
+          </ion-toggle>
+        </div>
+        @if (preferencesService.dataBackupEnabled) 
+        {
+          <div class="flex flex-col gap-5 pl-1 mt-2">
+            <div class="flex justify-between items-center">
+              <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">
+                INTERVAL
+              </span>
+                <div class="bg-return-button rounded-general">
+                <ion-select
+                  [(ngModel)]="preferencesService.dataIntervalDays"
+                  (ionChange)="onDataIntervalChange($event)"
+                  interface="popover"
+                  fill="none"
+                  [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                  class="text-white uppercase text-sm tracking-wide outline-none px-2 py-0 font-lexend rounded-general text-[12px] w-32.5">
+                  @for (option of dataIntervalOptions; track option.value) 
+                  {
+                    <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
+                  }
+                </ion-select>
+              </div>
+            </div>
+          </div>
+        }
+        <ion-button class="set-add-btn font-lexend mt-4 flex text-[14px]">
+        BACKUP NOW
+        </ion-button>
+
+      </div>
+
+      <div class="bg-musclegroup-card rounded-general p-4 py-5 flex flex-col gap-4 shadow-sm/30 mt-5">
+        <div class="flex justify-between items-center">
+          <span class="text-white font-lexend uppercase tracking-wide">IMPORT DATA</span>
+          <ion-button class="import-button font-lexend flex text-[14px]">
+            IMPORT
+          </ion-button>
+        </div>
+      </div>
+
+
+
+      <ion-button (click)="confirmClearData()" class="workout-delete-template font-lexend mt-8 flex text-[16px]">
+        CLEAR DATA
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>
