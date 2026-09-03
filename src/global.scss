@@ -370,6 +370,28 @@ ion-toggle.settings-toggle
   --handle-background-checked: #ffffff;
 }
 
+.stepper-btn 
+{
+  background: var(--color-return-button);
+  border-radius: 6px;
+  width: 28px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 14px;
+  border: none;
+
+  &:active {
+    background: var(--color-return-button-pressed);
+  }
+
+  ion-icon {
+    pointer-events: none;
+  }
+}
+
 
 html,
 body,

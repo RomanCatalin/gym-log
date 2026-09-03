@@ -8,6 +8,7 @@ const KEYS = {
   restTimeSeconds: 'pref_rest_time_seconds',
   dataBackupEnabled: 'pref_data_backup_enabled',
   dataIntervalDays: 'pref_data_interval_days',
+  lastBackupAt: 'pref_last_backup_at',
   alertEnabled: 'pref_alert_enabled',
   soundEnabled: 'pref_sound_enabled',
   vibrationEnabled: 'pref_vibration_enabled',
@@ -20,12 +21,14 @@ export class PreferencesService
 
   theme: ThemeOption = 'dark';
   restTimeSeconds = 180;
-  dataIntervalDays = 7;
-  dataBackupEnabled = true;
   alertEnabled = false;
   soundEnabled = false;
   vibrationEnabled = false;
   notificationEnabled = false;
+
+  dataIntervalDays = 7;
+  dataBackupEnabled = true;
+  lastBackupAt = 0;
 
   public ready: Promise<void>;
 
@@ -38,12 +41,13 @@ export class PreferencesService
   {
     try 
     {
-      const [theme, restTime, dataInterval, dataBackup, alert, sound, vibration, notification] = await Promise.all
+      const [theme, restTime, dataInterval, dataBackup, lastBackupAt, alert, sound, vibration, notification] = await Promise.all
       ([
         Preferences.get({ key: KEYS.theme }),
         Preferences.get({ key: KEYS.restTimeSeconds }),
         Preferences.get({ key: KEYS.dataIntervalDays}),
         Preferences.get({ key: KEYS.dataBackupEnabled}),
+        Preferences.get({ key: KEYS.lastBackupAt }),
         Preferences.get({ key: KEYS.alertEnabled }),
         Preferences.get({ key: KEYS.soundEnabled }),
         Preferences.get({ key: KEYS.vibrationEnabled }),
@@ -63,6 +67,12 @@ export class PreferencesService
     }
 
     if (dataBackup.value !== null) this.dataBackupEnabled = dataBackup.value === 'true';
+
+    if (lastBackupAt.value !== null) {
+      const parsed = parseInt(lastBackupAt.value, 10);
+      if (!isNaN(parsed)) this.lastBackupAt = parsed;
+    }
+
     if (alert.value !== null) this.alertEnabled = alert.value === 'true';
     if (sound.value !== null) this.soundEnabled = sound.value === 'true';
     if (vibration.value !== null) this.vibrationEnabled = vibration.value === 'true';
@@ -92,6 +102,11 @@ export class PreferencesService
   async setDataBackupEnabled(value: boolean) {
     this.dataBackupEnabled = value;
     await Preferences.set({ key: KEYS.dataBackupEnabled, value: value.toString() });
+  }
+
+  async setLastBackupAt(value: number) {
+    this.lastBackupAt = value;
+    await Preferences.set({ key: KEYS.lastBackupAt, value: value.toString() });
   }
 
   async setAlertEnabled(value: boolean) {

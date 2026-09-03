@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { CapacitorSQLite, SQLiteConnection, SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
+import { inject } from '@angular/core';
+import { PreferencesService } from './preferences-service';
+
 
 export interface Exercise { id: string; name: string; }
 export interface MuscleGroup { id: string; name: string; exercises: Exercise[]; }
@@ -26,6 +30,9 @@ export class WorkoutService {
   public isDbReady = false;
   public dbReady: Promise<void>;
   pendingActiveWorkout: ActiveWorkout | null = null;
+
+  private preferencesService = inject(PreferencesService);
+  private readonly BACKUP_FILE_NAME = 'gym-log-backup.json';
 
   constructor() 
   {
@@ -61,12 +68,16 @@ export class WorkoutService {
       await this.loadTemplates();
       await this.loadHistory();
       await this.loadActiveWorkout();
+      this.maybeAutoBackup();
       
     } 
     catch (error) 
     {
       console.error('Eroare la inițializarea bazei de date SQLite:', error);
     }
+
+
+
   }
 
   async saveTemplates() 
@@ -262,4 +273,105 @@ async clearAllData()
     console.error('Eroare la ștergerea tuturor datelor:', error);
   }
 }
+
+async saveHistory() 
+{
+  await this.dbReady;
+  if (!this.isDbReady) return;
+  try {
+    await this.db.execute('DELETE FROM history');
+    for (const workout of this.workoutHistory) {
+      await this.db.query(
+        'INSERT INTO history (id, startTime, data) VALUES (?, ?, ?)',
+        [workout.id, workout.startTime, JSON.stringify(workout)]
+      );
+    }
+  } catch (error) {
+    console.error('[Backup] Eroare la salvarea istoricului:', error);
+  }
+}
+
+async createBackup() {
+  await this.dbReady;
+  if (!this.isDbReady) return;
+  try {
+    const payload = {
+      version: 1,
+      createdAt: Date.now(),
+      workouts: this.workouts,
+      workoutHistory: this.workoutHistory,
+    };
+    await Filesystem.writeFile({
+      path: this.BACKUP_FILE_NAME,
+      data: JSON.stringify(payload),
+      directory: Directory.Data,
+      encoding: Encoding.UTF8,
+    });
+    await this.preferencesService.setLastBackupAt(Date.now());
+    console.log('[Backup] Backup creat cu succes.');
+  } catch (error) {
+    console.error('[Backup] Eroare la crearea backup-ului:', error);
+  }
+}
+
+async getBackupFileUri(): Promise<string> {
+  const result = await Filesystem.getUri({ path: this.BACKUP_FILE_NAME, directory: Directory.Data });
+  return result.uri;
+}
+
+async restoreFromBackup(backupData: { workouts?: Workout[]; workoutHistory?: ActiveWorkout[] }) {
+  await this.dbReady;
+  if (!this.isDbReady) return;
+  this.workouts = backupData.workouts || [];
+  this.workoutHistory = backupData.workoutHistory || [];
+  await this.saveTemplates();
+  await this.saveHistory();
+}
+
+async maybeAutoBackup() {
+  await this.preferencesService.ready;
+  if (!this.preferencesService.dataBackupEnabled) return;
+
+  const intervalMs = this.preferencesService.dataIntervalDays * 24 * 60 * 60 * 1000;
+  if (Date.now() - this.preferencesService.lastBackupAt >= intervalMs) {
+    await this.createBackup();
+  }
+}
+
+getLastSetForExercise(exerciseName: string): WorkoutSet | null {
+  const normalizedName = exerciseName.toUpperCase().trim();
+
+  const sortedHistory = [...this.workoutHistory].sort((a, b) => b.startTime - a.startTime);
+
+  for (const workout of sortedHistory) {
+    for (const group of workout.muscleGroups) {
+      for (const exercise of group.exercises) {
+        if (exercise.name.toUpperCase().trim() !== normalizedName) continue;
+        if (exercise.sets.length > 0) {
+          return exercise.sets[exercise.sets.length - 1];
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+async getShareableBackupUri(): Promise<string> {
+  const payload = {
+    version: 1,
+    createdAt: Date.now(),
+    workouts: this.workouts,
+    workoutHistory: this.workoutHistory,
+  };
+  await Filesystem.writeFile({
+    path: this.BACKUP_FILE_NAME,
+    data: JSON.stringify(payload),
+    directory: Directory.Cache,
+    encoding: Encoding.UTF8,
+  });
+  const result = await Filesystem.getUri({ path: this.BACKUP_FILE_NAME, directory: Directory.Cache });
+  return result.uri;
+}
+
 }

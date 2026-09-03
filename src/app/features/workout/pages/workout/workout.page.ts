@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { returnUpBackOutline, chevronDownOutline, add } from 'ionicons/icons';
+import { returnUpBackOutline, chevronDownOutline, add, chevronUpOutline } from 'ionicons/icons';
 import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
 import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
 
@@ -40,7 +40,7 @@ export class WorkoutPage implements OnInit, OnDestroy
 
   constructor() 
   {
-    addIcons({ returnUpBackOutline, chevronDownOutline, add });
+    addIcons({ returnUpBackOutline, chevronDownOutline, chevronUpOutline, add });
   }
 
   async ngOnInit() 
@@ -143,12 +143,31 @@ export class WorkoutPage implements OnInit, OnDestroy
   goToExercise(exercise: WorkoutExercise) 
   {
     this.activeExercise = exercise;
+    const last = this.workoutService.getLastSetForExercise(exercise.name);
+    this.newReps = last ? last.reps : null;
+    this.newWeight = last ? last.weight : null;
   }
 
-  collapseExercise() {
-  this.activeExercise = null;
-}
+  incrementReps() {
+  this.newReps = (this.newReps || 0) + 1;
+  }
 
+  decrementReps() {
+    this.newReps = Math.max(0, (this.newReps || 0) - 1);
+  }
+
+  incrementWeight() {
+    this.newWeight = Math.round(((this.newWeight || 0) + 2.5) * 10) / 10;
+  }
+
+  decrementWeight() {
+    this.newWeight = Math.max(0, Math.round(((this.newWeight || 0) - 2.5) * 10) / 10);
+  }
+
+  collapseExercise() 
+  {
+  this.activeExercise = null;
+  }
 
   async addGroup() 
   {
@@ -184,7 +203,7 @@ export class WorkoutPage implements OnInit, OnDestroy
 
   async addSet() 
   {
-    if (this.newReps && this.newWeight && this.activeExercise) 
+    if (this.newReps != null && this.newWeight != null && this.activeExercise) 
     {
       this.activeExercise.sets.push({
         reps: this.newReps,

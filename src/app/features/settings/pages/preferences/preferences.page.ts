@@ -13,7 +13,7 @@ import { WorkoutService } from 'src/app/services/workout-service';
   templateUrl: './preferences.page.html',
   styleUrls: ['./preferences.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonIcon, IonSelect, IonSelectOption, IonToggle, IonButton]
+  imports: [IonContent, CommonModule, FormsModule, IonIcon, IonSelect, IonSelectOption, IonToggle, IonButton]
 })
 export class PreferencesPage implements OnInit {
 

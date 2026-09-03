@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -7,13 +7,15 @@ import { addIcons } from 'ionicons';
 import { returnUpBackOutline } from 'ionicons/icons';
 import { WorkoutService } from 'src/app/services/workout-service';
 import { PreferencesService } from 'src/app/services/preferences-service';
+import { Share } from '@capacitor/share';
+import { FilePicker } from '@capawesome/capacitor-file-picker';
 
 @Component({
   selector: 'app-databackup',
   templateUrl: './databackup.page.html',
   styleUrls: ['./databackup.page.scss'],
   standalone: true,
-  imports: [IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonButton, IonIcon, IonToggle, IonSelect, IonSelectOption]
+  imports: [IonContent, CommonModule, FormsModule, IonButton, IonIcon, IonToggle, IonSelect, IonSelectOption]
 })
 export class DatabackupPage implements OnInit {
 
@@ -29,6 +31,7 @@ export class DatabackupPage implements OnInit {
   private workoutService = inject(WorkoutService);
   private alertController = inject(AlertController);
   preferencesService = inject(PreferencesService);
+  private ngZone = inject(NgZone);
   
   
   dataIntervalOptions = 
@@ -73,6 +76,58 @@ export class DatabackupPage implements OnInit {
     });
     await alert.present();
   }
+
+async backupNow() {
+  try {
+    await this.workoutService.createBackup();
+    const uri = await this.workoutService.getShareableBackupUri(); 
+    await Share.share({ title: 'Gym Log — Backup', files: [uri] }); 
+  } catch (error) {
+    console.error('[Backup] Eroare la backup manual:', error);
+  }
+}
+
+async importData() {
+  try {
+    const result = await FilePicker.pickFiles({ readData: true });
+    const file = result.files?.[0];
+    if (!file || !file.data) return;
+
+    const jsonText = atob(file.data);
+    const parsed = JSON.parse(jsonText);
+
+    if (!parsed.workouts || !parsed.workoutHistory) {
+      throw new Error('Format de fișier invalid.');
+    }
+
+    const alert = await this.alertController.create({
+      header: 'Import Data?',
+      message: 'This will replace all current templates and workout history with the data from this backup. This cannot be undone.',
+      cssClass: 'custom-alert',
+      buttons: [
+        { text: 'Cancel', role: 'cancel' },
+        {
+          text: 'Import',
+          handler: () => {
+            this.ngZone.run(async () => {
+              await this.workoutService.restoreFromBackup(parsed);
+            });
+          }
+        }
+      ]
+    });
+    await alert.present();
+  } catch (error) {
+    console.error('[Import] Eroare la importul datelor:', error);
+    const errorAlert = await this.alertController.create({
+      header: 'Import Failed',
+      message: 'The selected file could not be read as a valid backup.',
+      cssClass: 'custom-alert',
+      buttons: ['OK'],
+    });
+    await errorAlert.present();
+  }
+}
 
 
 }
