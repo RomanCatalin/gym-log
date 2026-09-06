@@ -1,4 +1,17 @@
 <ion-content [fullscreen]="true">
+   @if (isResting) 
+   {
+    <div slot="fixed" class="w-full z-50 bg-workout-finish px-5 py-3 flex justify-between items-center shadow-lg"
+         style="padding-top: calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 10px);">
+      <span class="text-white font-lexend uppercase tracking-wide text-sm">Resting</span>
+      <div class="flex items-center gap-4">
+        <span class="text-white font-lexend text-xl tracking-widest">{{ restTimeDisplay }}</span>
+        <ion-button (click)="skipRest()" size="small" fill="clear" class="text-white font-lexend">
+          SKIP
+        </ion-button>
+      </div>
+    </div>
+  }
   <div class="min-h-full bg-main-background p-5 pt-12 font-lexend text-white">
 
     <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">

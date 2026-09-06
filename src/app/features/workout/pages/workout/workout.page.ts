@@ -6,6 +6,9 @@ import { addIcons } from 'ionicons';
 import { returnUpBackOutline, chevronDownOutline, add, chevronUpOutline } from 'ionicons/icons';
 import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
 import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
+import { LocalNotifications } from '@capacitor/local-notifications';
+import { PreferencesService } from 'src/app/services/preferences-service';
+
 
 @Component({
   selector: 'app-workout',
@@ -20,7 +23,7 @@ export class WorkoutPage implements OnInit, OnDestroy
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
   readonly recentWorkoutsLimit = 6;
-
+  private preferencesService = inject(PreferencesService);
 
   viewState: 1 | 2 | 3 = 1;
   activeMuscleGroup: WorkoutMuscleGroup | null = null;
@@ -37,6 +40,11 @@ export class WorkoutPage implements OnInit, OnDestroy
   timerDisplay = '00:00';
   selectedTemplateId = '';
 
+  isResting = false;
+  restTimeDisplay = '';
+  private restEndsAt: number | null = null;
+  private restInterval: any;
+  private restNotificationId: number | null = null;
 
   constructor() 
   {
@@ -55,6 +63,7 @@ export class WorkoutPage implements OnInit, OnDestroy
   ngOnDestroy() 
   {
     this.stopTimer();
+    clearInterval(this.restInterval);
   }
 
   async confirmStartWorkout(event: any) 
@@ -143,9 +152,18 @@ export class WorkoutPage implements OnInit, OnDestroy
   goToExercise(exercise: WorkoutExercise) 
   {
     this.activeExercise = exercise;
-    const last = this.workoutService.getLastSetForExercise(exercise.name);
-    this.newReps = last ? last.reps : null;
-    this.newWeight = last ? last.weight : null;
+    if (exercise.sets.length > 0) 
+    {
+      const lastSet = exercise.sets[exercise.sets.length - 1];
+      this.newReps = lastSet.reps;
+      this.newWeight = lastSet.weight;
+    } 
+    else 
+    {
+      const last = this.workoutService.getLastSetForExercise(exercise.name);
+      this.newReps = last ? last.reps : null;
+      this.newWeight = last ? last.weight : null;
+    }
   }
 
   incrementReps() {
@@ -201,7 +219,7 @@ export class WorkoutPage implements OnInit, OnDestroy
     }
   }
 
-  async addSet() 
+  async addSet_backup() 
   {
     if (this.newReps != null && this.newWeight != null && this.activeExercise) 
     {
@@ -212,6 +230,16 @@ export class WorkoutPage implements OnInit, OnDestroy
       this.newReps = null;
       this.newWeight = null;
       await this.workoutService.saveActiveWorkout();
+    }
+  }
+
+  async addSet() 
+  {
+   if (this.newReps != null && this.newWeight != null && this.activeExercise) 
+    {
+      this.activeExercise.sets.push({ reps: this.newReps, weight: this.newWeight });
+      await this.workoutService.saveActiveWorkout();
+      this.startRestTimer();
     }
   }
 
@@ -381,7 +409,116 @@ export class WorkoutPage implements OnInit, OnDestroy
   });
 
   await alert.present();
-}
+  }
 
+  async startRestTimer() 
+  {
+    const seconds = this.preferencesService.restTimeSeconds;
+    if (!seconds || seconds <= 0) return;
 
+    this.isResting = true;
+    this.restEndsAt = Date.now() + seconds * 1000;
+    this.updateRestDisplay();
+
+    clearInterval(this.restInterval);
+    this.restInterval = setInterval(() => {
+      this.ngZone.run(() => {
+        this.updateRestDisplay();
+        this.cdr.detectChanges();
+      });
+    }, 1000);
+
+    if (this.preferencesService.alertEnabled) 
+    {
+
+      const channelId = this.preferencesService.soundEnabled ? 'rest_sound_1' : 'rest_silent';
+
+      this.restNotificationId = Math.floor(Math.random() * 1000000);
+      const notificationId = this.restNotificationId;
+
+      try 
+      {
+        await LocalNotifications.schedule({
+          notifications: [{
+            id: notificationId,
+            title: 'Rest complete!',
+            body: 'Time to start your next set.',
+            channelId,
+            autoCancel: true,
+            schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
+          }],
+        });
+        setTimeout(async () => {
+          try 
+          {
+            await LocalNotifications.cancel({ 
+              notifications: [{ id: notificationId }] 
+            });
+
+            await LocalNotifications.removeDeliveredNotifications({ 
+              notifications: [{
+                id: notificationId,
+                title: '',
+                body: ''
+              }] 
+            });
+          } 
+          catch (error) 
+          {
+            console.error('[RestTimer] Eroare la auto-curățarea notificării:', error);
+          }
+        }, (seconds + 10) * 1000);
+
+      } 
+      catch (error) 
+      {
+        console.error('[RestTimer] Eroare la programarea notificării:', error);
+      }
+   }
+ }
+  
+  private updateRestDisplay() 
+  {
+    if (!this.restEndsAt) return;
+    const remainingMs = this.restEndsAt - Date.now();
+    const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
+
+    const minutes = Math.floor(remainingSec / 60).toString().padStart(2, '0');
+    const seconds = (remainingSec % 60).toString().padStart(2, '0');
+    this.restTimeDisplay = `${minutes}:${seconds}`;
+
+    if (remainingSec <= 0) {
+      this.finishRestTimer();
+    }
+  }
+
+  private finishRestTimer() 
+  {
+    clearInterval(this.restInterval);
+    this.isResting = false;
+    this.restEndsAt = null;
+    this.restNotificationId = null;
+  }
+
+  async skipRest() 
+  {
+    clearInterval(this.restInterval);
+    this.isResting = false;
+    this.restEndsAt = null;
+    this.restTimeDisplay = '';
+
+    if (this.restNotificationId !== null) 
+    {
+      try 
+      {
+        await LocalNotifications.cancel({ notifications: [{ id: this.restNotificationId }] });
+      } 
+      catch (error) 
+      {
+        console.error('[RestTimer] Eroare la anularea notificării:', error);
+      }
+      this.restNotificationId = null;
+    }
+  }
+  
 }

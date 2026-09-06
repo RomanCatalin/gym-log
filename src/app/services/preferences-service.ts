@@ -11,7 +11,6 @@ const KEYS = {
   lastBackupAt: 'pref_last_backup_at',
   alertEnabled: 'pref_alert_enabled',
   soundEnabled: 'pref_sound_enabled',
-  vibrationEnabled: 'pref_vibration_enabled',
   notificationEnabled: 'pref_notification_enabled',
 };
 
@@ -41,7 +40,7 @@ export class PreferencesService
   {
     try 
     {
-      const [theme, restTime, dataInterval, dataBackup, lastBackupAt, alert, sound, vibration, notification] = await Promise.all
+      const [theme, restTime, dataInterval, dataBackup, lastBackupAt, alert, sound, notification] = await Promise.all
       ([
         Preferences.get({ key: KEYS.theme }),
         Preferences.get({ key: KEYS.restTimeSeconds }),
@@ -50,7 +49,6 @@ export class PreferencesService
         Preferences.get({ key: KEYS.lastBackupAt }),
         Preferences.get({ key: KEYS.alertEnabled }),
         Preferences.get({ key: KEYS.soundEnabled }),
-        Preferences.get({ key: KEYS.vibrationEnabled }),
         Preferences.get({ key: KEYS.notificationEnabled }),
       ]);
 
@@ -75,7 +73,6 @@ export class PreferencesService
 
     if (alert.value !== null) this.alertEnabled = alert.value === 'true';
     if (sound.value !== null) this.soundEnabled = sound.value === 'true';
-    if (vibration.value !== null) this.vibrationEnabled = vibration.value === 'true';
     if (notification.value !== null) this.notificationEnabled = notification.value === 'true';
     } 
     catch (error) 
@@ -117,11 +114,6 @@ export class PreferencesService
   async setSoundEnabled(value: boolean) {
     this.soundEnabled = value;
     await Preferences.set({ key: KEYS.soundEnabled, value: value.toString() });
-  }
-
-  async setVibrationEnabled(value: boolean) {
-    this.vibrationEnabled = value;
-    await Preferences.set({ key: KEYS.vibrationEnabled, value: value.toString() });
   }
 
   async setNotificationEnabled(value: boolean) {

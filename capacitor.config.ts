@@ -17,6 +17,9 @@ const config: CapacitorConfig = {
     Keyboard: {
       resizeOnFullScreen: false, // you have @capacitor/keyboard installed — this must stay false or it fights the plugin
     },
+    LocalNotifications: {
+      smallIcon: 'ic_stat_name', 
+    },
   },
 };
 
