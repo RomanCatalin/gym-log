@@ -8,12 +8,12 @@ import { WorkoutService, ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise } fr
 
 @Component({
   selector: 'app-statistics-page',
-  templateUrl: './statistics-page.page.html',
-  styleUrls: ['./statistics-page.page.scss'],
+  templateUrl: './statistics.page.html',
+  styleUrls: ['./statistics.page.scss'],
   standalone: true,
   imports: [IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule]
 })
-export class StatisticsPagePage {
+export class StatisticsPage {
   workoutService = inject(WorkoutService);
 
   statTypes = ['TOTAL WEIGHT LIFTED', 'WORKOUT TYPE', 'MUSCLE GROUP', 'EXERCISE'];
