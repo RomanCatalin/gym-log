@@ -82,12 +82,18 @@
 
     --radius-general: 10px;
 
+    --padding-general: 40px;
+
     --color-templates-background: #363636;
     --color-templates-card: #3F3F3F;
     --color-templates-card-pressed: #636363;
     --color-templates-musclegroup-card: #434343;
 
     --color-import-button: #8F7B5A;
+
+    --color-statistics-header: #515151;
+    --color-statistics-content: #303030;
+    --color-statistics-button: #353535;
 
 }
 
@@ -114,7 +120,7 @@ ion-tab-bar.custom-tab-bar
   justify-content: center;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.5rem 0.45rem;
+  padding: 0.35rem 0.45rem;
 }
 
 ion-tab-button {
@@ -295,6 +301,8 @@ ion-select {
 }
 
 
+
+
 ion-popover.custom-template-popover {
   --background: #313131;
   --color: white;
@@ -390,6 +398,180 @@ ion-toggle.settings-toggle
   ion-icon {
     pointer-events: none;
   }
+}
+
+ion-modal.workout-history-modal {
+  --border-radius: 16px 16px 0 0;
+  --background: transparent;
+}
+
+ion-modal.split-editor-modal {
+  --background: transparent;
+}
+
+ion-modal.split-editor-modal::part(content) {
+  background: transparent;
+  box-shadow: none;
+}
+
+
+ion-item.cycle-slot-item {
+  --background: transparent;
+  --inner-background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --border-width: 0;
+  --box-shadow: none;
+}
+
+ion-item.cycle-slot-item::part(native) {
+  background: transparent;
+  border: none;
+}
+
+ion-action-sheet.custom-action-sheet-cycle {
+  --background: var(--color-return-button);
+  --color: white;
+  --button-color: white;
+  --button-background-selected: var(--color-return-button-pressed);
+}
+
+ion-action-sheet.custom-action-sheet-cycle .action-sheet-title {
+  text-align: center;
+}
+
+ion-action-sheet .action-sheet-container {
+  border-top-left-radius: 10px !important;
+  border-top-right-radius: 10px !important;
+  overflow: hidden;
+}
+
+ion-action-sheet.custom-action-sheet-cycle .action-sheet-title {
+  background: #2A2A2A !important;
+}
+
+ion-action-sheet.custom-action-sheet-cycle .action-sheet-button .action-sheet-button-inner {
+  justify-content: center;
+}
+ion-action-sheet.custom-action-sheet-cycle .action-sheet-button {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; 
+}
+
+ion-action-sheet.custom-action-sheet-cycle .action-sheet-cancel {
+  background: var(--color-workout-delete) !important; 
+  color: white !important;
+}
+
+.statistics-inner-tab-bar {
+  display: flex;
+  background: var(--color-hotbar-button);
+}
+
+.statistics-inner-tab-bar ion-button.stats-toggle-btn {
+  flex: 1;
+  margin: 0;
+  --border-radius: 0;
+  --box-shadow: none;
+  --padding-top: 14px;
+  --padding-bottom: 14px;
+  --padding-start: 0;
+  --padding-end: 0;
+  --color: rgba(255, 255, 255, 0.4);
+  --background: transparent;
+  --background-activated: rgba(255, 255, 255, 0.08);
+  --background-focused: transparent;
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+
+  &:last-child {
+    border-right: none;
+  }
+
+  &.active {
+    --color: #ffffff;
+  }
+
+  ion-icon {
+    font-size: 22px;
+  }
+}
+
+ion-button.trending-icon-btn {
+  --background: var(--color-statistics-button);
+  --background-activated: var(--color-return-button-pressed);
+  --border-radius: var(--radius-general);
+  --box-shadow: none;
+  --color: white;
+  --padding-start: 0;
+  --padding-end: 0;
+  width: 48px;
+  height: 48px;
+  margin: 0;
+
+  ion-icon {
+    font-size: 20px;
+  }
+}
+
+.modify-cycle-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+  --background-hover: transparent;
+  --background-focused: transparent;
+  --color: #ffffff;
+  --border-radius: 12px 0 0 12px;
+
+  &::part(native) {
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+
+.restart-cycle-btn {
+  --padding-start: 0;
+  --padding-end: 0;
+  --padding-top: 0;
+  --padding-bottom: 0;
+
+  --background-hover: transparent;
+  --background-focused: transparent;
+  --color: #fff;
+  --border-radius: 0 12px 12px 0;
+
+  width: 100%;
+  height: 100%;
+  margin: 0;
+
+  &::part(native) {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    box-shadow: none;
+  }
+}
+
+.modify-cycle-btn {
+  height: 48px; 
+}
+
+ion-popover.color-picker-popover {
+  --width: 200px;
+  --background: transparent;
+  --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+
+  &::part(content) {
+    background: var(--color-return-button);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+}
+
+ion-toast.custom-toast {
+  --background: var(--color-return-button);
+  --color: white;
+  --border-radius: var(--radius-general);
 }
 
 

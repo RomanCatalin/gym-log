@@ -1,124 +1,234 @@
-<ion-content [fullscreen]="true">
-  <div class="min-h-full bg-main-background p-5 pt-12 font-lexend text-white">
-  <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
-    
-    <div class="text-[28px] text-white px-1.5 uppercase tracking-wide">
-      STATISTICS
-    </div>
+<ion-content [fullscreen]="true" [scrollY]="false">
+  <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-white flex flex-col">
+    <div class="bg-workout-background rounded-general shadow-md relative overflow-hidden flex-1 flex flex-col">
 
-    <div class="flex flex-col gap-4 mt-4">
-  
-      <div class="flex flex-col gap-2">
-        <div class="text-white/70 text-sm px-1.5 uppercase tracking-widest">Show Stats For</div>
-        <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
-          <ion-select 
-            [(ngModel)]="selectedStatType" 
-            (ionChange)="onStatTypeChange()" 
-            interface="popover"
-            fill="none"
-            [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-            class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+      <div class="flex-1 overflow-y-auto">
+        @if (viewState === 1) 
+        {
+          <div class="p-4 flex flex-col gap-4">
+            <div class="text-[28px] text-white font-lexend uppercase tracking-wide">
+              Progression
+            </div>
+            <div class="bg-musclegroup-card p-0 rounded-general">
+              <div class="flex gap-1 items-stretch bg-statistics-header p-1 rounded-general rounded-b-none">
+                <div class="flex-1 min-w-0 bg-statistics-button rounded-l-general rounded-r-none flex items-center shadow-sm/30">
+                  <ion-select
+                    interface="popover"
+                    fill="none"
+                    [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                    placeholder="GROUP"
+                    [(ngModel)]="selectedGroup"
+                    (ionChange)="onGroupChange()"
+                    class="w-full text-white uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
+                    @for (group of availableGroups; track group) {
+                      <ion-select-option [value]="group">
+                        {{ group }}
+                      </ion-select-option>
+                    }
+                  </ion-select>
+                </div>
+                <div class="flex-1 min-w-0 bg-statistics-button rounded-none flex items-center shadow-sm/30">
+                  <ion-select
+                    interface="popover"
+                    fill="none"
+                    [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                    placeholder="EXERCISE"
+                    [(ngModel)]="selectedExercise"
+                    (ionChange)="onExerciseChange()"
+                    [disabled]="!selectedGroup"
+                    class="w-full text-white uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
+                    @for (exercise of availableExercises; track exercise) {
+                      <ion-select-option [value]="exercise">
+                        {{ exercise }}
+                      </ion-select-option>
+                    }
+                  </ion-select>
+                </div>
+                <div class="rounded-r-general rounded-l-none items-center flex justify-center bg-statistics-button shadow-sm/30">
+                  <ion-button fill="clear" class="trending-icon-btn shrink-0">
+                    <ion-icon name="trending-up-outline" slot="icon-only"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
+              <div class="bg-statistics-content rounded-general mt-2 mx-1 mb-2 p-3 flex flex-col" style="min-height: 56vh;">
+                @if (!selectedGroup || !selectedExercise) {
+                  <div class="flex-1 flex items-center justify-center text-white/40 text-sm uppercase tracking-wide text-center px-6">
+                    Select a muscle group and exercise to see progress
+                  </div>
+                } @else if (rawChartData.length === 0) {
+                  <div class="flex-1 flex items-center justify-center text-white/40 text-sm uppercase tracking-wide text-center px-6">
+                    No recorded sets yet for this exercise
+                  </div>
+                } @else {
+                  <div class="text-[14px] text-white/90 font-lexend uppercase text-center tracking-widest pb-2">
+                    {{ selectedExercise }}
+                  </div>
+                  <div class="w-full overflow-hidden">
+                     <svg
+                      [attr.viewBox]="chartConfig.viewBox"
+                      class="w-full h-full drop-shadow-md"
+                      preserveAspectRatio="none">
+                      <line x1="20" y1="40" x2="380" y2="40" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+                      <line x1="20" y1="110" x2="380" y2="110" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
+                      <line x1="20" y1="180" x2="380" y2="180" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
 
-            @for (type of statTypes; track type) {
-              <ion-select-option [value]="type">{{ type }}</ion-select-option>
-            }
-          </ion-select>
-        </div>
-      </div>
+                      @for (seg of chartConfig.segments; track $index) {
+                        <line [attr.x1]="seg.x1" [attr.y1]="seg.y1" [attr.x2]="seg.x2" [attr.y2]="seg.y2"
+                              [attr.stroke]="seg.color" stroke-width="3" stroke-linecap="round"
+                              class="transition-all duration-300" />
+                      }
 
-      @if (selectedStatType !== 'TOTAL WEIGHT LIFTED') {
-        <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
-          <ion-select 
-            [(ngModel)]="selectedSubItem" 
-            interface="popover"
-            fill="none"
-            [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-            placeholder="SELECT ITEM"
-            class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+                      @for (pt of chartConfig.points; track pt.date; let i = $index) {
+                        <g (click)="selectPoint(i)" class="cursor-pointer">
+                          <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="25" fill="transparent" />
+                          <circle [attr.cx]="pt.x" [attr.cy]="pt.y" [attr.r]="activePointIndex === i ? 7 : 5"
+                                  [attr.fill]="activePointIndex === i ? '#ffffff' : '#2b3036'"
+                                  stroke="#9ca3af" stroke-width="2.5" class="transition-all duration-300" />
+                          <text [attr.x]="pt.x" [attr.y]="pt.y - 15"
+                                [attr.fill]="activePointIndex === i ? '#ffffff' : 'rgba(255,255,255,0.7)'"
+                                font-size="12" font-family="Lexend, sans-serif" font-weight="bold"
+                                [attr.text-anchor]="pt.textAnchor" class="transition-all duration-300">
+                            {{ pt.value }}kg
+                          </text>
+                          @if (activePointIndex === i) {
+                            <text [attr.x]="pt.x" [attr.y]="pt.y + 22" fill="#9ca3af" font-size="11"
+                                  font-family="Lexend, sans-serif" font-weight="bold" [attr.text-anchor]="pt.textAnchor">
+                              {{ pt.date }}
+                            </text>
+                          }
+                        </g>
+                      }
+                    </svg>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+        } 
+        @else 
+        {
+          <div class="p-4 flex flex-col gap-4">
+            <div class="text-[28px] text-white font-lexend uppercase tracking-wide">
+              WORKOUT LOG
+            </div>
+            <div class="bg-musclegroup-card p-0 rounded-general">
+              <div class="flex gap-1 items-stretch bg-statistics-header p-1 rounded-general rounded-b-none">
+                <!-- 80% -->
+                <div class="flex-1 bg-statistics-button rounded-l-general rounded-r-none flex items-center justify-center">
+                  <ion-button fill="clear" (click)="openSplitEditor()" class="modify-cycle-btn w-full h-full font-lexend text-white font-medium tracking-widest text-base m-0">
+                    MODIFY SPLIT
+                  </ion-button>
+                </div>
 
-            @for (item of availableSubItems; track item) {
-              <ion-select-option [value]="item">{{ item }}</ion-select-option>
-            }
-          </ion-select>
-        </div>
-      }
-    </div>
+                <div class="w-[25%] bg-[#C49A50] rounded-r-general rounded-l-none flex items-center justify-center">
+                  <ion-button fill="clear" (click)="openRestartPicker()" class="restart-cycle-btn w-full h-full m-0">
+                    <ion-icon name="refresh" slot="icon-only" class="text-white text-[22px]"></ion-icon>
+                  </ion-button>
+                </div>
+              </div>
 
-
-    <div class="bg-templates-musclegroup-card rounded-general p-4 flex flex-col gap-2 shadow-sm/30 mt-8 select-none">
-      <div class="text-[16px] text-white/90 font-lexend uppercase text-center tracking-widest pb-2">
-        {{ selectedStatType === 'TOTAL WEIGHT LIFTED' ? 'Total Progress' : selectedSubItem }}
-      </div>
-      
-      <div class="w-full overflow-hidden">
-        <svg [attr.viewBox]="chartConfig.viewBox" class="w-full h-auto drop-shadow-md">
-          
-          <line x1="20" y1="40" x2="380" y2="40" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
-          <line x1="20" y1="110" x2="380" y2="110" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
-          <line x1="20" y1="180" x2="380" y2="180" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
-
-          @for (seg of chartConfig.segments; track $index) 
-          {
-            <line 
-              [attr.x1]="seg.x1" 
-              [attr.y1]="seg.y1" 
-              [attr.x2]="seg.x2" 
-              [attr.y2]="seg.y2" 
-              [attr.stroke]="seg.color" 
-              stroke-width="3" 
-              stroke-linecap="round" 
-              class="transition-all duration-300"
-            />
-          }
-
-          @for (pt of chartConfig.points; track pt.date; let i = $index) 
-          {
+              <div class="bg-statistics-content rounded-general mt-2 mx-1 mb-2 p-3 flex flex-col justify-between" style="min-height: 56vh;">
             
-           <g (click)="selectPoint(i)" class="cursor-pointer">
-              
-              <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="25" fill="transparent" />
-              
-              <circle 
-                [attr.cx]="pt.x" 
-                [attr.cy]="pt.y" 
-                [attr.r]="activePointIndex === i ? 7 : 5" 
-                [attr.fill]="activePointIndex === i ? '#ffffff' : '#2b3036'" 
-                stroke="#9ca3af" 
-                stroke-width="2.5" 
-                class="transition-all duration-300"
-              />
+                <div class="flex flex-col w-full">
+                  <div class="flex justify-between items-center px-1 pb-3 pt-1">
+                    <button (click)="prevMonth()" class="text-white text-xl px-2">‹</button>
+                    <span class="text-white font-lexend uppercase tracking-widest text-base">{{ calendarMonthLabel }}</span>
+                    <button (click)="nextMonth()" class="text-white text-xl px-2">›</button>
+                  </div>
+                  
+                  <div class="grid grid-cols-7 gap-1.5 px-1 pb-3">
+                    @for (dayName of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; track dayName) {
+                      <div class="text-center text-white/50 text-[10px] uppercase font-lexend">{{ dayName }}</div>
+                    }
+                  </div>
 
-              <text 
-                [attr.x]="pt.x" 
-                [attr.y]="pt.y - 15" 
-                [attr.fill]="activePointIndex === i ? '#ffffff' : 'rgba(255,255,255,0.7)'"
-                font-size="12" 
-                font-family="Lexend, sans-serif" 
-                font-weight="bold"
-                [attr.text-anchor]="pt.textAnchor"
-                class="transition-all duration-300"
-              >
-                {{ pt.value }}kg
-              </text>
+                  <div class="grid grid-cols-7 gap-1.5 px-1">
+                    @for (cell of calendarCells; track $index) {
+                      @if (cell) {
+                        @if (cell.isOutsideMonth) {
+                          <!-- Zile din luna următoare/anterioară -->
+                          <div 
+                            class="aspect-square flex items-center justify-center font-lexend text-sm text-white/30 bg-[#252525]"
+                            [style.border-radius.px]="$index % 7 === 0 || $index % 7 === 6 ? 8 : 0"
+                            [style.border-top-left-radius.px]="$index % 7 === 0 ? 8 : 0"
+                            [style.border-bottom-left-radius.px]="$index % 7 === 0 ? 8 : 0"
+                            [style.border-top-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                            [style.border-bottom-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                          >
+                            {{ cell.day }}
+                          </div>
+                        } @else {
+                          <!-- Zi normală -->
+                          <button 
+                            type="button" 
+                            (click)="onDayTap(cell)" 
+                            class="aspect-square flex items-center justify-center text-sm font-lexend text-white"
+                            [style.background]="cell.color"
+                            [class.brightness-65]="cell.isPast"
+                            [class.contrast-115]="cell.isPast"
+                            [style.border-radius.px]="$index % 7 === 0 || $index % 7 === 6 ? 8 : 0"
+                            [style.border-top-left-radius.px]="$index % 7 === 0 ? 8 : 0"
+                            [style.border-bottom-left-radius.px]="$index % 7 === 0 ? 8 : 0"
+                            [style.border-top-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                            [style.border-bottom-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                          >
+                            {{ cell.day }}
+                          </button>
+                        }
+                      } @else {
+                        <!-- Spațiu gol dacă folosești elemente null -->
+                        <div 
+                          class="aspect-square"
+                          [style.border-radius.px]="$index % 7 === 0 || $index % 7 === 6 ? 8 : 0"
+                          [style.border-top-left-radius.px]="$index % 7 === 0 ? 8 : 0"
+                          [style.border-bottom-left-radius.px]="$index % 7 === 0 ? 8 : 0"
+                          [style.border-top-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                          [style.border-bottom-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                        ></div>
+                      }
+                    }
+                  </div>
+                </div>
 
-              @if (activePointIndex === i) {
-                <text 
-                  [attr.x]="pt.x" 
-                  [attr.y]="pt.y + 22" 
-                  fill="#9ca3af" 
-                  font-size="11" 
-                  font-family="Lexend, sans-serif" 
-                  font-weight="bold"
-                  [attr.text-anchor]="pt.textAnchor"
-                >
-                  {{ pt.date }}
-                </text>
-              }
-            </g>
-          }
-        </svg>
+                @if (cycleBarSlots.length > 0) {
+                  <div class="flex items-center justify-center w-full pt-4 pb-1 px-1">
+                    <div class="flex items-center gap-1.5 p-1.5 bg-musclegroup-card rounded-full w-full transition-all duration-200"
+                      [style.max-width.%]="(cycleBarSlots.length / 7) * 100">               
+                      @for (slot of cycleBarSlots; track $index) {
+                        <div 
+                          class="flex-1 h-3"
+                          [class.rounded-l-full]="$first"
+                          [class.rounded-r-full]="$last"
+                          [class.ring-2]="slot.isToday"
+                          [class.ring-white]="slot.isToday"
+                          [class.ring-offset-1]="slot.isToday"
+                          [class.ring-offset-[#2a2a2a]]="slot.isToday"
+                          [style.background]="slot.color">
+                        </div>
+                      }
+                    </div>
+                  </div>
+                } @else {
+                  <div class="flex-1 flex items-center justify-center text-white/40 text-sm uppercase tracking-wide text-center px-6">
+                    No split defined yet tap Modify Split to create one
+                  </div>
+                }
+
+              </div>
+            </div>
+          </div>
+        }
       </div>
+
+      <div class="statistics-inner-tab-bar">
+        <ion-button (click)="goToProgression()" [ngClass]="{ 'active': viewState === 1 }" expand="block" fill="clear" class="stats-toggle-btn">
+          <ion-icon name="bar-chart-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+        <ion-button (click)="goToWorkoutLog()" [ngClass]="{ 'active': viewState === 2 }" expand="block" fill="clear" class="stats-toggle-btn">
+          <ion-icon name="calendar-outline" slot="icon-only"></ion-icon>
+        </ion-button>
+      </div>
+
     </div>
-  </div>
   </div>
 </ion-content>

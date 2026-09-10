@@ -1,0 +1,37 @@
+<div class="bg-workout-background rounded-general p-4 pb-0 font-lexend text-white flex flex-col w-full">
+
+  <div class="text-center pb-2">
+    <div class="text-[28px] uppercase tracking-wide">{{ workout.name }}</div>
+  </div>
+
+  <div class="flex justify-between items-center px-1 pb-4">
+    <span class="text-white/60 text-base">{{ dateDisplay }}</span>
+    <div class="flex items-center gap-2 text-white text-lg">
+      <span>{{ durationDisplay }}</span>
+      <ion-icon name="time-outline" class="text-xl"></ion-icon>
+    </div>
+  </div>
+
+  <div class="flex flex-col gap-4 pb-4">
+    @for (item of groupsWithData; track item.group.id) {
+      <div class="bg-musclegroup-card rounded-general p-4 flex flex-col gap-3 shadow-sm/30">
+        <div class="text-[22px] uppercase tracking-wide">{{ item.group.name }}</div>
+        @for (ex of item.exercises; track ex.exercise.id) {
+          <div class="bg-set-card rounded-general py-3 px-3 flex justify-between items-center text-sm font-lexend gap-2">
+            <span class="uppercase tracking-wide min-w-0 break-words">{{ ex.exercise.name }}</span>
+            <span class="text-white tracking-wide shrink-0 whitespace-nowrap">{{ ex.bestSet.weight }}<span class="text-white/70">kg x </span>{{ ex.bestSet.reps }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    @if (groupsWithData.length === 0) 
+    {
+      <div class="text-center text-white/50 uppercase text-sm py-6">No sets recorded for this workout</div>
+    }
+  </div>
+
+  <button (click)="close()" class="w-full flex justify-center items-center py-3 border-t border-white/10 mt-auto">
+    <ion-icon name="chevron-down-outline" class="text-2xl text-white"></ion-icon>
+  </button>
+</div>

@@ -7,6 +7,7 @@ export const EXERCISES_BY_GROUP: ExerciseDatabase =
   CHEST: 
   [
     'Bench Press',
+    'Incline Bench Press',
     'Machine Chest Press',
     'Machine Incline Chest Press',
     'Incline Dumbbell Press',
@@ -23,7 +24,9 @@ export const EXERCISES_BY_GROUP: ExerciseDatabase =
     'Pull-ups',
     'Seated Cable Row',
     'Machine Row',
-    'Deadlift'
+    'Deadlift',
+    'Dumbbell Shrugs',
+    'Barbell Shrugs'
   ],
   LEGS: 
   [
@@ -65,7 +68,11 @@ export const EXERCISES_BY_GROUP: ExerciseDatabase =
     'Crunches',
     'Cable Crunches',
     'Leg Raises',
-    'Plank'
+    'Plank',
+    'Machine Crunches',
+    'Russian Twists',
+    'Bicycle Crunches',
+    'Hanging Leg Raises'
   ] 
 };
 

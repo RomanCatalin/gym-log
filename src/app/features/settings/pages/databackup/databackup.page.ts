@@ -2,7 +2,7 @@ import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonContent, IonHeader, IonTitle, IonToolbar, IonButton, IonIcon, AlertController, IonToggle, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
+import { IonContent, ToastController, IonButton, IonIcon, AlertController, IonToggle, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline } from 'ionicons/icons';
 import { WorkoutService } from 'src/app/services/workout-service';
@@ -32,7 +32,7 @@ export class DatabackupPage implements OnInit {
   private alertController = inject(AlertController);
   preferencesService = inject(PreferencesService);
   private ngZone = inject(NgZone);
-  
+  private toastController = inject(ToastController);
   
   dataIntervalOptions = 
   [
@@ -78,12 +78,34 @@ export class DatabackupPage implements OnInit {
   }
 
 async backupNow() {
-  try {
+  try 
+  {
     await this.workoutService.createBackup();
+    const toast = await this.toastController.create({
+      message: 'Backup saved',
+      duration: 2500,
+      position: 'bottom',
+      positionAnchor: 'hotbar-id',
+      cssClass: 'custom-toast',
+    });
+    await toast.present();
+  } 
+  catch (error) 
+  {
+    console.error('[Backup] Eroare la backup manual:', error);
+  }
+}
+
+async share()
+{
+  try 
+  {
     const uri = await this.workoutService.getShareableBackupUri(); 
     await Share.share({ title: 'Gym Log — Backup', files: [uri] }); 
-  } catch (error) {
-    console.error('[Backup] Eroare la backup manual:', error);
+  } 
+  catch (error) 
+  {
+    console.error('[Backup] Eroare la share:', error);
   }
 }
 

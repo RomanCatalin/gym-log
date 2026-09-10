@@ -1,5 +1,5 @@
 <ion-content [fullscreen]="true">
-  <div class="min-h-full bg-main-background p-5 pt-12 font-lexend text-white">
+  <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-white">
 
     <div class="bg-workout-background rounded-general p-4 pb-10">
 
@@ -17,16 +17,21 @@
         </div>
 
         <!-- Lista de Workouts -->
-        <div class="flex flex-col gap-5">
+        <div class="flex flex-col gap-4">
           @for (wk of workoutService.workouts; track wk.id) 
           {
-            <ion-button (click)="goToLevel2(wk)" class="workout-card-template font-lexend">
-              <span class="text-base tracking-wide uppercase">
-                {{ wk.name }}
-                <ion-icon name="pencil-outline" class="absolute pl-2 text-base pt-1"></ion-icon>
-              </span>
-
-            </ion-button>
+            <div class="flex items-stretch">
+              <ion-button (click)="goToLevel2(wk)" class="workout-card-template font-lexend flex-1 min-w-0" style="--border-radius: var(--radius-general) 0 0 var(--radius-general);">
+                <span class="text-base tracking-wide uppercase">
+                  {{ wk.name }}
+                  <ion-icon name="pencil-outline" class="absolute pl-2 text-base pt-1"></ion-icon>
+                </span>
+              </ion-button>
+              <button (click)="openColorPicker($event, wk)" class="w-16 shrink-0 shadow-sm/40"
+                      [style.border-radius]="'0 var(--radius-general) var(--radius-general) 0'"
+                      [style.background]="wk.color || restColor">
+              </button>
+            </div>
           }
           <div class="bg-musclegroup-card rounded-general p-2 py-3 flex gap-3 items-center shadow-sm/30">
             <input
@@ -34,18 +39,12 @@
               placeholder="WORKOUT NAME"
               class="bg-return-button rounded-general text-white uppercase text-sm tracking-wide outline-none w-full px-4 py-2 font-lexend placeholder:text-white/30"
             />
-
             <ion-button (click)="addWorkout()" class="font-lexend input-add-btn">
               <ion-icon name="add" class=""></ion-icon>
             </ion-button>
-
           </div>
         </div>
       }
-
-
-
-
 
       @if (viewState === 2 && selectedWorkout)
       {

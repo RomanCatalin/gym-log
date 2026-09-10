@@ -4,16 +4,20 @@ import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import { inject } from '@angular/core';
 import { PreferencesService } from './preferences-service';
-
+import {Preferences} from '@capacitor/preferences';
+import { REST_DAY_COLOR } from 'src/app/shared/constants/workout-colors';
 
 export interface Exercise { id: string; name: string; }
 export interface MuscleGroup { id: string; name: string; exercises: Exercise[]; }
-export interface Workout { id: string; name: string; muscleGroups: MuscleGroup[]; }
+export interface Workout { id: string; name: string; muscleGroups: MuscleGroup[]; color?: string;}
 
 export interface WorkoutSet { reps: number | null; weight: number | null; }
 export interface WorkoutExercise { id: string; name: string; isCustom: boolean; isCompleted: boolean; sets: WorkoutSet[]; }
 export interface WorkoutMuscleGroup { id: string; name: string; isCustom: boolean; isCompleted: boolean; exercises: WorkoutExercise[]; }
 export interface ActiveWorkout { id: string; name: string; startTime: number; endTime?: number; durationSeconds?: number; muscleGroups: WorkoutMuscleGroup[]; }
+
+export interface CycleSlot {  type: 'workout' | 'rest'; workoutId?: string;}
+export interface Cycle {  slots: CycleSlot[]; anchorDate: number;}
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +37,8 @@ export class WorkoutService {
 
   private preferencesService = inject(PreferencesService);
   private readonly BACKUP_FILE_NAME = 'gym-log-backup.json';
+
+  cycle: Cycle | null = null;
 
   constructor() 
   {
@@ -68,6 +74,7 @@ export class WorkoutService {
       await this.loadTemplates();
       await this.loadHistory();
       await this.loadActiveWorkout();
+      await this.loadCycle();
       this.maybeAutoBackup();
       
     } 
@@ -357,7 +364,8 @@ getLastSetForExercise(exerciseName: string): WorkoutSet | null {
   return null;
 }
 
-async getShareableBackupUri(): Promise<string> {
+async getShareableBackupUri(): Promise<string> 
+{
   const payload = {
     version: 1,
     createdAt: Date.now(),
@@ -372,6 +380,63 @@ async getShareableBackupUri(): Promise<string> {
   });
   const result = await Filesystem.getUri({ path: this.BACKUP_FILE_NAME, directory: Directory.Cache });
   return result.uri;
+}
+
+async loadCycle() {
+  try {
+    const res = await Preferences.get({ key: 'workout_cycle' });
+    if (res.value) {
+      this.cycle = JSON.parse(res.value);
+    }
+  } catch (error) {
+    console.error('[Cycle] Eroare la încărcare:', error);
+  }
+}
+
+async saveCycle(cycle: Cycle) {
+  this.cycle = cycle;
+  await Preferences.set({ key: 'workout_cycle', value: JSON.stringify(cycle) });
+}
+
+async restartCycleAtSlot(slotIndex: number) {
+  if (!this.cycle) return;
+  const todayMidnight = new Date();
+  todayMidnight.setHours(0, 0, 0, 0);
+  const newAnchor = todayMidnight.getTime() - slotIndex * 24 * 60 * 60 * 1000;
+  this.cycle.anchorDate = newAnchor;
+  await this.saveCycle(this.cycle);
+}
+
+getCycleSlotIndexForDate(date: Date): number | null {
+  if (!this.cycle || this.cycle.slots.length === 0) return null;
+  const dayMidnight = new Date(date);
+  dayMidnight.setHours(0, 0, 0, 0);
+  const anchorMidnight = new Date(this.cycle.anchorDate);
+  anchorMidnight.setHours(0, 0, 0, 0);
+  const diffDays = Math.round((dayMidnight.getTime() - anchorMidnight.getTime()) / (24 * 60 * 60 * 1000));
+  const len = this.cycle.slots.length;
+  return ((diffDays % len) + len) % len;
+}
+
+getCycleSlotForDate(date: Date): CycleSlot | null {
+  const index = this.getCycleSlotIndexForDate(date);
+  if (index === null || !this.cycle) return null;
+  return this.cycle.slots[index];
+}
+getWorkoutColor(workoutName: string): string {
+  const template = this.workouts.find(w => w.name.toUpperCase() === workoutName.toUpperCase());
+  return template?.color || REST_DAY_COLOR;
+}
+
+getHistoryForDate(date: Date): ActiveWorkout[] {
+  const dayStr = date.toDateString();
+  return this.workoutHistory.filter(w => new Date(w.startTime).toDateString() === dayStr);
+}
+
+getWorkoutColorById(workoutId: string | undefined): string {
+  if (!workoutId) return REST_DAY_COLOR;
+  const wk = this.workouts.find(w => w.id === workoutId);
+  return wk?.color || REST_DAY_COLOR;
 }
 
 }

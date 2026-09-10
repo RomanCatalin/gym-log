@@ -1,196 +1,151 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { IonContent, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
+import { IonContent, IonIcon, IonButton, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronDownOutline } from 'ionicons/icons';
-import { WorkoutService, ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise } from 'src/app/services/workout-service';
+import { barChartOutline, calendarOutline, refresh, trendingUpOutline } from 'ionicons/icons';
+import { WorkoutService } from 'src/app/services/workout-service';
+import { FormsModule } from '@angular/forms';
+import { ModalController, ActionSheetController } from '@ionic/angular/standalone';
+import { REST_DAY_COLOR } from 'src/app/shared/constants/workout-colors';
+import { WorkoutHistoryDetailComponent } from '../../components/workout-history-detail/workout-history-detail.component';
+import { SplitEditorComponent } from '../../components/split-editor/spllit-editor.component';
 
 @Component({
   selector: 'app-statistics-page',
   templateUrl: './statistics.page.html',
   styleUrls: ['./statistics.page.scss'],
   standalone: true,
-  imports: [IonContent, IonSelect, IonSelectOption, CommonModule, FormsModule]
+  imports: [CommonModule, IonContent, IonIcon, IonButton, IonSelect, FormsModule, IonSelectOption],
 })
 export class StatisticsPage {
   workoutService = inject(WorkoutService);
 
-  statTypes = ['TOTAL WEIGHT LIFTED', 'WORKOUT TYPE', 'MUSCLE GROUP', 'EXERCISE'];
-  selectedStatType: string = 'EXERCISE';
-  selectedSubItem: string = '';
+  viewState: 1 | 2 = 1; // 1 = Progression, 2 = Workout Log
 
-  activePointIndex: number | null = null; 
-  selectedTimeRange: '7d' | '30d' | 'all' = '7d';
+  selectedGroup = '';
+  selectedExercise = '';
+  activePointIndex: number | null = null;
+
+  private modalController = inject(ModalController);
+  private actionSheetController = inject(ActionSheetController);
+
+  calendarMonth = new Date().getMonth();
+  calendarYear = new Date().getFullYear();
 
   constructor() {
-    addIcons({ chevronDownOutline });
+    addIcons({ trendingUpOutline, barChartOutline, calendarOutline, refresh });
   }
 
+  goToProgression() { this.viewState = 1; }
+  goToWorkoutLog() { this.viewState = 2; }
 
-  get availableSubItems(): string[] 
-  {
+  get availableGroups(): string[] {
     const history = this.workoutService.workoutHistory;
-    if (!history || history.length === 0) return [];
-    if (this.selectedStatType === 'TOTAL WEIGHT LIFTED') return [];
-
     const items = new Set<string>();
-
     history.forEach(workout => {
-      if (this.selectedStatType === 'WORKOUT TYPE') {
-        items.add(workout.name.toUpperCase());
-      } else {
-        workout.muscleGroups.forEach(mg => {
-          if (this.selectedStatType === 'MUSCLE GROUP') {
-            items.add(mg.name.toUpperCase());
-          } else if (this.selectedStatType === 'EXERCISE') {
-            mg.exercises.forEach(ex => items.add(ex.name.toUpperCase()));
-          }
-        });
-      }
+      workout.muscleGroups.forEach(mg => {
+        if (mg.exercises.some(ex => ex.sets.length > 0)) {
+          items.add(mg.name.toUpperCase());
+        }
+      });
     });
-
     return Array.from(items);
   }
 
-  onStatTypeChange() {
+  get availableExercises(): string[] {
+    if (!this.selectedGroup) return [];
+    const history = this.workoutService.workoutHistory;
+    const items = new Set<string>();
+    history.forEach(workout => {
+      workout.muscleGroups
+        .filter(mg => mg.name.toUpperCase() === this.selectedGroup)
+        .forEach(mg => {
+          mg.exercises.forEach(ex => {
+            if (ex.sets.length > 0) items.add(ex.name.toUpperCase());
+          });
+        });
+    });
+    return Array.from(items);
+  }
+
+  onGroupChange() {
+    this.selectedExercise = '';
     this.activePointIndex = null;
-    const subItems = this.availableSubItems;
-    if (subItems.length > 0) {
-      this.selectedSubItem = subItems[0];
-    } else {
-      this.selectedSubItem = '';
-    }
+  }
+
+  onExerciseChange() {
+    this.activePointIndex = null;
   }
 
   selectPoint(index: number) {
     this.activePointIndex = this.activePointIndex === index ? null : index;
   }
 
-  private parseDate(dateStr: string): Date {
-    const [day, month, year] = dateStr.split('/').map(Number);
-    return new Date(year, month - 1, day);
-  }
-
-
-  private getExerciseMaxWeight(exercise: WorkoutExercise): number 
-  {
-    let maxWeight = 0;
-    exercise.sets.forEach(set => {
-      if (set.weight && set.weight > maxWeight) {
-        maxWeight = set.weight;
-      }
+  private getExerciseMaxWeight(sets: { weight: number | null; reps: number | null }[]): number {
+    let max = 0;
+    sets.forEach(s => {
+      if (s.weight && s.weight > max) max = s.weight;
     });
-    return maxWeight;
+    return max;
   }
 
-
-  private calculateMuscleGroupMaxWeightSum(group: WorkoutMuscleGroup): number 
-  {
-    let sum = 0;
-    group.exercises.forEach(ex => {
-      sum += this.getExerciseMaxWeight(ex);
-    });
-    return sum;
+  private formatDate(timestamp: number): string {
+    const d = new Date(timestamp);
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   }
 
-  private calculateWorkoutMaxWeightSum(workout: ActiveWorkout): number 
-  {
-    let sum = 0;
-    workout.muscleGroups.forEach(g => {
-      sum += this.calculateMuscleGroupMaxWeightSum(g);
-    });
-    return sum;
-  }
+  get rawChartData(): { date: string; value: number; timestamp: number }[] {
+    if (!this.selectedGroup || !this.selectedExercise) return [];
 
-
-  get rawHistoryData() 
-  {
     const history = this.workoutService.workoutHistory;
-    if (!history || history.length === 0) return [];
-
-    const dailyData = new Map<string, number>();
+    const dailyBest = new Map<string, { value: number; timestamp: number }>();
 
     history.forEach(workout => {
-      const dateObj = new Date(workout.startTime);
-      const day = dateObj.getDate().toString().padStart(2, '0');
-      const month = (dateObj.getMonth() + 1).toString().padStart(2, '0');
-      const year = dateObj.getFullYear();
-      const dateStr = `${day}/${month}/${year}`;
-
-      let sessionValue = 0;
-
-      if (this.selectedStatType === 'TOTAL WEIGHT LIFTED') {
-        sessionValue = this.calculateWorkoutMaxWeightSum(workout);
-      } 
-      else if (this.selectedStatType === 'WORKOUT TYPE' && workout.name.toUpperCase() === this.selectedSubItem) {
-        sessionValue = this.calculateWorkoutMaxWeightSum(workout);
-      } 
-      else if (this.selectedStatType === 'MUSCLE GROUP') {
-        const group = workout.muscleGroups.find(g => g.name.toUpperCase() === this.selectedSubItem);
-        if (group) sessionValue = this.calculateMuscleGroupMaxWeightSum(group);
-      } 
-      else if (this.selectedStatType === 'EXERCISE') {
-        let maxWeight = 0;
-        workout.muscleGroups.forEach(g => {
-          const ex = g.exercises.find(e => e.name.toUpperCase() === this.selectedSubItem);
-          if (ex) {
-            const exMax = this.getExerciseMaxWeight(ex);
-            if (exMax > maxWeight) maxWeight = exMax;
-          }
+      let maxForThisWorkout = 0;
+      workout.muscleGroups
+        .filter(mg => mg.name.toUpperCase() === this.selectedGroup)
+        .forEach(mg => {
+          mg.exercises
+            .filter(ex => ex.name.toUpperCase() === this.selectedExercise)
+            .forEach(ex => {
+              const max = this.getExerciseMaxWeight(ex.sets);
+              if (max > maxForThisWorkout) maxForThisWorkout = max;
+            });
         });
-        sessionValue = maxWeight;
-      }
 
-      if (sessionValue > 0) {
-        if (dailyData.has(dateStr)) 
-        {
-          dailyData.set(dateStr, Math.max(dailyData.get(dateStr)!, sessionValue));
-        } 
-        else 
-        {
-          dailyData.set(dateStr, sessionValue);
+      if (maxForThisWorkout > 0) {
+        const dateStr = this.formatDate(workout.startTime);
+        const existing = dailyBest.get(dateStr);
+        if (!existing || maxForThisWorkout > existing.value) {
+          dailyBest.set(dateStr, { value: maxForThisWorkout, timestamp: workout.startTime });
         }
       }
     });
 
-    const result = Array.from(dailyData.entries()).map(([date, value]) => ({ date, value }));
-    result.sort((a, b) => this.parseDate(a.date).getTime() - this.parseDate(b.date).getTime());
-    
+    const result = Array.from(dailyBest.entries()).map(([date, data]) => ({
+      date, value: data.value, timestamp: data.timestamp,
+    }));
+    result.sort((a, b) => a.timestamp - b.timestamp);
     return result;
   }
 
-
-  get chartConfig() 
-  {
-    const allHistory = this.rawHistoryData;
-    let rawData = allHistory;
-
-    if (this.selectedTimeRange === '7d') {
-      const now = new Date();
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(now.getDate() - 7);
-      sevenDaysAgo.setHours(0, 0, 0, 0);
-
-      rawData = allHistory.filter(item => {
-        const itemDate = this.parseDate(item.date);
-        return itemDate >= sevenDaysAgo && itemDate <= now;
-      });
-    }
-
+  get chartConfig() {
+    const rawData = this.rawChartData;
     const svgWidth = 400;
-    const svgHeight = 220; 
-    
+    const svgHeight = 400;
+
     if (rawData.length === 0) return { points: [], segments: [], viewBox: `0 0 ${svgWidth} ${svgHeight}` };
 
     const maxVal = Math.max(...rawData.map(d => d.value));
     const minVal = Math.min(...rawData.map(d => d.value));
     const range = maxVal === minVal ? 10 : maxVal - minVal;
 
-    const paddingX = 25; 
-    const topPadding = 40; 
-    const bottomPadding = 40; 
-
+    const paddingX = 25;
+    const topPadding = 40;
+    const bottomPadding = 40;
     const usableWidth = svgWidth - paddingX * 2;
     const usableHeight = svgHeight - topPadding - bottomPadding;
 
@@ -210,18 +165,169 @@ export class StatisticsPage {
     for (let i = 0; i < points.length - 1; i++) {
       const p1 = points[i];
       const p2 = points[i + 1];
-      
-      let lineColor = '#9ca3af'; 
-      if (p2.value > p1.value) lineColor = '#4ade80'; 
-      else if (p2.value < p1.value) lineColor = '#f87171'; 
-
-      segments.push({
-        x1: p1.x, y1: p1.y,
-        x2: p2.x, y2: p2.y,
-        color: lineColor
-      });
+      let lineColor = '#9ca3af';
+      if (p2.value > p1.value) lineColor = '#4ade80';
+      else if (p2.value < p1.value) lineColor = '#f87171';
+      segments.push({ x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: lineColor });
     }
 
     return { points, segments, viewBox: `0 0 ${svgWidth} ${svgHeight}` };
+  }
+
+  get calendarMonthLabel(): string {
+    const names = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
+    return `${names[this.calendarMonth]} ${this.calendarYear}`;
+  }
+
+  prevMonth() {
+    this.calendarMonth--;
+    if (this.calendarMonth < 0) { this.calendarMonth = 11; this.calendarYear--; }
+  }
+
+  nextMonth() {
+    this.calendarMonth++;
+    if (this.calendarMonth > 11) { this.calendarMonth = 0; this.calendarYear++; }
+  }
+
+  get calendarCells(): ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; } | null)[] {
+    const firstOfMonth = new Date(this.calendarYear, this.calendarMonth, 1);
+    const daysInMonth = new Date(this.calendarYear, this.calendarMonth + 1, 0).getDate();
+    const jsDay = firstOfMonth.getDay(); 
+    const leadingBlanks = (jsDay + 6) % 7; 
+
+    const cells: ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; } | null)[] = [];
+
+    if (leadingBlanks > 0) {
+      const previousMonthDays = new Date(this.calendarYear, this.calendarMonth, 0).getDate();
+
+      for (let i = leadingBlanks; i > 0; i--) {
+        const day = previousMonthDays - i + 1;
+        const date = new Date(this.calendarYear, this.calendarMonth - 1, day);
+        date.setHours(0, 0, 0, 0);
+
+        cells.push({
+          day,
+          date,
+          color: '#252525',
+          hasHistory: false,
+          isOutsideMonth: true,
+          isPast: true,
+        });
+      }
+    }
+
+    const todayMidnight = new Date();
+    todayMidnight.setHours(0, 0, 0, 0);
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(this.calendarYear, this.calendarMonth, d);
+      date.setHours(0, 0, 0, 0);
+      
+      let color: string;
+      let hasHistory = false;
+      const isPast = date.getTime() < todayMidnight.getTime();
+
+      if (isPast) {
+        const history = this.workoutService.getHistoryForDate(date);
+        if (history.length > 0) {
+          color = this.workoutService.getWorkoutColor(history[0].name);
+          hasHistory = true;
+        } else {
+          color = REST_DAY_COLOR;
+        }
+      } else {
+        const slot = this.workoutService.getCycleSlotForDate(date);
+        color = !slot 
+          ? REST_DAY_COLOR 
+          : (slot.type === 'rest' ? REST_DAY_COLOR : this.workoutService.getWorkoutColorById(slot.workoutId));
+      }
+
+      cells.push({
+        day: d,
+        date,
+        color,
+        hasHistory,
+        isOutsideMonth: false,
+        isPast,
+      });
+    }
+    const trailingDays = (7 - (cells.length % 7)) % 7;
+    for (let i = 1; i <= trailingDays; i++) {
+      const date = new Date(this.calendarYear, this.calendarMonth + 1, i);
+      date.setHours(0, 0, 0, 0);
+
+      cells.push({
+        day: i,
+        date,
+        color: '#252525',
+        hasHistory: false,
+        isOutsideMonth: true,
+        isPast: false,
+      });
+    }
+
+    return cells;
+  }
+
+  get cycleBarSlots(): { color: string; isToday: boolean }[] {
+    if (!this.workoutService.cycle || this.workoutService.cycle.slots.length === 0) return [];
+    const todayIndex = this.workoutService.getCycleSlotIndexForDate(new Date());
+
+    return this.workoutService.cycle.slots.map((slot, i) => ({
+      color: slot.type === 'rest' ? REST_DAY_COLOR : this.workoutService.getWorkoutColorById(slot.workoutId),
+      isToday: i === todayIndex,
+    }));
+  }
+
+  async onDayTap(cell: { day: number; date: Date; color: string; hasHistory: boolean } | null) {
+    if (!cell || !cell.hasHistory) return;
+    const history = this.workoutService.getHistoryForDate(cell.date);
+    if (history.length === 0) return;
+
+    const modal = await this.modalController.create({
+      component: WorkoutHistoryDetailComponent,
+      componentProps: { workout: history[0] },
+      cssClass: 'workout-history-modal',
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 0.95],
+    });
+    await modal.present();
+  }
+
+  async openSplitEditor() {
+    const modal = await this.modalController.create({
+      component: SplitEditorComponent,
+      cssClass: 'split-editor-modal',
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 0.95],
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data?.saved) {
+      const todayMidnight = new Date();
+      todayMidnight.setHours(0, 0, 0, 0);
+      await this.workoutService.saveCycle({ slots: data.slots, anchorDate: todayMidnight.getTime() });
+    }
+  }
+
+  async openRestartPicker() {
+    if (!this.workoutService.cycle || this.workoutService.cycle.slots.length === 0) return;
+
+    const buttons: any[] = this.workoutService.cycle.slots.map((slot, index) => {
+      const label = slot.type === 'rest' ? 'REST' : (this.workoutService.workouts.find(w => w.id === slot.workoutId)?.name || 'UNKNOWN');
+      return {
+        text: `DAY ${index + 1}: ${label}`,
+        handler: () => { this.workoutService.restartCycleAtSlot(index); },
+      };
+    });
+    buttons.push({ text: 'CANCEL', role: 'cancel' });
+
+    const actionSheet = await this.actionSheetController.create({
+      header: 'START SPLIT FROM:',
+      cssClass: 'custom-action-sheet-cycle',
+      buttons,
+    });
+    await actionSheet.present();
   }
 }

@@ -1,0 +1,5 @@
+<div class="bg-return-button p-3 grid grid-cols-5 gap-2 justify-items-center">
+  @for (color of colors; track color) {
+    <button style="border-radius: 6px;"(click)="pick(color)" class="w-full aspect-square rounded-general shrink-0" [style.background]="color" ></button>
+  }
+</div>

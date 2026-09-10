@@ -7,7 +7,9 @@ import { addIcons } from 'ionicons';
 import { arrowRedoOutline, pencilOutline, chevronDownOutline, closeOutline, returnUpBackOutline, add } from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
-
+import { PopoverController } from '@ionic/angular/standalone';
+import { WORKOUT_COLOR_PALETTE, REST_DAY_COLOR } from 'src/app/shared/constants/workout-colors';
+import { ColorPickerComponent } from '../../components/color-picker/color-picker.component';
 
 @Component({
   selector: 'app-workout-templates',
@@ -38,6 +40,9 @@ export class WorkoutTemplatesPage {
 
   exercisesByGroup: Record<string, string[]> = EXERCISES_BY_GROUP;
  
+  private popoverController = inject(PopoverController);
+  restColor = REST_DAY_COLOR;
+
   get availableGroups(): string[] 
   {
     if (!this.selectedWorkout?.muscleGroups) return ALL_MUSCLE_GROUPS;
@@ -87,9 +92,17 @@ export class WorkoutTemplatesPage {
     this.viewState = 3;
   }
 
+  private getNextAvailableColor(): string 
+  {
+    const usedColors = new Set(this.workoutService.workouts.map(w => w.color).filter((c): c is string => !!c));
+    const unused = WORKOUT_COLOR_PALETTE.find(c => !usedColors.has(c));
+    if (unused) return unused;
+    return WORKOUT_COLOR_PALETTE[this.workoutService.workouts.length % WORKOUT_COLOR_PALETTE.length];
+  }
+
   async addWorkout() {
     if (this.newWorkoutName.trim()) {
-      this.workoutService.workouts.push({ id: Date.now().toString(), name: this.newWorkoutName.toUpperCase(), muscleGroups: [] });
+      this.workoutService.workouts.push({ id: Date.now().toString(), name: this.newWorkoutName.toUpperCase(), muscleGroups: [], color: this.getNextAvailableColor(), });
       await this.workoutService.saveTemplates();
       this.newWorkoutName = '';
     }
@@ -130,6 +143,23 @@ export class WorkoutTemplatesPage {
   async deleteExercise(exerciseId: string) {
     if (this.selectedMuscleGroup) {
       this.selectedMuscleGroup.exercises = this.selectedMuscleGroup.exercises.filter(e => e.id !== exerciseId);
+      await this.workoutService.saveTemplates();
+    }
+  }
+
+  async openColorPicker(event: Event, workout: Workout) 
+  {
+    const popover = await this.popoverController.create({
+      component: ColorPickerComponent,
+      event,
+      cssClass: 'color-picker-popover',
+    });
+    await popover.present();
+
+    const { data } = await popover.onDidDismiss();
+    if (data) 
+    {
+      workout.color = data;
       await this.workoutService.saveTemplates();
     }
   }

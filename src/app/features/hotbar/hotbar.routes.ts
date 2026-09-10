@@ -12,8 +12,7 @@ export const routes: Routes = [
       },
       {
         path: 'statistics',
-        loadComponent: () =>
-          import('../statistics/pages/statistics/statistics.page').then(m => m.StatisticsPage),
+        loadComponent: () => import('../statistics/pages/statistics/statistics.page').then(m => m.StatisticsPage),                           
       },
       {
         path: 'settings',
