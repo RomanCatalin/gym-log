@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonContent, ToastController, IonButton, IonIcon, AlertController, IonToggle, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { returnUpBackOutline } from 'ionicons/icons';
+import { returnUpBackOutline, shareSocialOutline } from 'ionicons/icons';
 import { WorkoutService } from 'src/app/services/workout-service';
 import { PreferencesService } from 'src/app/services/preferences-service';
 import { Share } from '@capacitor/share';
@@ -21,7 +21,7 @@ export class DatabackupPage implements OnInit {
 
   constructor() 
   { 
-    addIcons({ returnUpBackOutline });
+    addIcons({ returnUpBackOutline, shareSocialOutline });
   }
 
   ngOnInit() {

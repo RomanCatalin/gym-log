@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonContent, IonIcon, IonButton, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barChartOutline, calendarOutline, refresh, trendingUpOutline } from 'ionicons/icons';
+import { barChart, barChartOutline, calendar, calendarOutline, refresh, trendingUpOutline } from 'ionicons/icons';
 import { WorkoutService } from 'src/app/services/workout-service';
 import { FormsModule } from '@angular/forms';
 import { ModalController, ActionSheetController } from '@ionic/angular/standalone';
@@ -33,7 +33,7 @@ export class StatisticsPage {
   calendarYear = new Date().getFullYear();
 
   constructor() {
-    addIcons({ trendingUpOutline, barChartOutline, calendarOutline, refresh });
+    addIcons({ trendingUpOutline, barChart, calendar, refresh });
   }
 
   goToProgression() { this.viewState = 1; }
@@ -189,14 +189,16 @@ export class StatisticsPage {
     if (this.calendarMonth > 11) { this.calendarMonth = 0; this.calendarYear++; }
   }
 
-  get calendarCells(): ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; } | null)[] {
+  get calendarCells(): ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; isToday: boolean } | null)[] 
+  {
     const firstOfMonth = new Date(this.calendarYear, this.calendarMonth, 1);
     const daysInMonth = new Date(this.calendarYear, this.calendarMonth + 1, 0).getDate();
     const jsDay = firstOfMonth.getDay(); 
     const leadingBlanks = (jsDay + 6) % 7; 
 
-    const cells: ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; } | null)[] = [];
+    const cells: ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; isToday: boolean } | null)[] = [];
 
+    // 1. Zilele din luna anterioară (completare grilă)
     if (leadingBlanks > 0) {
       const previousMonthDays = new Date(this.calendarYear, this.calendarMonth, 0).getDate();
 
@@ -212,6 +214,7 @@ export class StatisticsPage {
           hasHistory: false,
           isOutsideMonth: true,
           isPast: true,
+          isToday: false,
         });
       }
     }
@@ -219,6 +222,7 @@ export class StatisticsPage {
     const todayMidnight = new Date();
     todayMidnight.setHours(0, 0, 0, 0);
 
+    // 2. Zilele lunii curente
     for (let d = 1; d <= daysInMonth; d++) {
       const date = new Date(this.calendarYear, this.calendarMonth, d);
       date.setHours(0, 0, 0, 0);
@@ -226,9 +230,12 @@ export class StatisticsPage {
       let color: string;
       let hasHistory = false;
       const isPast = date.getTime() < todayMidnight.getTime();
+      const isToday = date.getTime() === todayMidnight.getTime();
+
+      const history = this.workoutService.getHistoryForDate(date);
 
       if (isPast) {
-        const history = this.workoutService.getHistoryForDate(date);
+        // TRECUT: Dacă există antrenament, folosește culoarea lui. Dacă nu, folosește REST_DAY_COLOR.
         if (history.length > 0) {
           color = this.workoutService.getWorkoutColor(history[0].name);
           hasHistory = true;
@@ -236,10 +243,16 @@ export class StatisticsPage {
           color = REST_DAY_COLOR;
         }
       } else {
-        const slot = this.workoutService.getCycleSlotForDate(date);
-        color = !slot 
-          ? REST_DAY_COLOR 
-          : (slot.type === 'rest' ? REST_DAY_COLOR : this.workoutService.getWorkoutColorById(slot.workoutId));
+        // ASTĂZI ȘI VIITOR: Aplicăm logica bazată pe Split
+        if (history.length > 0) {
+          color = this.workoutService.getWorkoutColor(history[0].name);
+          hasHistory = true;
+        } else {
+          const slot = this.workoutService.getCycleSlotForDate(date);
+          color = !slot 
+            ? REST_DAY_COLOR 
+            : (slot.type === 'rest' ? REST_DAY_COLOR : this.workoutService.getWorkoutColorById(slot.workoutId));
+        }
       }
 
       cells.push({
@@ -249,8 +262,11 @@ export class StatisticsPage {
         hasHistory,
         isOutsideMonth: false,
         isPast,
+        isToday,
       });
     }
+
+    // 3. Zilele din luna următoare (completare grilă)
     const trailingDays = (7 - (cells.length % 7)) % 7;
     for (let i = 1; i <= trailingDays; i++) {
       const date = new Date(this.calendarYear, this.calendarMonth + 1, i);
@@ -263,6 +279,7 @@ export class StatisticsPage {
         hasHistory: false,
         isOutsideMonth: true,
         isPast: false,
+        isToday: false,
       });
     }
 
@@ -279,20 +296,54 @@ export class StatisticsPage {
     }));
   }
 
-  async onDayTap(cell: { day: number; date: Date; color: string; hasHistory: boolean } | null) {
+  async onDayTap(cell: { day: number; date: Date; color: string; hasHistory: boolean } | null) 
+  {
     if (!cell || !cell.hasHistory) return;
+  
     const history = this.workoutService.getHistoryForDate(cell.date);
     if (history.length === 0) return;
 
-    const modal = await this.modalController.create({
-      component: WorkoutHistoryDetailComponent,
-      componentProps: { workout: history[0] },
-      cssClass: 'workout-history-modal',
-      initialBreakpoint: 0.75,
-      breakpoints: [0, 0.75, 0.95],
+    if (history.length === 1) {
+      this.openWorkoutDetailModal(history[0]);
+      return;
+    }
+
+    const buttons: any[] = history.map((workout) => 
+    {
+      const timeStr = new Date(workout.startTime).toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+
+      return {
+        text: `${workout.name.toUpperCase()} (${timeStr})`,
+        handler: () => {
+          this.openWorkoutDetailModal(workout);
+        }
+      };
     });
-    await modal.present();
+
+    buttons.push({ text: 'CANCEL', role: 'cancel' });
+
+    const actionSheet = await this.actionSheetController.create({
+      header: 'SELECT WORKOUT',
+      cssClass: 'custom-action-sheet-cycle',
+      buttons,
+    });
+
+    await actionSheet.present();
   }
+
+private async openWorkoutDetailModal(workout: any) {
+  const modal = await this.modalController.create({
+    component: WorkoutHistoryDetailComponent,
+    componentProps: { workout },
+    cssClass: 'workout-history-modal',
+    initialBreakpoint: 0.75,
+    breakpoints: [0, 0.75, 0.95],
+  });
+  await modal.present();
+}
 
   async openSplitEditor() {
     const modal = await this.modalController.create({

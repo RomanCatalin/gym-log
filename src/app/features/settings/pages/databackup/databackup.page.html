@@ -22,7 +22,7 @@
         </div>
         @if (preferencesService.dataBackupEnabled) 
         {
-          <div class="flex flex-col gap-5 pl-1 mt-2">
+          <div class="flex flex-col gap-5 pl-0.5 mt-2">
             <div class="flex justify-between items-center">
               <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">
                 INTERVAL
@@ -44,21 +44,30 @@
             </div>
           </div>
         }
-        <ion-button (click)="backupNow()" class="set-add-btn font-lexend mt-3 flex text-[14px]">
-        BACKUP NOW
-        </ion-button>
-
-        <ion-button (click)="share()" class="set-add-btn font-lexend mt-1 flex text-[14px]">
-        SHARE
-        </ion-button>
+        <div class="flex gap-0.75 items-stretch">
+          <div class="flex-1 bg-[#5A818F] rounded-l-general rounded-r-none flex items-center justify-center shadow-sm/30">
+            <ion-button fill="clear" (click)="backupNow()" class="w-full h-full font-lexend text-white font-medium tracking-widest text-sm m-0">
+              BACKUP NOW
+            </ion-button>
+          </div>
+          <div class="w-[22%] bg-[#41616d] rounded-r-general rounded-l-none flex items-center justify-center shadow-sm/30">
+            <ion-button fill="clear" (click)="share()" class="w-full h-full m-0 text-white">
+              <ion-icon name="share-social-outline" slot="icon-only" class="text-white text-[20px]"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
       </div>
 
-      <div class="bg-musclegroup-card rounded-general p-4 py-5 flex flex-col gap-4 shadow-sm/30 mt-5">
+      <div class="bg-musclegroup-card rounded-general p-4 py-4 flex flex-col gap-4 shadow-sm/30 mt-5">
         <div class="flex justify-between items-center">
           <span class="text-white font-lexend uppercase tracking-wide">IMPORT DATA</span>
-          <ion-button (click)="importData()" class="import-button font-lexend flex text-[14px]">
-            IMPORT
-          </ion-button>
+          
+          <div class="bg-[#6561aa] rounded-general flex items-center justify-center shadow-sm/30">
+            <ion-button fill="clear" (click)="importData()" class="font-lexend text-[14px] font-medium text-white m-0" style="--color: #ffffff; --ripple-color: #ffffff;">
+              IMPORT
+            </ion-button>
+          </div>
+
         </div>
       </div>
 

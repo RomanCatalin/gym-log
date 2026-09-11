@@ -171,6 +171,9 @@
                             [style.border-bottom-left-radius.px]="$index % 7 === 0 ? 8 : 0"
                             [style.border-top-right-radius.px]="$index % 7 === 6 ? 8 : 0"
                             [style.border-bottom-right-radius.px]="$index % 7 === 6 ? 8 : 0"
+                            [class.ring-1]="cell.isToday"
+                            [class.z-10]="cell.isToday"
+                            [class.ring-white]="cell.isToday"
                           >
                             {{ cell.day }}
                           </button>
@@ -222,10 +225,10 @@
 
       <div class="statistics-inner-tab-bar">
         <ion-button (click)="goToProgression()" [ngClass]="{ 'active': viewState === 1 }" expand="block" fill="clear" class="stats-toggle-btn">
-          <ion-icon name="bar-chart-outline" slot="icon-only"></ion-icon>
+          <ion-icon name="bar-chart" slot="icon-only"></ion-icon>
         </ion-button>
         <ion-button (click)="goToWorkoutLog()" [ngClass]="{ 'active': viewState === 2 }" expand="block" fill="clear" class="stats-toggle-btn">
-          <ion-icon name="calendar-outline" slot="icon-only"></ion-icon>
+          <ion-icon name="calendar" slot="icon-only"></ion-icon>
         </ion-button>
       </div>
 
