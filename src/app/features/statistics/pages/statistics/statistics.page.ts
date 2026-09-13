@@ -33,7 +33,7 @@ export class StatisticsPage {
   calendarYear = new Date().getFullYear();
 
   constructor() {
-    addIcons({ trendingUpOutline, barChart, calendar, refresh });
+    addIcons({ trendingUpOutline, barChart, barChartOutline, calendar, calendarOutline, refresh });
   }
 
   goToProgression() { this.viewState = 1; }

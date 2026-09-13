@@ -8,12 +8,12 @@ import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'sr
 import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { PreferencesService } from 'src/app/services/preferences-service';
-
+import { IonAccordion, IonAccordionGroup, IonItem } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-workout',
   standalone: true,
-  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption],
+  imports: [CommonModule, FormsModule, IonContent, IonIcon, IonButton, IonSelect, IonSelectOption, IonAccordion, IonAccordionGroup, IonItem],
   templateUrl: './workout.page.html',
 })
 export class WorkoutPage implements OnInit, OnDestroy 
@@ -149,17 +149,22 @@ export class WorkoutPage implements OnInit, OnDestroy
     this.viewState = 2;
   }
 
-  goToExercise(exercise: WorkoutExercise) 
-  {
+  onExerciseAccordionChange(event: any) {
+    const exerciseId = event.detail.value;
+    if (!exerciseId) {
+      this.activeExercise = null;
+      return;
+    }
+    if (!this.activeMuscleGroup) return;
+    const exercise = this.activeMuscleGroup.exercises.find(e => e.id === exerciseId);
+    if (!exercise) return;
+
     this.activeExercise = exercise;
-    if (exercise.sets.length > 0) 
-    {
+    if (exercise.sets.length > 0) {
       const lastSet = exercise.sets[exercise.sets.length - 1];
       this.newReps = lastSet.reps;
       this.newWeight = lastSet.weight;
-    } 
-    else 
-    {
+    } else {
       const last = this.workoutService.getLastSetForExercise(exercise.name);
       this.newReps = last ? last.reps : null;
       this.newWeight = last ? last.weight : null;

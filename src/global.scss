@@ -269,7 +269,7 @@ ion-select {
   --padding-start: 0;
   --padding-end: 0;
   color: #ffffff !important;
-  
+
   &::part(icon) {
     color: #ffffff !important;
     opacity: 1 !important;
@@ -285,6 +285,8 @@ ion-select {
     min-width: 0;
     line-height: 1.25;
   }
+
+  
 }
 
 
@@ -299,7 +301,7 @@ ion-popover.custom-template-popover {
   &::part(content) {
     background: #313131;
     color: white;
-    border-radius: 0 0 12px 12px !important; 
+    border-radius: var(rounded-general) !important; 
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     overflow: hidden; 
   }
@@ -316,6 +318,12 @@ ion-popover.custom-template-popover {
       font-family: inherit;
       font-size: 0.875rem;
       text-transform: uppercase;
+    }
+
+    ion-item.ion-focused {
+      --background: transparent !important;
+      --background-focused: white !important;
+      --background-activated: white !important;
     }
   }
   
@@ -469,6 +477,7 @@ ion-action-sheet.custom-action-sheet-cycle .action-sheet-cancel {
   --background-focused: transparent;
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 
+  
   &:last-child {
     border-right: none;
   }
@@ -562,6 +571,78 @@ ion-toast.custom-toast {
   --border-radius: var(--radius-general);
 }
 
+
+.workout-accordion-group {
+  display: flex;
+  flex-direction: column;
+}
+
+ion-accordion.exercise-accordion {
+  margin-bottom: 0.75rem;
+  background: var(--color-exercise-card); 
+  border-radius: var(--radius-general);    
+  overflow: hidden;                        
+  transition: background-color 200ms ease;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+
+  > ion-item[slot="header"] {
+    --background: transparent;             
+    --color: white;
+    --padding-top: 20px;
+    --padding-bottom: 20px;
+    --padding-start: 20px;
+    --padding-end: 20px;
+    --min-height: 0;
+    --inner-padding-end: 0;                
+    border-radius: 0;                      
+
+    &::part(native) 
+    {
+      border-radius: 0;
+      justify-content: center;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+
+  .exercise-accordion-content {
+    background: transparent;
+    padding: 1rem;
+  }
+
+  .ion-accordion-toggle-icon,
+  ion-icon[slot="end"],
+  [slot="end"] {
+    display: none !important;
+  }
+
+  &.completed-workout-btn {
+    background: var(--color-exercise-card); 
+
+    > ion-item[slot="header"] {
+      --background: var(--color-workout-finish); 
+    }
+  
+  }
+  
+  &.is-expanded .exercise-accordion-title {
+    font-size: 18px;
+  }
+}
+
+.exercise-accordion-title {
+  font-family: "Lexend Giga", sans-serif;
+  font-size: 14px;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  display: block;
+  transition: font-size 150ms ease;
+}
 
 html,
 body,

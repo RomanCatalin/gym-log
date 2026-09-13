@@ -22,23 +22,21 @@ export class PreferencesPage implements OnInit {
     addIcons({ returnUpBackOutline, playOutline });
   }
 
-  async ngOnInit() {
+  async ngOnInit() 
+  {
     await this.preferencesService.ready;
+    this.restMinutes = Math.floor(this.preferencesService.restTimeSeconds / 60);
+    this.restSeconds = this.preferencesService.restTimeSeconds % 60;
   }
+
   preferencesService = inject(PreferencesService);
   private router = inject(Router);
   private alertController = inject(AlertController);
 
-  restTimeOptions = 
-  [
-    { label: '5 SECONDS', value: 5 },
-    { label: '30 SECONDS', value: 30 },
-    { label: '1 MINUTE', value: 60 },
-    { label: '1:30 MINUTES', value: 90 },
-    { label: '2 MINUTES', value: 120 },
-    { label: '3 MINUTES', value: 180 },
-    { label: '5 MINUTES', value: 300 },
-  ];
+  restMinutes: number | null = 0;
+  restSeconds: number | null = 0;
+
+
 
   goBack() {
     this.router.navigate(['/settings']);
@@ -78,6 +76,37 @@ export class PreferencesPage implements OnInit {
     });
 
     await alert.present();
+  }
+
+  onRestMinutesInput(event: any) 
+  {
+    let value = event.target.value.replace(/\D/g, '').slice(0, 2);
+
+    event.target.value = value;
+    this.restMinutes = value ? Number(value) : null;
+  }
+
+  onRestSecondsInput(event: any) 
+  {
+    let value = event.target.value.replace(/\D/g, '').slice(0, 2);
+
+    let seconds = value ? Number(value) : null;
+
+    if (seconds !== null && seconds > 59) 
+    {
+      seconds = 59;
+      value = '59';
+    }
+
+    event.target.value = value;
+    this.restSeconds = seconds;
+  }
+
+  onRestTimeBlur() 
+  {
+    const minutes = this.restMinutes ?? 0;
+    const seconds = this.restSeconds ?? 0;
+    this.preferencesService.setRestTimeSeconds(minutes * 60 + seconds);
   }
 
 }

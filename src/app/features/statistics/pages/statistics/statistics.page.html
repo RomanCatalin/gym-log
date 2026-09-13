@@ -143,9 +143,12 @@
                   </div>
 
                   <div class="grid grid-cols-7 gap-1.5 px-1">
-                    @for (cell of calendarCells; track $index) {
-                      @if (cell) {
-                        @if (cell.isOutsideMonth) {
+                    @for (cell of calendarCells; track $index)
+                    {
+                      @if (cell) 
+                      {
+                        @if (cell.isOutsideMonth) 
+                        {
                           <!-- Zile din luna următoare/anterioară -->
                           <div 
                             class="aspect-square flex items-center justify-center font-lexend text-sm text-white/30 bg-[#252525]"
@@ -157,7 +160,9 @@
                           >
                             {{ cell.day }}
                           </div>
-                        } @else {
+                        } 
+                        @else 
+                        {
                           <!-- Zi normală -->
                           <button 
                             type="button" 
@@ -178,8 +183,9 @@
                             {{ cell.day }}
                           </button>
                         }
-                      } @else {
-                        <!-- Spațiu gol dacă folosești elemente null -->
+                      } 
+                      @else 
+                      {
                         <div 
                           class="aspect-square"
                           [style.border-radius.px]="$index % 7 === 0 || $index % 7 === 6 ? 8 : 0"
@@ -225,10 +231,10 @@
 
       <div class="statistics-inner-tab-bar">
         <ion-button (click)="goToProgression()" [ngClass]="{ 'active': viewState === 1 }" expand="block" fill="clear" class="stats-toggle-btn">
-          <ion-icon name="bar-chart" slot="icon-only"></ion-icon>
+          <ion-icon [name]="viewState === 1 ? 'bar-chart' : 'bar-chart-outline'" slot="icon-only"></ion-icon>
         </ion-button>
         <ion-button (click)="goToWorkoutLog()" [ngClass]="{ 'active': viewState === 2 }" expand="block" fill="clear" class="stats-toggle-btn">
-          <ion-icon name="calendar" slot="icon-only"></ion-icon>
+          <ion-icon [name]="viewState === 2 ? 'calendar' : 'calendar-outline'" slot="icon-only"></ion-icon>
         </ion-button>
       </div>
 

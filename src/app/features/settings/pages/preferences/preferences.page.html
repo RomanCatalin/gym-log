@@ -21,7 +21,7 @@
               interface="popover"
               fill="none"
               [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-              class="text-white uppercase text-sm tracking-wide outline-none px-4 py-0 font-lexend rounded-general">
+              class="bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 py-0 font-lexend rounded-general">
               <ion-select-option value="dark">DARK</ion-select-option>
             </ion-select>
           </div>
@@ -32,17 +32,25 @@
         <div class="flex justify-between items-center">
           <span class="text-white font-lexend uppercase tracking-wide">Rest Time</span>
           <div class="bg-return-button rounded-general">
-            <ion-select
-              [(ngModel)]="preferencesService.restTimeSeconds"
-              (ionChange)="onRestTimeChange($event)"
-              interface="popover"
-              fill="none"
-              [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-              class="text-white uppercase text-sm tracking-wide outline-none px-4 py-0.5 font-lexend rounded-general w-38">
-              @for (option of restTimeOptions; track option.value) {
-                <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
-              }
-            </ion-select>
+            <div class="flex items-center gap-1 bg-return-button rounded-general px-2 py-1">
+              <input
+                type="text"
+                inputmode="numeric"
+                [(ngModel)]="restMinutes"
+                (input)="onRestMinutesInput($event)"
+                (blur)="onRestTimeBlur()"
+                placeholder="00"
+                class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-white font-lexend text-sm" />
+              <span class="text-white font-lexend text-sm">:</span>
+              <input
+                type="text"
+                inputmode="numeric"
+                [(ngModel)]="restSeconds"
+                (input)="onRestSecondsInput($event)"
+                (blur)="onRestTimeBlur()"
+                placeholder="00"
+                class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-white font-lexend text-sm" />
+            </div>
           </div>
         </div>
 
