@@ -3,7 +3,7 @@
 
     <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
       <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
-        <div class="text-[22px] text-white font-lexend">
+        <div class="text-[22px] text-primary font-lexend">
           DATA & BACKUP
         </div>
         <ion-button (click)="goBack()" class="return-btn">
@@ -13,7 +13,7 @@
 
       <div class="bg-musclegroup-card rounded-general p-4 flex flex-col gap-4 shadow-sm/30">
         <div class="flex justify-between items-center">
-          <span class="text-white font-lexend uppercase tracking-wide">AUTOMATIC BACKUP</span>
+          <span class="text-primary font-lexend uppercase tracking-wide">AUTOMATIC BACKUP</span>
           <ion-toggle
             [(ngModel)]="preferencesService.dataBackupEnabled"
             (ionChange)="onDataBackupToggle($event)"
@@ -24,7 +24,7 @@
         {
           <div class="flex flex-col gap-5 pl-0.5 mt-2">
             <div class="flex justify-between items-center">
-              <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">
+              <span class="text-primary/80 font-lexend uppercase text-sm tracking-wide">
                 INTERVAL
               </span>
                 <div class="bg-return-button rounded-general">
@@ -34,7 +34,7 @@
                   interface="popover"
                   fill="none"
                   [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-                  class="text-white uppercase text-sm tracking-wide outline-none px-2 py-0 font-lexend rounded-general text-[12px] w-32.5">
+                  class="text-primary uppercase text-sm tracking-wide outline-none px-2 py-0 font-lexend rounded-general text-[12px] w-32.5">
                   @for (option of dataIntervalOptions; track option.value) 
                   {
                     <ion-select-option [value]="option.value">{{ option.label }}</ion-select-option>
@@ -51,8 +51,8 @@
             </ion-button>
           </div>
           <div class="w-[22%] bg-[#41616d] rounded-r-general rounded-l-none flex items-center justify-center shadow-sm/30">
-            <ion-button fill="clear" (click)="share()" class="w-full h-full m-0 text-white">
-              <ion-icon name="share-social-outline" slot="icon-only" class="text-white text-[20px]"></ion-icon>
+            <ion-button fill="clear" (click)="share()" class="w-full h-full m-0 text-primary">
+              <ion-icon name="share-social-outline" slot="icon-only" class="text-primary text-[20px]"></ion-icon>
             </ion-button>
           </div>
         </div>
@@ -60,10 +60,10 @@
 
       <div class="bg-musclegroup-card rounded-general p-4 py-4 flex flex-col gap-4 shadow-sm/30 mt-5">
         <div class="flex justify-between items-center">
-          <span class="text-white font-lexend uppercase tracking-wide">IMPORT DATA</span>
+          <span class="text-primary font-lexend uppercase tracking-wide">IMPORT DATA</span>
           
           <div class="bg-[#6561aa] rounded-general flex items-center justify-center shadow-sm/30">
-            <ion-button fill="clear" (click)="importData()" class="font-lexend text-[14px] font-medium text-white m-0" style="--color: #ffffff; --ripple-color: #ffffff;">
+            <ion-button fill="clear" (click)="importData()" class="font-lexend text-[14px] font-medium text-primary m-0" style="--color: #ffffff; --ripple-color: #ffffff;">
               IMPORT
             </ion-button>
           </div>

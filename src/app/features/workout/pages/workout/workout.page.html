@@ -3,22 +3,22 @@
    {
     <div slot="fixed" class="w-full z-50 bg-workout-finish px-5 py-3 flex justify-between items-center shadow-lg"
          style="padding-top: calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 10px);">
-      <span class="text-white font-lexend uppercase tracking-wide text-sm">Resting</span>
+      <span class="text-primary font-lexend uppercase tracking-wide text-sm">Resting</span>
       <div class="flex items-center gap-4">
-        <span class="text-white font-lexend text-xl tracking-widest">{{ restTimeDisplay }}</span>
-        <ion-button (click)="skipRest()" size="small" fill="clear" class="text-white font-lexend">
+        <span class="text-primary font-lexend text-xl tracking-widest">{{ restTimeDisplay }}</span>
+        <ion-button (click)="skipRest()" size="small" fill="clear" class="text-primary font-lexend">
           SKIP
         </ion-button>
       </div>
     </div>
   }
-  <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-white">
+  <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-primary">
 
     <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
       
       @if (!workoutService.currentActiveWorkout) {
         <div class="flex flex-col gap-4">
-          <div class="text-[28px] text-white font-lexend px-1.5 pb-2">START A WORKOUT</div>
+          <div class="text-[28px] text-primary font-lexend px-1.5 pb-2">START A WORKOUT</div>
           <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
             <ion-select 
               [(ngModel)]="selectedTemplateId" 
@@ -27,7 +27,7 @@
               fill="none"
               [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
               placeholder="SELECT TEMPLATE"
-              class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+              class="w-full bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
 
               @for (wk of workoutService.workouts; track wk.id) {
                 <ion-select-option [value]="wk.id">{{ wk.name }}</ion-select-option>
@@ -38,7 +38,7 @@
        @if (recentWorkouts.length > 0) {
           <div class="flex flex-col gap-3 mt-9">
            <div class="flex justify-between items-center px-1 pb-1">
-              <div class="text-[18px] text-white/80 font-lexend uppercase tracking-widest">
+              <div class="text-[18px] text-primary/80 font-lexend uppercase tracking-widest">
                 Recent Workouts
               </div>
               <div class="rounded-general relative w-9 h-9 flex justify-center items-center active:opacity-70 transition-opacity">
@@ -48,14 +48,14 @@
             @for (history of recentWorkouts; track history.id) {
               <div class="bg-musclegroup-card rounded-general p-4 flex justify-between items-center shadow-sm/30">
                 <div class="flex flex-col gap-1">
-                  <div class="text-white font-lexend uppercase tracking-wide">
+                  <div class="text-primary font-lexend uppercase tracking-wide">
                     {{ history.name }}
                   </div>
-                  <div class="text-white/50 text-xs font-lexend">
+                  <div class="text-primary/50 text-xs font-lexend">
                     {{ history.date | date:'dd MMM yyyy, HH:mm' }}
                   </div>
                 </div>
-                <div class="text-white/80 text-sm font-lexend tracking-widest">
+                <div class="text-primary/80 text-sm font-lexend tracking-widest">
                   {{ history.durationDisplay }}
                 </div>
               </div>
@@ -68,13 +68,11 @@
       {
         <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
           <div class="flex items-center gap-2">
-            <div class="text-[28px] text-white font-lexend uppercase">
+            <div class="text-[28px] text-primary font-lexend uppercase">
               {{ workoutService.currentActiveWorkout.name }}
             </div>
-            <ion-icon name="chevron-down-outline" class="opacity-50 text-xl"></ion-icon>
           </div>
-          <!-- Timer-ul -->
-          <div class="text-xl font-light tracking-widest text-white/80">
+          <div class="text-xl font-light tracking-widest text-primary/80">
             {{ timerDisplay }}
           </div>
         </div>
@@ -91,32 +89,44 @@
               </ion-button>
             }
 
-            <div class="bg-templates-musclegroup-card rounded-general p-2 py-3 flex gap-3 items-center shadow-sm/30">
+            <div class="flex gap-1 items-stretch bg-templates-musclegroup-card p-1.5 py-2 rounded-general shadow-sm/30">
+              <ion-select 
+                [(ngModel)]="newGroupName" 
+                interface="popover"
+                fill="none"
+                [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                placeholder="MUSCLE GROUP"
+                class="w-full bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-4 py-1 font-lexend rounded-general rounded-r-none">
 
-              <div class="bg-return-button rounded-general flex-1 min-w-0 flex items-stretch">
-                <ion-select 
-                  [(ngModel)]="newGroupName" 
-                  interface="popover"
-                  fill="none"
-                  [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-                  placeholder="MUSCLE GROUP"
-                  class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
+                @for (group of availableGroupsForDropdown; track group) 
+                {
+                  <ion-select-option [value]="group">{{ group }}</ion-select-option>
+                }
+              </ion-select>
 
-                  @for (group of availableGroupsForDropdown; track group) {
-                    <ion-select-option [value]="group">{{ group }}</ion-select-option>
-                  }
-                </ion-select>
+              <div class="w-[20%] bg-return-button rounded-r-general rounded-l-none flex items-center justify-center">
+                <ion-button fill="clear" (click)="addGroup()" class="restart-cycle-btn w-full h-full m-0">
+                  <ion-icon name="add" slot="icon-only"></ion-icon>
+                </ion-button>
               </div>
-
-              <ion-button (click)="addGroup()" class="font-lexend input-add-btn shrink-0"> 
-                <ion-icon name="add"></ion-icon>
-              </ion-button>
-
             </div>
 
-            <ion-button (click)="endWorkout()" class="workout-delete-template font-lexend">
-              END WORKOUT
-            </ion-button>
+            <div class="flex gap-0.5 items-stretch bg-return-button p-0 rounded-general shadow-sm/30 mt-4">
+              <div class="flex-1 bg-workout-delete rounded-l-general rounded-r-none flex items-center justify-center">
+                <ion-button fill="clear" (click)="endWorkout()" class="modify-cycle-btn w-full h-full font-lexend text-primary tracking-widest text-base">
+                  END WORKOUT
+                </ion-button>
+              </div>
+
+              <div class="w-[17%] bg-[#6e3737] rounded-r-general rounded-l-none flex items-center justify-center">
+                <ion-button fill="clear" (click)="cancelWorkout()" class="restart-cycle-btn w-full h-full m-0">
+                  <span class="text-primary text-[22px] font-extralight">
+                      ✕
+                  </span>
+                </ion-button>
+              </div>
+            </div>
+
           </div>
         }
 
@@ -125,79 +135,90 @@
         {
         <div class="flex flex-col gap-4 bg-templates-musclegroup-card rounded-general p-2 px-3 pb-6 font-lexend">
           <div class="flex justify-between items-center px-1 pb-4 pt-1">
-            <div class="text-[22px] text-white font-lexend uppercase">{{ activeMuscleGroup.name }}</div>
+            <div class="text-[22px] text-primary font-lexend uppercase">{{ activeMuscleGroup.name }}</div>
             <ion-button (click)="goBack()" class="return-btn">
               <ion-icon name="return-up-back-outline" class="text-xl"></ion-icon>
             </ion-button>
           </div>
 
-        <ion-accordion-group [value]="activeExercise?.id" (ionChange)="onExerciseAccordionChange($event)" class="workout-accordion-group">
-          @for (ex of activeMuscleGroup.exercises; track ex.id) {
-            <ion-accordion [value]="ex.id" class="exercise-accordion shadow-sm/30" [ngClass]="{'completed-workout-btn': ex.isCompleted, 'is-expanded': activeExercise?.id === ex.id} ">
-              <ion-item slot="header" lines="none" class="exercise-accordion-header">
-                <span class="w-full text-center uppercase tracking-widest font-lexend text-white exercise-accordion-title">{{ ex.name }}</span>
-              </ion-item>
+          <ion-accordion-group [value]="activeExercise?.id" (ionChange)="onExerciseAccordionChange($event)" class="workout-accordion-group">
+            @for (ex of activeMuscleGroup.exercises; track ex.id) {
+              <ion-accordion [value]="ex.id" class="exercise-accordion shadow-sm/30" [ngClass]="{'completed-workout-btn': ex.isCompleted, 'is-expanded': activeExercise?.id === ex.id} ">
+                <ion-item slot="header" lines="none" class="exercise-accordion-header">
+                  <span class="w-full text-center uppercase tracking-widest font-lexend text-primary exercise-accordion-title">{{ ex.name }}</span>
+                </ion-item>
 
-              <div slot="content" class="exercise-accordion-content">
-                @for (set of ex.sets; track $index) 
-                {
-                  <div class="bg-set-card rounded-general py-3 px-5 flex justify-between items-center text-sm font-lexend text-white/90 mb-2 shadow-sm/30">
-                    <span>{{ set.weight }} kg</span>
-                    <span>{{ set.reps }} reps</span>
-                  </div>
-                }
-
-                <div class="flex flex-col bg-set-card rounded-general p-4 gap-3 shadow-sm/30">
-                  <div class="flex justify-between items-start text-sm font-lexend mt-2 text-white/90">
-                    <div class="flex flex-col items-center gap-2">
-                      <span class="uppercase tracking-wide text-xs text-white/70 mb-1">Weight</span>
-                      <div class="flex items-center gap-2">
-                        <div class="flex flex-col gap-1">
-                          <button type="button" (click)="incrementWeight()" class="stepper-btn">
-                            <ion-icon name="chevron-up-outline"></ion-icon>
-                          </button>
-                          <button type="button" (click)="decrementWeight()" class="stepper-btn">
-                            <ion-icon name="chevron-down-outline"></ion-icon>
-                          </button>
-                        </div>
-                        <input inputmode="decimal" step="0.1" min="0" max="999" [(ngModel)]="newWeight" (input)="restrictInput($event, 'newWeight')" class="bg-set-input-background rounded-general w-14 h-19 outline-none text-center text-white" />
-                      </div>
+                <div slot="content" class="exercise-accordion-content">
+                  @for (set of ex.sets; track $index) 
+                  {
+                    <div class="bg-set-card rounded-general py-3 px-5 flex justify-between items-center text-sm font-lexend text-primary/90 mb-2 shadow-sm/30">
+                      <span>{{ set.weight }} kg</span>
+                      <span>{{ set.reps }} reps</span>
                     </div>
+                  }
 
-                    <div class="flex flex-col items-center gap-2">
-                      <span class="uppercase tracking-wide text-xs text-white/70 mb-1">Reps</span>
-                      <div class="flex items-center gap-2">
-                        <input inputmode="decimal" step="any" min="0" max="999" [(ngModel)]="newReps" (input)="restrictInput($event, 'newReps')" class="bg-set-input-background rounded-general w-14 h-19 outline-none text-center text-white" />
-                        <div class="flex flex-col gap-1">
-                          <button type="button" (click)="incrementReps()" class="stepper-btn">
-                            <ion-icon name="chevron-up-outline"></ion-icon>
-                          </button>
-                          <button type="button" (click)="decrementReps()" class="stepper-btn">
-                            <ion-icon name="chevron-down-outline"></ion-icon>
-                          </button>
+                  <div class="flex flex-col bg-set-card rounded-general p-4 gap-3 shadow-sm/30">
+                    <div class="flex justify-between items-start text-sm font-lexend mt-2 text-primary/90">
+                      <div class="flex flex-col items-center gap-2">
+                        <span class="uppercase tracking-wide text-xs text-primary/70 mb-1">Weight</span>
+                        <div class="flex items-center gap-2">
+                          <div class="flex flex-col gap-1">
+                            <button type="button" (click)="incrementWeight()" class="stepper-btn">
+                              <ion-icon name="chevron-up-outline"></ion-icon>
+                            </button>
+                            <button type="button" (click)="decrementWeight()" class="stepper-btn">
+                              <ion-icon name="chevron-down-outline"></ion-icon>
+                            </button>
+                          </div>
+                          <input inputmode="decimal" step="0.1" min="0" max="999" [(ngModel)]="newWeight" (input)="restrictInput($event, 'newWeight')" class="bg-set-input-background rounded-general w-14 h-19 outline-none text-center text-primary" />
                         </div>
                       </div>
+
+                      <div class="flex flex-col items-center gap-2">
+                        <span class="uppercase tracking-wide text-xs text-primary/70 mb-1">Reps</span>
+                        <div class="flex items-center gap-2">
+                          <input inputmode="decimal" step="any" min="0" max="999" [(ngModel)]="newReps" (input)="restrictInput($event, 'newReps')" class="bg-set-input-background rounded-general w-14 h-19 outline-none text-center text-primary" />
+                          <div class="flex flex-col gap-1">
+                            <button type="button" (click)="incrementReps()" class="stepper-btn">
+                              <ion-icon name="chevron-up-outline"></ion-icon>
+                            </button>
+                            <button type="button" (click)="decrementReps()" class="stepper-btn">
+                              <ion-icon name="chevron-down-outline"></ion-icon>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                    <ion-button (click)="addSet()" class="set-add-btn font-lexend mt-6">ADD</ion-button>
                   </div>
-                  <ion-button (click)="addSet()" class="set-add-btn font-lexend mt-6">ADD</ion-button>
+
+                  <ion-button (click)="completeExercise()" class="set-complete-btn font-lexend pt-4 w-full">COMPLETE</ion-button>
                 </div>
+              </ion-accordion>
+            }
+          </ion-accordion-group>
+        
+            <div class="flex gap-1 items-stretch bg-exercise-card p-1.5 py-2 rounded-general shadow-sm/30">
+              <ion-select 
+                [(ngModel)]="newExerciseName" 
+                interface="popover"
+                fill="none"
+                [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+                placeholder="EXERCISE"
+                class="w-full bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general rounded-r-none">
 
-                <ion-button (click)="completeExercise()" class="set-complete-btn font-lexend pt-4 w-full">COMPLETE</ion-button>
-              </div>
-            </ion-accordion>
-          }
-        </ion-accordion-group>
-          <div class="bg-exercise-card rounded-general p-2 py-2.5 flex gap-3 items-center shadow-sm/30">
-            <div class="bg-return-button rounded-general flex-1 min-w-0 flex items-stretch">
-              <ion-select [(ngModel)]="newExerciseName" interface="popover" fill="none" [interfaceOptions]="{ cssClass: 'custom-template-popover' }" placeholder="EXERCISE" class="w-full bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
-                @for (exercise of availableExercisesForDropdown; track exercise) 
+                @for (group of availableExercisesForDropdown; track group) 
                 {
-                  <ion-select-option [value]="exercise">{{ exercise }}</ion-select-option>
+                  <ion-select-option [value]="group">{{ group }}</ion-select-option>
                 }
               </ion-select>
+
+              <div class="w-[20%] bg-return-button rounded-r-general rounded-l-none flex items-center justify-center">
+                <ion-button fill="clear" (click)="addExercise()" class="restart-cycle-btn w-full h-full m-0">
+                  <ion-icon name="add" slot="icon-only"></ion-icon>
+                </ion-button>
+              </div>
             </div>
-              <ion-button (click)="addExercise()" class="font-lexend input-add-btn shrink-0"><ion-icon name="add"></ion-icon></ion-button>
-          </div>
         </div>
         }
       }

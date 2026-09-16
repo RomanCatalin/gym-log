@@ -300,6 +300,54 @@ export class WorkoutPage implements OnInit, OnDestroy
 
     await alert.present();
   }
+
+  async cancelWorkout() 
+  {
+  if (!this.workoutService.currentActiveWorkout) return;
+
+  const alert = await this.alertController.create({
+    header: 'Cancel Workout',
+    message: 'Are you sure you want to cancel the current workout?',
+    cssClass: 'custom-alert',
+    buttons: [
+      { text: 'No', role: 'cancel' },
+      {
+        text: 'Yes, Cancel',
+        handler: () => {
+          this.ngZone.run(async () => {
+            await this.workoutService.cancelActiveWorkout();
+            this.stopTimer();
+            clearInterval(this.restInterval);
+            this.isResting = false;
+            this.restTimeDisplay = '';
+
+            if (this.restNotificationId !== null) 
+            {
+              try 
+              {
+                await LocalNotifications.cancel({ notifications: [{ id: this.restNotificationId }] });
+              } 
+              catch (error) 
+              {
+                console.error('[Cancel] Eroare la anularea notificării de rest:', error);
+              }
+              this.restNotificationId = null;
+            }
+
+            this.timerDisplay = '00:00';
+            this.selectedTemplateId = '';
+            this.viewState = 1;
+            this.activeMuscleGroup = null;
+            this.activeExercise = null;
+            this.cdr.detectChanges();
+          });
+        }
+      }
+    ]
+    });
+
+    await alert.present();
+  }
   
   availableGroups = ALL_MUSCLE_GROUPS;
 
@@ -378,7 +426,8 @@ export class WorkoutPage implements OnInit, OnDestroy
     });
   }
 
-  async promptResumeWorkout() {
+  async promptResumeWorkout() 
+  {
   const pending = this.workoutService.pendingActiveWorkout;
   if (!pending) return;
 
@@ -386,7 +435,6 @@ export class WorkoutPage implements OnInit, OnDestroy
     header: 'Resume Workout?',
     message: `You have an unfinished ${pending.name} workout. Continue where you left off?`,
     cssClass: 'custom-alert',
-    backdropDismiss: false,
     buttons: [
       {
         text: 'Discard',

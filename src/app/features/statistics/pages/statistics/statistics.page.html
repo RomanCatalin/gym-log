@@ -1,12 +1,12 @@
 <ion-content [fullscreen]="true" [scrollY]="false">
-  <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-white flex flex-col">
+  <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-primary flex flex-col">
     <div class="bg-workout-background rounded-general shadow-md relative overflow-hidden flex-1 flex flex-col">
 
       <div class="flex-1 overflow-y-auto">
         @if (viewState === 1) 
         {
           <div class="p-4 flex flex-col gap-4">
-            <div class="text-[28px] text-white font-lexend uppercase tracking-wide">
+            <div class="text-[28px] text-primary font-lexend uppercase tracking-wide">
               Progression
             </div>
             <div class="bg-musclegroup-card p-0 rounded-general">
@@ -19,7 +19,7 @@
                     placeholder="GROUP"
                     [(ngModel)]="selectedGroup"
                     (ionChange)="onGroupChange()"
-                    class="w-full text-white uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
+                    class="w-full text-primary uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
                     @for (group of availableGroups; track group) {
                       <ion-select-option [value]="group">
                         {{ group }}
@@ -36,7 +36,7 @@
                     [(ngModel)]="selectedExercise"
                     (ionChange)="onExerciseChange()"
                     [disabled]="!selectedGroup"
-                    class="w-full text-white uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
+                    class="w-full text-primary uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
                     @for (exercise of availableExercises; track exercise) {
                       <ion-select-option [value]="exercise">
                         {{ exercise }}
@@ -52,15 +52,15 @@
               </div>
               <div class="bg-statistics-content rounded-general mt-2 mx-1 mb-2 p-3 flex flex-col" style="min-height: 56vh;">
                 @if (!selectedGroup || !selectedExercise) {
-                  <div class="flex-1 flex items-center justify-center text-white/40 text-sm uppercase tracking-wide text-center px-6">
+                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm uppercase tracking-wide text-center px-6">
                     Select a muscle group and exercise to see progress
                   </div>
                 } @else if (rawChartData.length === 0) {
-                  <div class="flex-1 flex items-center justify-center text-white/40 text-sm uppercase tracking-wide text-center px-6">
+                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm uppercase tracking-wide text-center px-6">
                     No recorded sets yet for this exercise
                   </div>
                 } @else {
-                  <div class="text-[14px] text-white/90 font-lexend uppercase text-center tracking-widest pb-2">
+                  <div class="text-[14px] text-primary/90 font-lexend uppercase text-center tracking-widest pb-2">
                     {{ selectedExercise }}
                   </div>
                   <div class="w-full overflow-hidden">
@@ -108,21 +108,21 @@
         @else 
         {
           <div class="p-4 flex flex-col gap-4">
-            <div class="text-[28px] text-white font-lexend uppercase tracking-wide">
+            <div class="text-[28px] text-primary font-lexend uppercase tracking-wide">
               WORKOUT LOG
             </div>
             <div class="bg-musclegroup-card p-0 rounded-general">
               <div class="flex gap-1 items-stretch bg-statistics-header p-1 rounded-general rounded-b-none">
-                <!-- 80% -->
+                
                 <div class="flex-1 bg-statistics-button rounded-l-general rounded-r-none flex items-center justify-center">
-                  <ion-button fill="clear" (click)="openSplitEditor()" class="modify-cycle-btn w-full h-full font-lexend text-white font-medium tracking-widest text-base m-0">
+                  <ion-button fill="clear" (click)="openSplitEditor()" class="modify-cycle-btn w-full h-full font-lexend text-primary font-medium tracking-widest text-base m-0">
                     MODIFY SPLIT
                   </ion-button>
                 </div>
 
                 <div class="w-[25%] bg-[#C49A50] rounded-r-general rounded-l-none flex items-center justify-center">
                   <ion-button fill="clear" (click)="openRestartPicker()" class="restart-cycle-btn w-full h-full m-0">
-                    <ion-icon name="refresh" slot="icon-only" class="text-white text-[22px]"></ion-icon>
+                    <ion-icon name="refresh" slot="icon-only" class="text-primary text-[22px]"></ion-icon>
                   </ion-button>
                 </div>
               </div>
@@ -131,14 +131,14 @@
             
                 <div class="flex flex-col w-full">
                   <div class="flex justify-between items-center px-1 pb-3 pt-1">
-                    <button (click)="prevMonth()" class="text-white text-xl px-2">‹</button>
-                    <span class="text-white font-lexend uppercase tracking-widest text-base">{{ calendarMonthLabel }}</span>
-                    <button (click)="nextMonth()" class="text-white text-xl px-2">›</button>
+                    <button (click)="prevMonth()" class="text-primary text-xl px-2">‹</button>
+                    <span class="text-primary font-lexend uppercase tracking-widest text-base">{{ calendarMonthLabel }}</span>
+                    <button (click)="nextMonth()" class="text-primary text-xl px-2">›</button>
                   </div>
                   
                   <div class="grid grid-cols-7 gap-1.5 px-1 pb-3">
                     @for (dayName of ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']; track dayName) {
-                      <div class="text-center text-white/50 text-[10px] uppercase font-lexend">{{ dayName }}</div>
+                      <div class="text-center text-primary/50 text-[10px] uppercase font-lexend">{{ dayName }}</div>
                     }
                   </div>
 
@@ -151,7 +151,7 @@
                         {
                           <!-- Zile din luna următoare/anterioară -->
                           <div 
-                            class="aspect-square flex items-center justify-center font-lexend text-sm text-white/30 bg-[#252525]"
+                            class="aspect-square flex items-center justify-center font-lexend text-sm text-primary/30 bg-[#252525]"
                             [style.border-radius.px]="$index % 7 === 0 || $index % 7 === 6 ? 8 : 0"
                             [style.border-top-left-radius.px]="$index % 7 === 0 ? 8 : 0"
                             [style.border-bottom-left-radius.px]="$index % 7 === 0 ? 8 : 0"
@@ -167,7 +167,7 @@
                           <button 
                             type="button" 
                             (click)="onDayTap(cell)" 
-                            class="aspect-square flex items-center justify-center text-sm font-lexend text-white"
+                            class="aspect-square flex items-center justify-center text-sm font-lexend text-primary"
                             [style.background]="cell.color"
                             [class.brightness-65]="cell.isPast"
                             [class.contrast-115]="cell.isPast"
@@ -218,7 +218,7 @@
                     </div>
                   </div>
                 } @else {
-                  <div class="flex-1 flex items-center justify-center text-white/40 text-sm uppercase tracking-wide text-center px-6">
+                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm uppercase tracking-wide text-center px-6">
                     No split defined yet tap Modify Split to create one
                   </div>
                 }

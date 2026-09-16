@@ -3,7 +3,7 @@
 
     <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
       <div class="flex justify-between items-center px-1.5 pt-0.2 pb-7">
-        <div class="text-[24px] text-white font-lexend">
+        <div class="text-[24px] text-primary font-lexend">
           PREFERENCES
         </div>
         <ion-button (click)="goBack()" class="return-btn">
@@ -13,7 +13,7 @@
 
       <div class="bg-musclegroup-card rounded-general p-4 flex flex-col gap-4 shadow-sm/30">
         <div class="flex justify-between items-center">
-          <span class="text-white font-lexend uppercase tracking-wide">UI Theme</span>
+          <span class="text-primary font-lexend uppercase tracking-wide">UI Theme</span>
           <div class="bg-return-button rounded-general">
             <ion-select
               [(ngModel)]="preferencesService.theme"
@@ -21,7 +21,7 @@
               interface="popover"
               fill="none"
               [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-              class="bg-return-button text-white uppercase text-sm tracking-wide outline-none px-4 py-0 font-lexend rounded-general">
+              class="bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-4 py-0 font-lexend rounded-general">
               <ion-select-option value="dark">DARK</ion-select-option>
             </ion-select>
           </div>
@@ -30,7 +30,7 @@
 
       <div class="bg-musclegroup-card rounded-general p-4 mt-4 flex flex-col gap-4 shadow-sm/30">
         <div class="flex justify-between items-center">
-          <span class="text-white font-lexend uppercase tracking-wide">Rest Time</span>
+          <span class="text-primary font-lexend uppercase tracking-wide">Rest Time</span>
           <div class="bg-return-button rounded-general">
             <div class="flex items-center gap-1 bg-return-button rounded-general px-2 py-1">
               <input
@@ -40,7 +40,7 @@
                 (input)="onRestMinutesInput($event)"
                 (blur)="onRestTimeBlur()"
                 placeholder="00"
-                class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-white font-lexend text-sm" />
+                class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-primary! font-lexend text-sm" />
               <span class="text-white font-lexend text-sm">:</span>
               <input
                 type="text"
@@ -49,13 +49,13 @@
                 (input)="onRestSecondsInput($event)"
                 (blur)="onRestTimeBlur()"
                 placeholder="00"
-                class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-white font-lexend text-sm" />
+                class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-primary! font-lexend text-sm" />
             </div>
           </div>
         </div>
 
         <div class="flex justify-between items-center mt-2">
-          <span class="text-white font-lexend uppercase tracking-wide">Toggle Alert</span>
+          <span class="text-primary font-lexend uppercase tracking-wide">Toggle Alert</span>
           <ion-toggle
             [(ngModel)]="preferencesService.alertEnabled"
             (ionChange)="onAlertToggle($event)"
@@ -67,7 +67,7 @@
         {
           <div class="flex flex-col gap-5 pl-1 mt-4">
             <div class="flex justify-between items-center">
-              <span class="text-white/80 font-lexend uppercase text-sm tracking-wide">Sound & Vibration</span>
+              <span class="text-primary/80 font-lexend uppercase text-sm tracking-wide">Sound & Vibration</span>
               <ion-toggle [(ngModel)]="preferencesService.soundEnabled" (ionChange)="onSoundToggle($event)" class="settings-toggle"></ion-toggle>
             </div>           
           </div>

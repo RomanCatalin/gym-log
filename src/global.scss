@@ -48,6 +48,8 @@
 
 @theme 
 {
+    --color-text-primary: #ffffff;
+    --color-primary: var(--color-text-primary); 
 
     --color-hotbar-background:#414141;
     --color-hotbar-button:#2F2F2F;
@@ -127,7 +129,7 @@ ion-tab-button {
   --background: transparent;
   --background-focused: transparent;
   --background-focused-opacity: 0;
-  --color-selected: white;
+  --color-selected: var(--color-text-primary);
   font-size: 0.78rem;
 
   font-family: inherit;
@@ -141,7 +143,7 @@ ion-tab-button {
 
   &.tab-selected::part(native) {
     background-color: var(--color-hotbar-selected);
-    color: white;
+    color: var(--color-text-primary);
   }
 
   &::part(native):hover {
@@ -153,7 +155,7 @@ ion-tab-button {
 .settings-btn 
 {
   --background: var(--color-settings-button);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 20px;     
   --padding-bottom: 20px; 
@@ -164,7 +166,7 @@ ion-tab-button {
 .return-btn 
 {
   --background: var(--color-return-button);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 14px;     
   --padding-bottom: 14px;   
@@ -175,7 +177,7 @@ ion-tab-button {
 .input-add-btn 
 {
   --background: var(--color-return-button);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 11px;      
   --padding-bottom: 11px;   
@@ -187,7 +189,7 @@ ion-tab-button {
 .workout-card-template
 {
   --background: var(--color-musclegroup-card);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 20px;     
   --padding-bottom: 20px;  
@@ -198,7 +200,7 @@ ion-tab-button {
 .exercise-card
 {
   --background:var(--color-exercise-card);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 20px;     
   --padding-bottom: 20px;  
@@ -209,7 +211,7 @@ ion-tab-button {
 .musclegroup-card-template
 {
   --background: var(--color-templates-musclegroup-card);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 20px;     
   --padding-bottom: 20px; 
@@ -220,7 +222,7 @@ ion-tab-button {
 .workout-delete-template
 {
   --background: var(--color-workout-delete);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 20px;    
   --padding-bottom: 20px;   
@@ -237,13 +239,13 @@ ion-tab-button {
 
 .completed-workout-btn {
   --background: var(--color-workout-finish); 
-  --color: white; 
+  --color: var(--color-text-primary);
 }
 
 .set-add-btn
 {
   --background: #5A818F;
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 15px;     
   --padding-bottom: 15px; 
@@ -254,7 +256,7 @@ ion-tab-button {
 .set-complete-btn
 {
   --background: #607d60;
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
   --padding-top: 15px;     
   --padding-bottom: 15px;  
@@ -294,13 +296,13 @@ ion-select {
 
 ion-popover.custom-template-popover {
   --background: #313131;
-  --color: white;
+  --color: var(--color-text-primary);
   --width: calc(100% - 2rem);
   --max-width: 400px;
 
   &::part(content) {
     background: #313131;
-    color: white;
+    color: var(--color-text-primary);
     border-radius: var(rounded-general) !important; 
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
     overflow: hidden; 
@@ -313,7 +315,7 @@ ion-popover.custom-template-popover {
 
     ion-item {
       --background: transparent !important;
-      --color: white !important;
+      --color: var(--color-text-primary) !important;
       --ripple-color: rgba(255, 255, 255, 0.1);
       font-family: inherit;
       font-size: 0.875rem;
@@ -334,12 +336,14 @@ ion-popover.custom-template-popover {
 {
   --background: #2a2a2a; 
   --color: #ffffff;    
-  
+
 
   .alert-wrapper {
     --background: #2a2a2a !important;
     border-radius: 16px !important;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden !important;
+    border: 1px solid #212121!important;
   }
 
   .alert-title {
@@ -359,10 +363,20 @@ ion-popover.custom-template-popover {
     font-weight: 500;
     text-transform: uppercase;
   }
+
+  & *,
+  & *:focus,
+  & *:focus-visible {
+    outline: none !important;
+  }
 }
 
+
+
+
+
 ion-icon {
-  color: white;
+  color: var(--color-text-primary);
 }
 
 ion-toggle.settings-toggle 
@@ -382,7 +396,7 @@ ion-toggle.settings-toggle
   display: flex;
   align-items: center;
   justify-content: center;
-  color: white;
+  color: var(--color-text-primary);
   font-size: 14px;
   border: none;
 
@@ -426,36 +440,35 @@ ion-item.cycle-slot-item::part(native) {
 
 ion-action-sheet.custom-action-sheet-cycle {
   --background: var(--color-return-button);
-  --color: white;
-  --button-color: white;
+  --color: var(--color-text-primary);
+  --button-color: var(--color-text-primary);
   --button-background-selected: var(--color-return-button-pressed);
+  .action-sheet-container {
+    border-top-left-radius: 10px !important;
+    border-top-right-radius: 10px !important;
+    overflow: hidden;
+  }
+
+  .action-sheet-title {
+    text-align: center;
+    background: #2a2a2a !important;
+  }
+
+  .action-sheet-button {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+
+    .action-sheet-button-inner {
+      justify-content: center;
+    }
+  }
+
+  .action-sheet-cancel {
+    background: var(--color-workout-delete) !important;
+    color: var(--color-text-primary) !important;
+  }
 }
 
-ion-action-sheet.custom-action-sheet-cycle .action-sheet-title {
-  text-align: center;
-}
 
-ion-action-sheet .action-sheet-container {
-  border-top-left-radius: 10px !important;
-  border-top-right-radius: 10px !important;
-  overflow: hidden;
-}
-
-ion-action-sheet.custom-action-sheet-cycle .action-sheet-title {
-  background: #2A2A2A !important;
-}
-
-ion-action-sheet.custom-action-sheet-cycle .action-sheet-button .action-sheet-button-inner {
-  justify-content: center;
-}
-ion-action-sheet.custom-action-sheet-cycle .action-sheet-button {
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; 
-}
-
-ion-action-sheet.custom-action-sheet-cycle .action-sheet-cancel {
-  background: var(--color-workout-delete) !important; 
-  color: white !important;
-}
 
 .statistics-inner-tab-bar {
   display: flex;
@@ -497,7 +510,7 @@ ion-button.trending-icon-btn {
   --background-activated: var(--color-return-button-pressed);
   --border-radius: var(--radius-general);
   --box-shadow: none;
-  --color: white;
+  --color: var(--color-text-primary);
   --padding-start: 0;
   --padding-end: 0;
   width: 48px;
@@ -567,7 +580,7 @@ ion-popover.color-picker-popover {
 
 ion-toast.custom-toast {
   --background: var(--color-return-button);
-  --color: white;
+  --color: var(--color-text-primary);
   --border-radius: var(--radius-general);
 }
 
@@ -591,7 +604,7 @@ ion-accordion.exercise-accordion {
 
   > ion-item[slot="header"] {
     --background: transparent;             
-    --color: white;
+    --color: var(--color-text-primary);
     --padding-top: 20px;
     --padding-bottom: 20px;
     --padding-start: 20px;

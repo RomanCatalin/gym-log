@@ -115,10 +115,13 @@ export class WorkoutService {
     try 
     {
       const res = await this.db.query('SELECT data FROM templates');
-      if (res.values && res.values.length > 0) {
+      if (res.values && res.values.length > 0) 
+      {
         this.workouts = res.values.map(row => JSON.parse(row.data));
         console.log(`S-au încărcat ${this.workouts.length} template-uri.`);
-      } else {
+      } 
+      else 
+      {
         console.log(' Nu există template-uri salvate.');
       }
     } catch (error) {
@@ -242,6 +245,12 @@ async clearActiveWorkout()
   } catch (error) {
     console.error('Eroare la ștergerea antrenamentului activ:', error);
   }
+}
+
+async cancelActiveWorkout() 
+{
+  await this.clearActiveWorkout();
+  this.currentActiveWorkout = null;
 }
 
 resumeActiveWorkout() 
