@@ -1,0 +1,15 @@
+<div class="w-full z-50 bg-workout-finish px-5 py-3 flex justify-between items-center shadow-lg fixed top-0 left-0 transition-all duration-500 ease-in-out will-change-transform"
+     [class.translate-y-0]="restTimerService.isResting"
+     [class.opacity-100]="restTimerService.isResting"
+     [class.-translate-y-full]="!restTimerService.isResting"
+     [class.opacity-0]="!restTimerService.isResting"
+     [class.pointer-events-none]="!restTimerService.isResting"
+     style="padding-top: calc(var(--safe-area-inset-top, env(safe-area-inset-top, 0px)) + 10px);">
+  <span class="text-primary font-lexend uppercase tracking-wide text-sm">Resting</span>
+  <div class="flex items-center gap-4">
+    <span class="text-primary font-lexend text-xl tracking-widest">{{ restTimerService.restTimeDisplay }}</span>
+    <ion-button (click)="skipRest()" size="small" fill="clear" class="text-primary font-lexend">
+      SKIP
+    </ion-button>
+  </div>
+</div>

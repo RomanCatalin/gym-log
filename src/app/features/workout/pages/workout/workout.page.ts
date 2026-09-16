@@ -9,6 +9,7 @@ import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/
 import { LocalNotifications } from '@capacitor/local-notifications';
 import { PreferencesService } from 'src/app/services/preferences-service';
 import { IonAccordion, IonAccordionGroup, IonItem } from '@ionic/angular/standalone';
+import { RestTimerService } from 'src/app/services/rest-timer-service';
 
 @Component({
   selector: 'app-workout',
@@ -40,11 +41,8 @@ export class WorkoutPage implements OnInit, OnDestroy
   timerDisplay = '00:00';
   selectedTemplateId = '';
 
-  isResting = false;
-  restTimeDisplay = '';
-  private restEndsAt: number | null = null;
-  private restInterval: any;
-  private restNotificationId: number | null = null;
+  private restTimerService = inject(RestTimerService);
+
 
   constructor() 
   {
@@ -63,7 +61,6 @@ export class WorkoutPage implements OnInit, OnDestroy
   ngOnDestroy() 
   {
     this.stopTimer();
-    clearInterval(this.restInterval);
   }
 
   async confirmStartWorkout(event: any) 
@@ -244,7 +241,7 @@ export class WorkoutPage implements OnInit, OnDestroy
     {
       this.activeExercise.sets.push({ reps: this.newReps, weight: this.newWeight });
       await this.workoutService.saveActiveWorkout();
-      this.startRestTimer();
+      this.restTimerService.startRestTimer();
     }
   }
 
@@ -303,48 +300,33 @@ export class WorkoutPage implements OnInit, OnDestroy
 
   async cancelWorkout() 
   {
-  if (!this.workoutService.currentActiveWorkout) return;
+    if (!this.workoutService.currentActiveWorkout) return;
 
-  const alert = await this.alertController.create({
-    header: 'Cancel Workout',
-    message: 'Are you sure you want to cancel the current workout?',
-    cssClass: 'custom-alert',
-    buttons: [
-      { text: 'No', role: 'cancel' },
-      {
-        text: 'Yes, Cancel',
-        handler: () => {
-          this.ngZone.run(async () => {
-            await this.workoutService.cancelActiveWorkout();
-            this.stopTimer();
-            clearInterval(this.restInterval);
-            this.isResting = false;
-            this.restTimeDisplay = '';
+    const alert = await this.alertController.create({
+      header: 'Cancel Workout',
+      message: 'Are you sure you want to cancel the current workout?',
+      cssClass: 'custom-alert',
+      buttons: [
+        { text: 'No', role: 'cancel' },
+        {
+          text: 'Yes, Cancel',
+                handler: () => {
+            this.ngZone.run(async () => {
+              await this.workoutService.cancelActiveWorkout();
+              this.stopTimer();
+              await this.restTimerService.skipRest();
 
-            if (this.restNotificationId !== null) 
-            {
-              try 
-              {
-                await LocalNotifications.cancel({ notifications: [{ id: this.restNotificationId }] });
-              } 
-              catch (error) 
-              {
-                console.error('[Cancel] Eroare la anularea notificării de rest:', error);
-              }
-              this.restNotificationId = null;
-            }
-
-            this.timerDisplay = '00:00';
-            this.selectedTemplateId = '';
-            this.viewState = 1;
-            this.activeMuscleGroup = null;
-            this.activeExercise = null;
-            this.cdr.detectChanges();
-          });
+              this.timerDisplay = '00:00';
+              this.selectedTemplateId = '';
+              this.viewState = 1;
+              this.activeMuscleGroup = null;
+              this.activeExercise = null;
+              this.cdr.detectChanges();
+            });
+          }
         }
-      }
-    ]
-    });
+      ]
+      });
 
     await alert.present();
   }
@@ -462,116 +444,6 @@ export class WorkoutPage implements OnInit, OnDestroy
   });
 
   await alert.present();
-  }
-
-  async startRestTimer() 
-  {
-    const seconds = this.preferencesService.restTimeSeconds;
-    if (!seconds || seconds <= 0) return;
-
-    this.isResting = true;
-    this.restEndsAt = Date.now() + seconds * 1000;
-    this.updateRestDisplay();
-
-    clearInterval(this.restInterval);
-    this.restInterval = setInterval(() => {
-      this.ngZone.run(() => {
-        this.updateRestDisplay();
-        this.cdr.detectChanges();
-      });
-    }, 1000);
-
-    if (this.preferencesService.alertEnabled) 
-    {
-
-      const channelId = this.preferencesService.soundEnabled ? 'rest_sound_1' : 'rest_silent';
-
-      this.restNotificationId = Math.floor(Math.random() * 1000000);
-      const notificationId = this.restNotificationId;
-
-      try 
-      {
-        await LocalNotifications.schedule({
-          notifications: [{
-            id: notificationId,
-            title: 'Rest complete!',
-            body: 'Time to start your next set.',
-            channelId,
-            autoCancel: true,
-            schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
-          }],
-        });
-        setTimeout(async () => {
-          try 
-          {
-            await LocalNotifications.cancel({ 
-              notifications: [{ id: notificationId }] 
-            });
-
-            await LocalNotifications.removeDeliveredNotifications({ 
-              notifications: [{
-                id: notificationId,
-                title: '',
-                body: ''
-              }] 
-            });
-          } 
-          catch (error) 
-          {
-            console.error('[RestTimer] Eroare la auto-curățarea notificării:', error);
-          }
-        }, (seconds + 10) * 1000);
-
-      } 
-      catch (error) 
-      {
-        console.error('[RestTimer] Eroare la programarea notificării:', error);
-      }
-   }
- }
-  
-  private updateRestDisplay() 
-  {
-    if (!this.restEndsAt) return;
-    const remainingMs = this.restEndsAt - Date.now();
-    const remainingSec = Math.max(0, Math.ceil(remainingMs / 1000));
-
-    const minutes = Math.floor(remainingSec / 60).toString().padStart(2, '0');
-    const seconds = (remainingSec % 60).toString().padStart(2, '0');
-    this.restTimeDisplay = `${minutes}:${seconds}`;
-
-    if (remainingSec <= 0) {
-      this.finishRestTimer();
-    }
-  }
-
-  private finishRestTimer() 
-  {
-    clearInterval(this.restInterval);
-    this.isResting = false;
-    this.restEndsAt = null;
-    this.restNotificationId = null;
-  }
-
-  async skipRest() 
-  {
-    clearInterval(this.restInterval);
-    this.isResting = false;
-    this.restEndsAt = null;
-    this.restTimeDisplay = '';
-
-    if (this.restNotificationId !== null) 
-    {
-      try 
-      {
-        await LocalNotifications.cancel({ notifications: [{ id: this.restNotificationId }] });
-      } 
-      catch (error) 
-      {
-        console.error('[RestTimer] Eroare la anularea notificării:', error);
-      }
-      this.restNotificationId = null;
-    }
   }
   
 }

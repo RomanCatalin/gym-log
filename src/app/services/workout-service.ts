@@ -312,10 +312,11 @@ async createBackup() {
   if (!this.isDbReady) return;
   try {
     const payload = {
-      version: 1,
+      version: 2,
       createdAt: Date.now(),
       workouts: this.workouts,
       workoutHistory: this.workoutHistory,
+      cycle: this.cycle,
     };
     await Filesystem.writeFile({
       path: this.BACKUP_FILE_NAME,
@@ -335,13 +336,18 @@ async getBackupFileUri(): Promise<string> {
   return result.uri;
 }
 
-async restoreFromBackup(backupData: { workouts?: Workout[]; workoutHistory?: ActiveWorkout[] }) {
+async restoreFromBackup(backupData: { workouts?: Workout[]; workoutHistory?: ActiveWorkout[] ; cycle?: Cycle }) {
   await this.dbReady;
   if (!this.isDbReady) return;
   this.workouts = backupData.workouts || [];
-  this.workoutHistory = backupData.workoutHistory || [];
+  this.workoutHistory = backupData.workoutHistory || [];;
   await this.saveTemplates();
   await this.saveHistory();
+  
+  if (backupData.cycle) 
+  {
+    await this.saveCycle(backupData.cycle);
+  }
 }
 
 async maybeAutoBackup() {
