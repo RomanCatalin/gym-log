@@ -20,11 +20,25 @@ export class RestTimerService {
     const seconds = this.preferencesService.restTimeSeconds;
     if (!seconds || seconds <= 0) return;
 
+    clearInterval(this.restInterval);
+    if (this.restNotificationId !== null) 
+    { 
+      try 
+      { 
+        await LocalNotifications.cancel({ notifications: [{ id: this.restNotificationId }] }); 
+      } 
+      catch (error) 
+      { 
+        console.error( '[RestTimer] Eroare la anularea notificării anterioare:', error ); 
+      } 
+
+      this.restNotificationId = null; 
+    }
+
     this.isResting = true;
     this.restEndsAt = Date.now() + seconds * 1000;
     this.updateRestDisplay();
 
-    clearInterval(this.restInterval);
     this.restInterval = setInterval(() => {
       this.ngZone.run(() => {
         this.updateRestDisplay();
@@ -47,22 +61,9 @@ export class RestTimerService {
             body: 'Time to start your next set.',
             channelId,
             autoCancel: true,
-            schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
-          }],
+            schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true }
+          }]
         });
-        setTimeout(async () => {
-          try 
-          {
-            await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
-            await LocalNotifications.removeDeliveredNotifications({
-              notifications: [{ id: notificationId, title: '', body: '' }]
-            });
-          } 
-          catch (error) 
-          {
-            console.error('[RestTimer] Eroare la auto-curățarea notificării:', error);
-          }
-        }, (seconds + 10) * 1000);
       } 
       catch (error) 
       {

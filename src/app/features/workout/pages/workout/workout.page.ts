@@ -241,7 +241,7 @@ export class WorkoutPage implements OnInit, OnDestroy
     {
       this.activeExercise.sets.push({ reps: this.newReps, weight: this.newWeight });
       await this.workoutService.saveActiveWorkout();
-      this.restTimerService.startRestTimer();
+      await this.restTimerService.startRestTimer();
     }
   }
 
@@ -282,6 +282,7 @@ export class WorkoutPage implements OnInit, OnDestroy
           handler: () => {
           this.ngZone.run(async () => {
             await this.workoutService.endWorkout();
+            await this.restTimerService.skipRest();
             this.stopTimer();
             this.timerDisplay = '00:00';
             this.selectedTemplateId = '';
