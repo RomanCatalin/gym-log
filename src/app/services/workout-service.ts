@@ -7,12 +7,12 @@ import { PreferencesService } from './preferences-service';
 import {Preferences} from '@capacitor/preferences';
 import { REST_DAY_COLOR } from 'src/app/shared/constants/workout-colors';
 
-export interface Exercise { id: string; name: string; }
-export interface MuscleGroup { id: string; name: string; exercises: Exercise[]; }
+export interface Exercise { id: string; name: string; equipmentBrand?: string; equipmentModel?: string; attachment?: string;}
+export interface MuscleGroup { id: string; name: string; exercises: Exercise[];}
 export interface Workout { id: string; name: string; muscleGroups: MuscleGroup[]; color?: string;}
 
-export interface WorkoutSet { reps: number | null; weight: number | null; }
-export interface WorkoutExercise { id: string; name: string; isCustom: boolean; isCompleted: boolean; sets: WorkoutSet[]; }
+export interface WorkoutSet { reps: number | null; weight: number | null; actualRestSeconds?: number; unilateralSide?: 'left' | 'right'; }
+export interface WorkoutExercise { id: string; name: string; isCustom: boolean; isCompleted: boolean; sets: WorkoutSet[]; equipmentBrand?: string; equipmentModel?: string; attachment?: string;}
 export interface WorkoutMuscleGroup { id: string; name: string; isCustom: boolean; isCompleted: boolean; exercises: WorkoutExercise[]; }
 export interface ActiveWorkout { id: string; name: string; startTime: number; endTime?: number; durationSeconds?: number; muscleGroups: WorkoutMuscleGroup[]; }
 
@@ -178,7 +178,10 @@ export class WorkoutService {
           name: ex.name,
           isCustom: false,
           isCompleted: false,
-          sets: [] 
+          sets: [],
+          equipmentBrand: ex.equipmentBrand,
+          equipmentModel: ex.equipmentModel,
+          attachment: ex.attachment,
         }))
       }));
 

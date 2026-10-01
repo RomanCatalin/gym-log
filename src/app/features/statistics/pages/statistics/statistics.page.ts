@@ -286,7 +286,8 @@ export class StatisticsPage {
     return cells;
   }
 
-  get cycleBarSlots(): { color: string; isToday: boolean }[] {
+  get cycleBarSlots(): { color: string; isToday: boolean }[] 
+  {
     if (!this.workoutService.cycle || this.workoutService.cycle.slots.length === 0) return [];
     const todayIndex = this.workoutService.getCycleSlotIndexForDate(new Date());
 
@@ -334,18 +335,19 @@ export class StatisticsPage {
     await actionSheet.present();
   }
 
-private async openWorkoutDetailModal(workout: any) {
-  const modal = await this.modalController.create({
-    component: WorkoutHistoryDetailComponent,
-    componentProps: { workout },
-    cssClass: 'workout-history-modal',
-    initialBreakpoint: 0.75,
-    breakpoints: [0, 0.75, 0.95],
-  });
-  await modal.present();
-}
+  private async openWorkoutDetailModal(workout: any) {
+    const modal = await this.modalController.create({
+      component: WorkoutHistoryDetailComponent,
+      componentProps: { workout },
+      cssClass: 'workout-history-modal',
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 0.95],
+    });
+    await modal.present();
+  }
 
-  async openSplitEditor() {
+  async openSplitEditor() 
+  {
     const modal = await this.modalController.create({
       component: SplitEditorComponent,
       cssClass: 'split-editor-modal',
@@ -355,14 +357,16 @@ private async openWorkoutDetailModal(workout: any) {
     await modal.present();
 
     const { data } = await modal.onDidDismiss();
-    if (data?.saved) {
+    if (data?.saved) 
+    {
       const todayMidnight = new Date();
       todayMidnight.setHours(0, 0, 0, 0);
       await this.workoutService.saveCycle({ slots: data.slots, anchorDate: todayMidnight.getTime() });
     }
   }
 
-  async openRestartPicker() {
+  async openRestartPicker() 
+  {
     if (!this.workoutService.cycle || this.workoutService.cycle.slots.length === 0) return;
 
     const buttons: any[] = this.workoutService.cycle.slots.map((slot, index) => {

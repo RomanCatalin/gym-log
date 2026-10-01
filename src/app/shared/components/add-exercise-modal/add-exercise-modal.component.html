@@ -1,0 +1,67 @@
+<div class="bg-musclegroup-background rounded-general max-h-[85vh] overflow-y-auto w-[90vw] max-w-md mx-auto">
+
+  <div class="text-[22px] uppercase tracking-wide text-center bg-[#494949] py-3 pt-5 shadow-sm/30">
+    ADD EXERCISE
+  </div>
+
+  <div class="p-4 font-lexend text-primary flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <span class="text-xs uppercase tracking-wide text-primary/60">Exercise</span>
+      <div class="bg-return-button rounded-general flex items-center shadow-sm/30">
+        <ion-select
+          [(ngModel)]="selectedName"
+          interface="popover"
+          fill="none"
+          [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+          placeholder="SELECT EXERCISE"
+          class="w-full text-primary uppercase text-sm tracking-wide outline-none px-4 py-1 font-lexend">
+          @for (ex of availableExercises; track ex) {
+            <ion-select-option [value]="ex">{{ ex }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    </div>
+    
+    <div class="flex flex-col gap-2">
+      <span class="text-xs uppercase tracking-wide text-primary/60">Attachment (optional)</span>
+      <div class="bg-return-button rounded-general flex items-center shadow-sm/30">
+        <ion-select
+          [(ngModel)]="selectedAttachment"
+          interface="popover"
+          fill="none"
+          [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
+          placeholder="SELECT ATTACHMENT"
+          class="w-full text-primary uppercase text-sm tracking-wide outline-none px-4 py-1 font-lexend">
+          @for (att of attachmentOptions; track att.name) {
+            <ion-select-option [value]="att.name">{{ att.name }}</ion-select-option>
+          }
+        </ion-select>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <span class="text-xs uppercase tracking-wide text-primary/60">Equipment Brand (optional)</span>
+      <button style="border-radius: 6px;" (click)="openBrandPicker($event)" class="bg-[#545454] w-30 aspect-6/3 flex items-center justify-center overflow-hidden shadow-sm/30">
+        @if (selectedBrandLogo) 
+        {
+          <img [src]="selectedBrandLogo" [alt]="selectedBrand" class="w-auto object-contain px-1"/>
+        } 
+        @else
+        {
+          <span class="text-primary text-sm uppercase tracking-wide">
+            {{ selectedBrand }}
+          </span>
+        } 
+      </button>
+    </div>
+  </div>
+
+  <div class="flex mt-2 gap-0.5 bg-return-button pt-0.5">
+    <ion-button (click)="cancel()" fill="clear" class="flex-1 workout-delete-template [&::part(native)]:bg-[#494949] font-lexend [&::part(native)]:rounded-r-none [&::part(native)]:rounded-tl-none">
+        <ion-icon name="close" class="scale-160"></ion-icon>
+    </ion-button>
+    <ion-button (click)="confirm()" [disabled]="!selectedName" class="flex-1 set-add-btn font-lexend [&::part(native)]:bg-workout-finish [&::part(native)]:rounded-l-none [&::part(native)]:rounded-tr-none">
+        <ion-icon name="checkmark" class="scale-160"></ion-icon>
+    </ion-button>
+  </div>
+</div>

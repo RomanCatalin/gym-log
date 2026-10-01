@@ -107,7 +107,7 @@
 
               <div class="w-[17%] bg-[#6e3737] rounded-r-general rounded-l-none flex items-center justify-center">
                 <ion-button fill="clear" (click)="cancelWorkout()" class="restart-cycle-btn w-full h-full m-0">
-                  <span class="text-primary text-[22px] font-extralight">
+                  <span class="text-primary text-[22px] font-extralight pb-0.75">
                       ✕
                   </span>
                 </ion-button>
@@ -136,76 +136,89 @@
                 </ion-item>
 
                 <div slot="content" class="exercise-accordion-content">
-                  @for (set of ex.sets; track $index) 
+                  @if (ex.equipmentBrand || ex.attachment) 
                   {
-                    <div class="bg-set-card rounded-general py-3 px-5 flex justify-between items-center text-sm font-lexend text-primary/90 mb-2 shadow-sm/30">
-                      <span>{{ set.weight }} kg</span>
-                      <span>{{ set.reps }} reps</span>
+                    <div class="text-xs text-primary/50 uppercase tracking-wide text-center pb-2">
+                      {{ ex.equipmentBrand }}{{ ex.equipmentBrand && ex.attachment ? ' · ' : '' }}{{ ex.attachment }}
                     </div>
                   }
+                  @for (set of ex.sets; track $index) 
+                  {
+                  <div class="bg-set-card rounded-general py-3 px-5 flex items-center text-sm font-lexend text-primary/90 mb-2 shadow-sm/30">
+                    <span class="flex-1 text-left my-auto">{{ set.weight }} kg</span>
 
-                  <div class="flex flex-col bg-set-card rounded-general p-4 gap-3 shadow-sm/30">
+                    <div class="flex-1 flex justify-center items-center h-full">
+                      @if (set.unilateralSide) { <span class="text-xs text-primary/50 uppercase">{{ set.unilateralSide === 'left' ? 'L' : 'R' }}</span> }
+                    </div>
+
+                    <span class="flex-1 text-right my-auto">{{ set.reps }} reps</span>
+                  </div>
+                  }
+
+                  <div class="flex flex-col bg-set-card rounded-general p-4 gap-3 pt-2 shadow-sm/30">
+                    
                     <div class="flex justify-between items-start text-sm font-lexend mt-2 text-primary/90">
+
                       <div class="flex flex-col items-center gap-2">
                         <span class="uppercase tracking-wide text-xs text-primary/70 mb-1">Weight</span>
                         <div class="flex items-center gap-2">
                           <div class="flex flex-col gap-1">
-                            <button type="button" (click)="incrementWeight()" class="stepper-btn">
+                            <button type="button" (click)="incrementWeight()" class="stepper-btn rounded-tl-general!">
                               <ion-icon name="chevron-up-outline"></ion-icon>
                             </button>
-                            <button type="button" (click)="decrementWeight()" class="stepper-btn">
+                            <button type="button" (click)="decrementWeight()" class="stepper-btn rounded-bl-general!">
                               <ion-icon name="chevron-down-outline"></ion-icon>
                             </button>
                           </div>
-                          <input inputmode="decimal" step="0.1" min="0" max="999" [(ngModel)]="newWeight" (input)="restrictInput($event, 'newWeight')" class="bg-set-input-background rounded-general w-14 h-19 outline-none text-center text-primary" />
+                          <input inputmode="decimal" step="0.1" min="0" max="999" [(ngModel)]="newWeight" (input)="restrictInput($event, 'newWeight')" class="bg-set-input-background rounded-general rounded-l-none w-14 h-19 outline-none text-center text-primary" />
                         </div>
                       </div>
 
                       <div class="flex flex-col items-center gap-2">
                         <span class="uppercase tracking-wide text-xs text-primary/70 mb-1">Reps</span>
                         <div class="flex items-center gap-2">
-                          <input inputmode="decimal" step="any" min="0" max="999" [(ngModel)]="newReps" (input)="restrictInput($event, 'newReps')" class="bg-set-input-background rounded-general w-14 h-19 outline-none text-center text-primary" />
+                          <input inputmode="decimal" step="any" min="0" max="999" [(ngModel)]="newReps" (input)="restrictInput($event, 'newReps')" class="bg-set-input-background rounded-general rounded-r-none w-14 h-19 outline-none text-center text-primary" />
                           <div class="flex flex-col gap-1">
-                            <button type="button" (click)="incrementReps()" class="stepper-btn">
+                            <button type="button" (click)="incrementReps()" class="stepper-btn rounded-tr-general!">
                               <ion-icon name="chevron-up-outline"></ion-icon>
                             </button>
-                            <button type="button" (click)="decrementReps()" class="stepper-btn">
+                            <button type="button" (click)="decrementReps()" class="stepper-btn rounded-br-general!">
                               <ion-icon name="chevron-down-outline"></ion-icon>
                             </button>
                           </div>
                         </div>
                       </div>
+
                     </div>
-                    <ion-button (click)="addSet()" class="set-add-btn font-lexend mt-6">ADD</ion-button>
+
+                    <div class="flex w-full gap-1">
+                      <ion-button type="button" (click)="toggleUnilateralSide('left')" fill="clear"class="flex-1 unilateral-toggle font-lexend [&::part(native)]:rounded-none [&::part(native)]:rounded-bl-general" [ngClass]="{ 'active': newUnilateralSide === 'left' }">
+                        L
+                      </ion-button>
+
+                      <ion-button type="button" (click)="toggleUnilateralSide('right')" fill="clear"class="flex-1 unilateral-toggle font-lexend [&::part(native)]:rounded-none [&::part(native)]:rounded-br-general" [ngClass]="{ 'active': newUnilateralSide === 'right' }">
+                        R
+                      </ion-button>
+                    </div>
+
+                    <div class="flex items-center overflow-hidden mt-1 rounded-general shadow-sm/30">
+                      <ion-button (click)="addSet()" fill="clear" class="flex-1 font-lexend [&::part(native)]:bg-add-button [&::part(native)]:text-white">
+                        ADD
+                      </ion-button>
+                    </div>
+
                   </div>
 
-                  <ion-button (click)="completeExercise()" class="set-complete-btn font-lexend pt-4 w-full">COMPLETE</ion-button>
+                  <ion-button (click)="completeExercise()" class="set-complete-btn font-lexend pt-4 w-full ">COMPLETE</ion-button>
                 </div>
               </ion-accordion>
             }
           </ion-accordion-group>
-        
-            <div class="flex gap-1 items-stretch bg-exercise-card p-1.5 py-2 rounded-general shadow-sm/30">
-              <ion-select 
-                [(ngModel)]="newExerciseName" 
-                interface="popover"
-                fill="none"
-                [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
-                placeholder="EXERCISE"
-                class="w-full bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general rounded-r-none">
 
-                @for (group of availableExercisesForDropdown; track group) 
-                {
-                  <ion-select-option [value]="group">{{ group }}</ion-select-option>
-                }
-              </ion-select>
+          <ion-button (click)="openAddExerciseModal()" style="--background: rgb(76, 76, 76);" class="musclegroup-card-template font-lexend w-full">
+            <ion-icon name="add" class="scale-130"></ion-icon>
+          </ion-button>
 
-              <div class="w-[20%] bg-return-button rounded-r-general rounded-l-none flex items-center justify-center">
-                <ion-button fill="clear" (click)="addExercise()" class="restart-cycle-btn w-full h-full m-0">
-                  <ion-icon name="add" slot="icon-only"></ion-icon>
-                </ion-button>
-              </div>
-            </div>
         </div>
         }
       }

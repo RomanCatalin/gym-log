@@ -15,12 +15,23 @@ export class RestTimerService {
   private restInterval: any;
   private restNotificationId: number | null = null;
 
-  async startRestTimer()
-   {
+  private restStartedAt: number | null = null;
+  private onRestEndCallback: ((actualSeconds: number) => void) | null = null;
+
+  async startRestTimer(onComplete?: (actualSeconds: number) => void)
+  {
     const seconds = this.preferencesService.restTimeSeconds;
     if (!seconds || seconds <= 0) return;
 
+    this.isResting = true;
+    this.restStartedAt = Date.now();
+    this.onRestEndCallback = onComplete || null;
+    this.restEndsAt = Date.now() + seconds * 1000;
+    this.updateRestDisplay();
+
+
     clearInterval(this.restInterval);
+
     if (this.restNotificationId !== null) 
     { 
       try 
@@ -89,6 +100,7 @@ export class RestTimerService {
 
   private finishRestTimer() 
   {
+    this.recordActualDuration();
     clearInterval(this.restInterval);
     this.isResting = false;
     this.restEndsAt = null;
@@ -115,5 +127,16 @@ export class RestTimerService {
       }
       this.restNotificationId = null;
     }
+  }
+
+  private recordActualDuration() 
+  {
+    if (this.restStartedAt && this.onRestEndCallback) 
+    {
+      const actualSeconds = Math.round((Date.now() - this.restStartedAt) / 1000);
+      this.onRestEndCallback(actualSeconds);
+    }
+  this.restStartedAt = null;
+  this.onRestEndCallback = null;
   }
 }

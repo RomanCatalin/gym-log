@@ -8,25 +8,30 @@ export const EXERCISES_BY_GROUP: ExerciseDatabase =
   [
     'Bench Press',
     'Incline Bench Press',
+    'Smith Machine Bench Press',
+    'Incline Smith Machine Bench Press',
     'Machine Chest Press',
     'Machine Incline Chest Press',
+    'Dumbbell Press',
     'Incline Dumbbell Press',
     'Pec Fly',
     'Cable Flyes',
     'Push-ups',
-    'Dips'
+    'Wide Grip Seated Dips',
+    'Wide Grip Dips'
   ],
   BACK: 
   [
     'Lat Pulldown',
     'Machine Lat Pulldown',
     'Barbell Row',
-    'Pull-ups',
+    'Dumbbell Row',
     'Seated Cable Row',
     'Machine Row',
-    'Deadlift',
     'Dumbbell Shrugs',
-    'Barbell Shrugs'
+    'Barbell Shrugs',
+    'Pull-ups',
+    'Deadlift'
   ],
   LEGS: 
   [
@@ -34,20 +39,27 @@ export const EXERCISES_BY_GROUP: ExerciseDatabase =
     'Leg Press',
     'Leg Extensions',
     'Leg Curls',
-    'Calf Raises'
+    'Hip Thrust',
+    'Calf Raises',
+    'Abductor Machine'
   ],
   SHOULDERS: 
   [
     'Overhead Press',
     'Cable Lateral Raises',
     'Dumbbell Lateral Raises',
-    'Front Raises',
-    'Cable Face Pulls'
+    'Machine Lateral Raises',
+    'Dumbbell Front Raises',
+    'Cable Front Raises',
+    'Cable Face Pulls',
+    'Reverse Pec Deck'
   ],
   BICEPS: 
   [
     'Dumbbell Curls',
+    'Incline Dumbbell Curls',
     'Hammer Curls',
+    'Cable Hammer Curls',
     'Preacher Curls',
     'Bar Curls',
     'Bayesian Curls'
@@ -57,11 +69,10 @@ export const EXERCISES_BY_GROUP: ExerciseDatabase =
     'Cable Tricep Pushdowns',
     'Cable Overhead Extension',
     'Dumbbell Overhead Extension',
-    'Dumbbell Tricep Pushdown',
-    'Seated Dips',
-    'Dips',
-    'Unilateral Tricep Pushdown',
-    'Skull Crushers',
+    'Close Grip Seated Dips',
+    'Close Grip Dips',
+    'Close Grip Bench Press',
+    'Skull Crushers'
   ],
   CORE: 
   [

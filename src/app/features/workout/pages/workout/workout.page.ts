@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, ChangeDetectorRef, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
+import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption, ModalController} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline, chevronDownOutline, add, chevronUpOutline } from 'ionicons/icons';
 import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
@@ -10,6 +10,7 @@ import { LocalNotifications } from '@capacitor/local-notifications';
 import { PreferencesService } from 'src/app/services/preferences-service';
 import { IonAccordion, IonAccordionGroup, IonItem } from '@ionic/angular/standalone';
 import { RestTimerService } from 'src/app/services/rest-timer-service';
+import { AddExerciseModalComponent } from 'src/app/shared/components/add-exercise-modal/add-exercise-modal.component';
 
 @Component({
   selector: 'app-workout',
@@ -32,10 +33,10 @@ export class WorkoutPage implements OnInit, OnDestroy
 
 
   newGroupName = '';
-  newExerciseName = '';
   newReps: number | null = null;
   newWeight: number | null = null;
-
+  newActualSeconds: number | null = null;
+  newUnilateralSide: 'left' | 'right' | null = null;
 
   timerInterval: any;
   timerDisplay = '00:00';
@@ -43,6 +44,7 @@ export class WorkoutPage implements OnInit, OnDestroy
 
   private restTimerService = inject(RestTimerService);
 
+  private modalController = inject(ModalController);
 
   constructor() 
   {
@@ -205,18 +207,32 @@ export class WorkoutPage implements OnInit, OnDestroy
     }
   }
 
-  async addExercise() 
-  {
-    if (this.newExerciseName.trim() && this.activeMuscleGroup) 
-    {
+  async openAddExerciseModal() {
+    if (!this.activeMuscleGroup) return;
+
+    const modal = await this.modalController.create({
+      component: AddExerciseModalComponent,
+      componentProps: {
+        muscleGroupName: this.activeMuscleGroup.name,
+        existingExerciseNames: this.activeMuscleGroup.exercises.map(e => e.name),
+      },
+      cssClass: 'add-exercise-modal',
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 0.95],
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && this.activeMuscleGroup) {
       this.activeMuscleGroup.exercises.push({
         id: Date.now().toString(),
-        name: this.newExerciseName.toUpperCase(),
+        name: data.name.toUpperCase(),
         isCustom: true,
         isCompleted: false,
-        sets: []
+        sets: [],
+        equipmentBrand: data.equipmentBrand,
+        attachment: data.attachment,
       });
-      this.newExerciseName = '';
       await this.workoutService.saveActiveWorkout();
     }
   }
@@ -235,13 +251,22 @@ export class WorkoutPage implements OnInit, OnDestroy
     }
   }
 
+  toggleUnilateralSide(side: 'left' | 'right') 
+  {
+  this.newUnilateralSide = this.newUnilateralSide === side ? null : side;
+  }
+
   async addSet() 
   {
-   if (this.newReps != null && this.newWeight != null && this.activeExercise) 
+    if (this.newReps != null && this.newWeight != null && this.activeExercise) 
     {
-      this.activeExercise.sets.push({ reps: this.newReps, weight: this.newWeight });
+      const newSet = { reps: this.newReps, weight: this.newWeight, actualRestSeconds: 0, unilateralSide: this.newUnilateralSide || undefined  };
+      this.activeExercise.sets.push(newSet);
       await this.workoutService.saveActiveWorkout();
-      await this.restTimerService.startRestTimer();
+      this.newUnilateralSide = null;
+      
+      this.restTimerService.startRestTimer((actualSeconds) => {newSet.actualRestSeconds = actualSeconds; this.workoutService.saveActiveWorkout();});
+      
     }
   }
 

@@ -1,0 +1,27 @@
+<div class="bg-return-button flex flex-col gap-3">
+  <div class="px-2 py-2 gap-3">
+    @if (title) {
+      <div class="text-primary/60 text-sm uppercase tracking-wide text-center pb-3">
+        {{ title }}
+      </div>
+    }
+
+    <div class="grid grid-cols-4 gap-2">
+      @for (item of items; track item.name) {
+        <button style="border-radius: 6px;" (click)="pick(item.name)" class="w-full aspect-5/3 bg-[#545454] flex items-center justify-center overflow-hidden active:bg-white/10 shadow-sm/30">
+          @if (item.logo)
+          {
+            <img [src]="item.logo" [alt]="item.name" class="w-full h-full object-contain px-1"/>
+          }
+        </button>
+      }
+    </div>
+
+  </div>
+
+  <button type="button" (click)="cancel()" class="w-full flex items-center justify-center py-3 border-t border-white/10 text-primary/80 uppercase tracking-wide text-sm bg-workout-delete h-8">
+    CANCEL
+  </button>
+
+
+</div>

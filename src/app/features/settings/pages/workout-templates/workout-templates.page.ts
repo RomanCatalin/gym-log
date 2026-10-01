@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonContent, IonButton, IonSelect, IonSelectOption, IonIcon } from '@ionic/angular/standalone';
+import { IonContent, IonButton, IonSelect, IonSelectOption, IonIcon, ModalController } from '@ionic/angular/standalone';
 import { WorkoutService, Workout, MuscleGroup } from 'src/app/services/workout-service';
 import { addIcons } from 'ionicons';
 import { arrowRedoOutline, pencilOutline, chevronDownOutline, closeOutline, returnUpBackOutline, add } from 'ionicons/icons';
@@ -10,6 +10,7 @@ import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/
 import { PopoverController } from '@ionic/angular/standalone';
 import { WORKOUT_COLOR_PALETTE, REST_DAY_COLOR } from 'src/app/shared/constants/workout-colors';
 import { ColorPickerComponent } from '../../components/color-picker/color-picker.component';
+import { AddExerciseModalComponent } from 'src/app/shared/components/add-exercise-modal/add-exercise-modal.component';
 
 @Component({
   selector: 'app-workout-templates',
@@ -36,12 +37,13 @@ export class WorkoutTemplatesPage {
   selectedMuscleGroup: MuscleGroup | null = null;
   newWorkoutName = '';
   selectedNewGroup = '';
-  selectedNewExercise = '';
 
   exercisesByGroup: Record<string, string[]> = EXERCISES_BY_GROUP;
  
   private popoverController = inject(PopoverController);
   restColor = REST_DAY_COLOR;
+
+  private modalController = inject(ModalController);
 
   get availableGroups(): string[] 
   {
@@ -116,11 +118,31 @@ export class WorkoutTemplatesPage {
     }
   }
 
-  async addExercise() {
-    if (this.selectedMuscleGroup && this.selectedNewExercise) {
-      this.selectedMuscleGroup.exercises.push({ id: Date.now().toString(), name: this.selectedNewExercise });
+  async openAddExerciseModal() 
+  {
+    if (!this.selectedMuscleGroup) return;
+
+    const modal = await this.modalController.create({
+      component: AddExerciseModalComponent,
+      componentProps: {
+        muscleGroupName: this.selectedMuscleGroup.name,
+        existingExerciseNames: this.selectedMuscleGroup.exercises.map(e => e.name),
+      },
+      cssClass: 'add-exercise-modal',
+      initialBreakpoint: 0.75,
+      breakpoints: [0, 0.75, 0.95],
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data && this.selectedMuscleGroup) {
+      this.selectedMuscleGroup.exercises.push({
+        id: Date.now().toString(),
+        name: data.name,
+        equipmentBrand: data.equipmentBrand,
+        attachment: data.attachment,
+      });
       await this.workoutService.saveTemplates();
-      this.selectedNewExercise = '';
     }
   }
 
