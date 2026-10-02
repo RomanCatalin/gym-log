@@ -132,7 +132,7 @@
             @for (ex of activeMuscleGroup.exercises; track ex.id) {
               <ion-accordion [value]="ex.id" class="exercise-accordion shadow-sm/30" [ngClass]="{'completed-workout-btn': ex.isCompleted, 'is-expanded': activeExercise?.id === ex.id} ">
                 <ion-item slot="header" lines="none" class="exercise-accordion-header">
-                  <span class="w-full text-center uppercase tracking-widest font-lexend text-primary exercise-accordion-title px-2">{{ ex.name }}</span>
+                  <span class="w-full text-center uppercase tracking-widest font-lexend text-primary exercise-accordion-title px-4">{{ ex.name }}</span>
                 </ion-item>
 
                 <div slot="content" class="exercise-accordion-content">
