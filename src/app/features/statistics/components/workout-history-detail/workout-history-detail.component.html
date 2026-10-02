@@ -1,10 +1,10 @@
-<div class="bg-workout-background rounded-general font-lexend text-primary flex flex-col w-full max-h-full min-h-0 overflow-hidden">
+<div class="bg-workout-background rounded-general font-lexend text-primary flex flex-col w-full max-h-[90dvh] min-h-0 overflow-hidden">
   <div class="p-4 pb-0 flex flex-col flex-1 min-h-0">
     <div class="text-center pb-2 shrink-0">
       <div class="text-[28px] uppercase tracking-wide">{{ workout.name }}</div>
     </div>
 
-    <div class="flex justify-between items-center px-1 pb-4 shrink-0">
+    <div class="flex justify-between items-center px-5 pb-4 shrink-0 border-b-2 border-black/30 -mx-4">
       <span class="text-primary/60 text-base">{{ dateDisplay }}</span>
       <div class="flex items-center gap-2 text-primary text-lg">
         <span>{{ durationDisplay }}</span>
@@ -17,16 +17,33 @@
         @for (item of groupsWithData; track item.group.id) {
           <div class="bg-musclegroup-card rounded-general p-4 flex flex-col gap-3 shadow-sm/30">
             <div class="text-[22px] uppercase tracking-wide">{{ item.group.name }}</div>
-            @for (ex of item.exercises; track ex.exercise.id) {
-              <div class="bg-set-card rounded-general py-3 px-3 flex justify-between items-center text-sm font-lexend gap-2">
-                <div class="min-w-0 flex flex-col w-[70%]">
-                  <span class="uppercase tracking-wide min-w-0 break-words">{{ ex.exercise.name }}</span>
-                  <span class="text-primary/80 tracking-wide text-xs">{{ ex.exercise.attachment }}</span>
-                  <span class="text-primary/60 tracking-wide text-xs">{{ ex.exercise.equipmentBrand }}</span>
-                </div>
-                <span class="text-primary tracking-wide shrink-0 whitespace-nowrap">{{ ex.bestSet.weight }}<span class="text-primary/70">kg x </span>{{ ex.bestSet.reps }}</span>
-              </div>
-            }
+            <ion-accordion-group class="workout-accordion-group">
+              @for (ex of item.exercises; track ex.id) {
+                <ion-accordion [value]="ex.id" class="exercise-accordion shadow-sm/30">
+                  <ion-item slot="header" lines="none" class="exercise-accordion-header">
+                    <span class="w-full text-center uppercase tracking-widest font-lexend text-primary exercise-accordion-title">{{ ex.name }}</span>
+                  </ion-item>
+
+                  <div slot="content" class="exercise-accordion-content">
+                    @if (ex.equipmentBrand || ex.attachment) {
+                      <div class="text-xs text-primary/50 uppercase tracking-wide text-center pb-2">
+                        {{ ex.equipmentBrand }}{{ ex.equipmentBrand && ex.attachment ? ' · ' : '' }}{{ ex.attachment }}
+                      </div>
+                    }
+                    @for (set of ex.sets; track $index) {
+                      <div class="bg-set-card rounded-general py-3 px-5 flex justify-between items-center text-sm font-lexend text-primary/90 mb-2 shadow-sm/30">
+                        <span>{{ set.weight }} kg</span>
+                        @if (set.unilateralSide) 
+                        {
+                          <span class="text-xs text-primary/50 uppercase">{{ set.unilateralSide === 'left' ? 'L' : 'R' }}</span>
+                        }
+                        <span>{{ set.reps }} reps</span>
+                      </div>
+                    }
+                  </div>
+                </ion-accordion>
+              }
+            </ion-accordion-group>
           </div>
         }
 
@@ -38,7 +55,7 @@
     </div>
   </div>
 
-  <button (click)="close()" class="w-full h-12 flex items-center justify-center border-t border-white/10 bg-musclegroup-card">
+  <button (click)="close()" style="border-top: 2px solid #0000004d;" class="w-full h-12 flex items-center justify-center  bg-musclegroup-card shrink-0">
     <ion-icon name="chevron-down-outline" class="text-2xl text-primary"></ion-icon>
   </button>
 

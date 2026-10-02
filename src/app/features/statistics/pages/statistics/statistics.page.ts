@@ -340,8 +340,6 @@ export class StatisticsPage {
       component: WorkoutHistoryDetailComponent,
       componentProps: { workout },
       cssClass: 'workout-history-modal',
-      initialBreakpoint: 0.75,
-      breakpoints: [0, 0.75, 0.95],
     });
     await modal.present();
   }

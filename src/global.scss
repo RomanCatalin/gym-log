@@ -411,8 +411,20 @@ ion-toggle.settings-toggle
 }
 
 ion-modal.workout-history-modal {
-  --border-radius: 16px 16px 0 0;
   --background: transparent;
+  --border-radius: 16px 16px 0 0;
+}
+
+ion-modal.workout-history-modal::part(content) {
+  height: fit-content;
+  max-height: 90dvh;
+  max-width: 95dvw;
+  margin-top: auto;
+  margin-bottom: 5dvh;
+  background: transparent;
+  border-radius: 16px 16px 16px 16px;
+  box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 100%),
+  0 15px 35px 0 rgba(0, 0, 0, 40%);
 }
 
 ion-modal.split-editor-modal {
@@ -657,7 +669,16 @@ ion-accordion.exercise-accordion {
   margin: 0 auto;
   text-align: center;
   display: block;
-  transition: font-size 150ms ease;
+
+  transition: transform 200ms ease;
+  transform-origin: center; 
+  will-change: transform;
+}
+
+ion-accordion.accordion-expanded .exercise-accordion-title,
+ion-accordion.accordion-expanding .exercise-accordion-title,
+ion-accordion .exercise-accordion-header:active .exercise-accordion-title {
+  transform: scale(1.3);
 }
 
 ion-modal.add-exercise-modal 

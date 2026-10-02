@@ -1,6 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalController, IonIcon } from '@ionic/angular/standalone';
+import { ModalController, IonIcon, IonAccordionGroup, IonAccordion, IonItem } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { chevronDownOutline, timeOutline } from 'ionicons/icons';
 import { ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise, WorkoutSet } from 'src/app/services/workout-service';
@@ -8,7 +8,7 @@ import { ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise, WorkoutSet } from '
 @Component({
   selector: 'app-workout-history-detail',
   standalone: true,
-  imports: [CommonModule, IonIcon],
+  imports: [CommonModule, IonIcon, IonAccordionGroup, IonAccordion, IonItem],
   templateUrl: './workout-history-detail.component.html',
 })
 export class WorkoutHistoryDetailComponent 
@@ -40,30 +40,11 @@ export class WorkoutHistoryDetailComponent
     return `${day}/${month}/${year}`;
   }
 
-  get groupsWithData(): { group: WorkoutMuscleGroup; exercises: { exercise: WorkoutExercise; bestSet: WorkoutSet }[] }[] 
+  get groupsWithData(): { group: WorkoutMuscleGroup;  exercises: WorkoutExercise[] }[] 
   {
-    return this.workout.muscleGroups
-      .map(group => {
-        const exercises = group.exercises
-          .map(exercise => ({ exercise, bestSet: this.getBestSet(exercise) }))
-          .filter((e): e is { exercise: WorkoutExercise; bestSet: WorkoutSet } => e.bestSet !== null);
-        return { group, exercises };
-      })
-      .filter(g => g.exercises.length > 0);
+    return this.workout.muscleGroups.map(group => ({group, exercises: group.exercises.filter(ex => ex.sets.length > 0),})).filter(g => g.exercises.length > 0);
   }
 
-  private getBestSet(exercise: WorkoutExercise): WorkoutSet | null 
-  {
-    if (!exercise.sets || exercise.sets.length === 0) return null; 
-    let best: WorkoutSet | null = null;
-    for (const set of exercise.sets) {
-      if (set.weight == null || set.reps == null) continue;
-      if (!best || set.weight > (best.weight ?? -Infinity) || (set.weight === best.weight && set.reps > (best.reps ?? -Infinity))) {
-        best = set;
-      }
-    }
-    return best;
-  }
 
   close() 
   {
