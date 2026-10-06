@@ -360,23 +360,50 @@ async maybeAutoBackup() {
   }
 }
 
-getLastSetForExercise(exerciseName: string): WorkoutSet | null {
+getBestSetForExercise(exerciseName: string): WorkoutSet | null 
+{
   const normalizedName = exerciseName.toUpperCase().trim();
-
   const sortedHistory = [...this.workoutHistory].sort((a, b) => b.startTime - a.startTime);
+
+  let absoluteBestSet: WorkoutSet | null = null;
+  let highestScore = -1;
+
+  const calculateSetScore = (set: WorkoutSet): number => 
+  {
+    const weight = set.weight || 0;
+    const reps = set.reps || 0;
+
+    if (weight <= 0 || reps <= 0) return 0;
+
+
+    let score = weight * (1 + reps / 30);
+
+
+    if (reps < 4) {
+      score *= 0.88; 
+    }
+
+    return score;
+  };
 
   for (const workout of sortedHistory) {
     for (const group of workout.muscleGroups) {
       for (const exercise of group.exercises) {
         if (exercise.name.toUpperCase().trim() !== normalizedName) continue;
-        if (exercise.sets.length > 0) {
-          return exercise.sets[exercise.sets.length - 1];
+
+        for (const set of exercise.sets) {
+          const score = calculateSetScore(set);
+
+          if (score > highestScore) {
+            highestScore = score;
+            absoluteBestSet = set;
+          }
         }
       }
     }
   }
 
-  return null;
+  return absoluteBestSet;
 }
 
 async getShareableBackupUri(): Promise<string> 

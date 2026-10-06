@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, IonSelectOption, IonSelect, IonToggle, AlertController, IonButton } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { returnUpBackOutline, playOutline} from 'ionicons/icons';
+import { returnUpBackOutline} from 'ionicons/icons';
 import { Router } from '@angular/router';
 import { PreferencesService } from 'src/app/services/preferences-service';
 import { LocalNotifications } from '@capacitor/local-notifications';
@@ -19,7 +19,7 @@ export class PreferencesPage implements OnInit {
 
   constructor() 
   {
-    addIcons({ returnUpBackOutline, playOutline });
+    addIcons({ returnUpBackOutline });
   }
 
   async ngOnInit() 
@@ -35,8 +35,6 @@ export class PreferencesPage implements OnInit {
 
   restMinutes: number | null = 0;
   restSeconds: number | null = 0;
-
-
 
   goBack() {
     this.router.navigate(['/settings']);
@@ -63,11 +61,23 @@ export class PreferencesPage implements OnInit {
     }
   }
 
-  onSoundToggle(event: any) {
+  onSoundToggle(event: any)
+  {
     this.preferencesService.setSoundEnabled(event.detail.checked);
   }
 
-  private async showPermissionDeniedAlert() {
+  onBestSetToggle(event: any)
+  {
+    this.preferencesService.setBestSetEnabled(event.detail.checked);
+  }
+
+  onUnilateralToggle(event: any) 
+  {
+    this.preferencesService.setUnilateralEnabled(event.detail.checked);
+  }
+
+  private async showPermissionDeniedAlert()
+  {
     const alert = await this.alertController.create({
       header: 'Permission refused',
       message: 'For notifications to be received at the end of rests, please allow notifications permission in your phone settings.',

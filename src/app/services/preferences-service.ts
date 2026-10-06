@@ -11,6 +11,8 @@ const KEYS = {
   lastBackupAt: 'pref_last_backup_at',
   alertEnabled: 'pref_alert_enabled',
   soundEnabled: 'pref_sound_enabled',
+  bestSetEnabled: 'pref_best_set_enabled',
+  unilateralEnabled: 'pref_unilateral_enabled',
   notificationEnabled: 'pref_notification_enabled',
 };
 
@@ -24,6 +26,8 @@ export class PreferencesService
   soundEnabled = false;
   vibrationEnabled = false;
   notificationEnabled = false;
+  bestSetEnabled = false;
+  unilateralEnabled = false;
 
   dataIntervalDays = 7;
   dataBackupEnabled = true;
@@ -40,7 +44,7 @@ export class PreferencesService
   {
     try 
     {
-      const [theme, restTime, dataInterval, dataBackup, lastBackupAt, alert, sound, notification] = await Promise.all
+      const [theme, restTime, dataInterval, dataBackup, lastBackupAt, alert, sound, notification, bestSet, unilateral] = await Promise.all
       ([
         Preferences.get({ key: KEYS.theme }),
         Preferences.get({ key: KEYS.restTimeSeconds }),
@@ -50,6 +54,8 @@ export class PreferencesService
         Preferences.get({ key: KEYS.alertEnabled }),
         Preferences.get({ key: KEYS.soundEnabled }),
         Preferences.get({ key: KEYS.notificationEnabled }),
+        Preferences.get({ key: KEYS.bestSetEnabled }),
+        Preferences.get({ key: KEYS.unilateralEnabled }),
       ]);
 
     if (theme.value) this.theme = theme.value as ThemeOption;
@@ -74,6 +80,9 @@ export class PreferencesService
     if (alert.value !== null) this.alertEnabled = alert.value === 'true';
     if (sound.value !== null) this.soundEnabled = sound.value === 'true';
     if (notification.value !== null) this.notificationEnabled = notification.value === 'true';
+    if (bestSet.value !== null) this.bestSetEnabled = bestSet.value === 'true';
+    if (unilateral.value !== null) this.unilateralEnabled = unilateral.value === 'true';
+
     } 
     catch (error) 
     {
@@ -119,5 +128,15 @@ export class PreferencesService
   async setNotificationEnabled(value: boolean) {
     this.notificationEnabled = value;
     await Preferences.set({ key: KEYS.notificationEnabled, value: value.toString() });
+  }
+
+  async setBestSetEnabled(value: boolean) {
+    this.bestSetEnabled = value;
+    await Preferences.set({ key: KEYS.bestSetEnabled, value: value.toString() });
+  }
+
+  async setUnilateralEnabled(value: boolean) {
+    this.unilateralEnabled = value;
+    await Preferences.set({ key: KEYS.unilateralEnabled, value: value.toString() });
   }
 }

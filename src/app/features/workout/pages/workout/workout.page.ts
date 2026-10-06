@@ -23,6 +23,7 @@ export class WorkoutPage implements OnInit, OnDestroy
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
   readonly recentWorkoutsLimit = 6;
+ preferencesService = inject(PreferencesService);
 
   viewState: 1 | 2 | 3 = 1;
   activeMuscleGroup: WorkoutMuscleGroup | null = null;
@@ -162,17 +163,26 @@ export class WorkoutPage implements OnInit, OnDestroy
 
     this.activeExercise = exercise;
     
-    if (exercise.sets.length > 0)
+    if(this.preferencesService.bestSetEnabled)
     {
-      const lastSet = exercise.sets[exercise.sets.length - 1];
-      this.newReps = lastSet.reps;
-      this.newWeight = lastSet.weight;
-    } 
+      if (exercise.sets.length > 0)
+      {
+        const lastSet = exercise.sets[exercise.sets.length - 1];
+        this.newReps = lastSet.reps;
+        this.newWeight = lastSet.weight;
+      } 
+      else 
+      {
+        const last = this.workoutService.getBestSetForExercise(exercise.name);
+        this.newReps = last ? last.reps : null;
+        this.newWeight = last ? last.weight : null;
+      }
+    }
     else 
     {
-      const last = this.workoutService.getLastSetForExercise(exercise.name);
-      this.newReps = last ? last.reps : null;
-      this.newWeight = last ? last.weight : null;
+      
+      this.newReps = null;
+      this.newWeight = null;
     }
   }
 
@@ -258,7 +268,7 @@ export class WorkoutPage implements OnInit, OnDestroy
       this.newUnilateralSide = null;
       
       this.restTimerService.startRestTimer((actualSeconds) => {newSet.actualRestSeconds = actualSeconds; this.workoutService.saveActiveWorkout();});
-      
+   
     }
   }
 

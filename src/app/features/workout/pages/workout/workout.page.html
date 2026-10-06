@@ -185,6 +185,8 @@
 
                     </div>
 
+                    @if(preferencesService.unilateralEnabled) 
+                    {
                     <div class="flex w-full gap-1">
                       <ion-button type="button" (click)="toggleUnilateralSide('left')" fill="clear"class="flex-1 unilateral-toggle font-lexend [&::part(native)]:rounded-none [&::part(native)]:rounded-bl-general" [ngClass]="{ 'active': newUnilateralSide === 'left' }">
                         L
@@ -194,6 +196,7 @@
                         R
                       </ion-button>
                     </div>
+                    }
 
                     <div class="flex items-center overflow-hidden mt-1 rounded-general shadow-sm/30">
                       <ion-button (click)="addSet()" fill="clear" class="flex-1 font-lexend [&::part(native)]:bg-add-button [&::part(native)]:text-white">
