@@ -4,13 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption, ModalController} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline, chevronDownOutline, add, chevronUpOutline } from 'ionicons/icons';
-import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
+import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise } from 'src/app/services/workout-service';
 import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
-import { LocalNotifications } from '@capacitor/local-notifications';
 import { PreferencesService } from 'src/app/services/preferences-service';
 import { IonAccordion, IonAccordionGroup, IonItem } from '@ionic/angular/standalone';
 import { RestTimerService } from 'src/app/services/rest-timer-service';
-import { AddExerciseModalComponent } from 'src/app/shared/components/add-exercise-modal/add-exercise-modal.component';
 
 @Component({
   selector: 'app-workout',
@@ -25,7 +23,6 @@ export class WorkoutPage implements OnInit, OnDestroy
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
   readonly recentWorkoutsLimit = 6;
-  private preferencesService = inject(PreferencesService);
 
   viewState: 1 | 2 | 3 = 1;
   activeMuscleGroup: WorkoutMuscleGroup | null = null;
@@ -33,6 +30,7 @@ export class WorkoutPage implements OnInit, OnDestroy
 
 
   newGroupName = '';
+  newExerciseName = '';
   newReps: number | null = null;
   newWeight: number | null = null;
   newActualSeconds: number | null = null;
@@ -148,22 +146,30 @@ export class WorkoutPage implements OnInit, OnDestroy
     this.viewState = 2;
   }
 
-  onExerciseAccordionChange(event: any) {
+  onExerciseAccordionChange(event: any) 
+  {
+    event.stopPropagation();
+
     const exerciseId = event.detail.value;
-    if (!exerciseId) {
+    if (!exerciseId || !this.activeMuscleGroup) 
+    {
       this.activeExercise = null;
       return;
     }
-    if (!this.activeMuscleGroup) return;
+
     const exercise = this.activeMuscleGroup.exercises.find(e => e.id === exerciseId);
     if (!exercise) return;
 
     this.activeExercise = exercise;
-    if (exercise.sets.length > 0) {
+    
+    if (exercise.sets.length > 0)
+    {
       const lastSet = exercise.sets[exercise.sets.length - 1];
       this.newReps = lastSet.reps;
       this.newWeight = lastSet.weight;
-    } else {
+    } 
+    else 
+    {
       const last = this.workoutService.getLastSetForExercise(exercise.name);
       this.newReps = last ? last.reps : null;
       this.newWeight = last ? last.weight : null;
@@ -207,32 +213,18 @@ export class WorkoutPage implements OnInit, OnDestroy
     }
   }
 
-  async openAddExerciseModal() {
-    if (!this.activeMuscleGroup) return;
-
-    const modal = await this.modalController.create({
-      component: AddExerciseModalComponent,
-      componentProps: {
-        muscleGroupName: this.activeMuscleGroup.name,
-        existingExerciseNames: this.activeMuscleGroup.exercises.map(e => e.name),
-      },
-      cssClass: 'add-exercise-modal',
-      initialBreakpoint: 0.75,
-      breakpoints: [0, 0.75, 0.95],
-    });
-    await modal.present();
-
-    const { data } = await modal.onDidDismiss();
-    if (data && this.activeMuscleGroup) {
+  async addExercise() 
+  {
+    if (this.newExerciseName.trim() && this.activeMuscleGroup) 
+    {
       this.activeMuscleGroup.exercises.push({
         id: Date.now().toString(),
-        name: data.name.toUpperCase(),
+        name: this.newExerciseName.toUpperCase(),
         isCustom: true,
         isCompleted: false,
-        sets: [],
-        equipmentBrand: data.equipmentBrand,
-        attachment: data.attachment,
+        sets: []
       });
+      this.newExerciseName = '';
       await this.workoutService.saveActiveWorkout();
     }
   }

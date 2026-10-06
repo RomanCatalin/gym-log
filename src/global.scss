@@ -681,12 +681,6 @@ ion-accordion .exercise-accordion-header:active .exercise-accordion-title {
   transform: scale(1.3);
 }
 
-ion-modal.add-exercise-modal 
-{
-  --border-radius: 16px 16px 0 0;
-  --background: transparent;
-}
-
 .unilateral-toggle 
 {
   margin: 0;
@@ -710,18 +704,7 @@ ion-modal.add-exercise-modal
   }
 }
 
-ion-popover.equipment-picker-popover 
-{
-  --width: 90vw;
-  --background: transparent;
-  --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
 
-  &::part(content) {
-    background: var(--color-return-button);
-    border-radius: 12px;
-    overflow: hidden;
-  }
-}
 
 
 html,

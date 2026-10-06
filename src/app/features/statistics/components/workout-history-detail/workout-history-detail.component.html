@@ -21,16 +21,12 @@
               @for (ex of item.exercises; track ex.id) {
                 <ion-accordion [value]="ex.id" class="exercise-accordion shadow-sm/30">
                   <ion-item slot="header" lines="none" class="exercise-accordion-header">
-                    <span class="w-full text-center uppercase tracking-widest font-lexend text-primary exercise-accordion-title">{{ ex.name }}</span>
+                    <span class="w-full text-center uppercase tracking-widest font-lexend text-primary exercise-accordion-title px-8">{{ ex.name }}</span>
                   </ion-item>
 
                   <div slot="content" class="exercise-accordion-content">
-                    @if (ex.equipmentBrand || ex.attachment) {
-                      <div class="text-xs text-primary/50 uppercase tracking-wide text-center pb-2">
-                        {{ ex.equipmentBrand }}{{ ex.equipmentBrand && ex.attachment ? ' · ' : '' }}{{ ex.attachment }}
-                      </div>
-                    }
-                    @for (set of ex.sets; track $index) {
+                    @for (set of ex.sets; track $index) 
+                    {
                       <div class="bg-set-card rounded-general py-3 px-5 flex justify-between items-center text-sm font-lexend text-primary/90 mb-2 shadow-sm/30">
                         <span>{{ set.weight }} kg</span>
                         @if (set.unilateralSide) 
@@ -39,6 +35,14 @@
                         }
                         <span>{{ set.reps }} reps</span>
                       </div>
+
+                      @if ($index < ex.sets.length - 1 && set.actualRestSeconds != null) 
+                      {
+                        <div class="text-center text-primary/40 text-xs font-lexend uppercase tracking-wide mb-2">
+                          <ion-icon name="timer-outline"></ion-icon>
+                          {{ formatRestDuration(set.actualRestSeconds) }}
+                        </div>
+                      }
                     }
                   </div>
                 </ion-accordion>

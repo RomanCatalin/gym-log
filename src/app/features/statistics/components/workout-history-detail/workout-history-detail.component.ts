@@ -2,7 +2,7 @@ import { Component, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ModalController, IonIcon, IonAccordionGroup, IonAccordion, IonItem } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { chevronDownOutline, timeOutline } from 'ionicons/icons';
+import { chevronDownOutline, timeOutline, timerOutline } from 'ionicons/icons';
 import { ActiveWorkout, WorkoutMuscleGroup, WorkoutExercise, WorkoutSet } from 'src/app/services/workout-service';
 
 @Component({
@@ -19,7 +19,7 @@ export class WorkoutHistoryDetailComponent
 
   constructor() 
   {
-    addIcons({ chevronDownOutline, timeOutline });
+    addIcons({ chevronDownOutline, timeOutline, timerOutline});
   }
 
   get durationDisplay(): string 
@@ -45,6 +45,12 @@ export class WorkoutHistoryDetailComponent
     return this.workout.muscleGroups.map(group => ({group, exercises: group.exercises.filter(ex => ex.sets.length > 0),})).filter(g => g.exercises.length > 0);
   }
 
+  formatRestDuration(seconds: number): string 
+  {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  }
 
   close() 
   {

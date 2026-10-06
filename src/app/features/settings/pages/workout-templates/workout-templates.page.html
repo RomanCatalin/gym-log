@@ -136,9 +136,18 @@
               </div>
             }
         
-            <ion-button (click)="openAddExerciseModal()" style="--background: rgb(76, 76, 76);" class="musclegroup-card-template font-lexend w-full h-14">
-              <ion-icon name="add" class="scale-130"></ion-icon>
-            </ion-button>
+            <div class="bg-exercise-card rounded-general p-2 py-2 flex gap-3 items-center shadow-sm/30">
+              <div class="bg-set-input-background rounded-general flex-1 min-w-0 flex items-stretch">
+                <ion-select [(ngModel)]="selectedNewExercise" interface="popover" fill="none" [interfaceOptions]="{ cssClass: 'custom-template-popover' }" placeholder="EXERCISE" class="w-full bg-set-input-background text-primary uppercase text-sm tracking-wide outline-none px-4 font-lexend rounded-general">
+                @for (ex of currentAvailableExercises; track ex) {
+                  <ion-select-option [value]="ex">{{ ex }}</ion-select-option>
+                }
+                </ion-select>
+              </div>
+              <ion-button (click)="addExercise()" class="font-lexend input-add-btn shrink-0"> 
+                <ion-icon name="add"></ion-icon>
+              </ion-button>
+            </div>
 
             <ion-button (click)="deleteGroup()" class="workout-delete-template font-lexend">
               DELETE GROUP
