@@ -11,7 +11,7 @@ export interface Exercise { id: string; name: string;}
 export interface MuscleGroup { id: string; name: string; exercises: Exercise[];}
 export interface Workout { id: string; name: string; muscleGroups: MuscleGroup[]; color?: string;}
 
-export interface WorkoutSet { reps: number | null; weight: number | null; actualRestSeconds?: number; unilateralSide?: 'left' | 'right'; }
+export interface WorkoutSet { reps: number | null; weight: number | null; actualRestSeconds?: number; unilateralSide?: 'left' | 'right'; loggedAt?: number; }
 export interface WorkoutExercise { id: string; name: string; isCustom: boolean; isCompleted: boolean; sets: WorkoutSet[];}
 export interface WorkoutMuscleGroup { id: string; name: string; isCustom: boolean; isCompleted: boolean; exercises: WorkoutExercise[]; }
 export interface ActiveWorkout { id: string; name: string; startTime: number; endTime?: number; durationSeconds?: number; muscleGroups: WorkoutMuscleGroup[]; }

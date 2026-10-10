@@ -15,25 +15,15 @@ export class RestTimerService {
   private restInterval: any;
   private restNotificationId: number | null = null;
 
-  private restStartedAt: number | null = null;
-  private onRestEndCallback: ((actualSeconds: number) => void) | null = null;
-
-  async startRestTimer(onComplete?: (actualSeconds: number) => void)
+  async startRestTimer()
   {
+    if(!this.preferencesService.alertEnabled)  return;
+
     const seconds = this.preferencesService.restTimeSeconds;
     if (!seconds || seconds <= 0) return;
 
-    this.isResting = true;
-    this.restStartedAt = Date.now();
-    this.onRestEndCallback = onComplete || null;
-    this.restEndsAt = Date.now() + seconds * 1000;
-    this.updateRestDisplay();
-
-
-    clearInterval(this.restInterval);
-
     if (this.restNotificationId !== null) 
-    { 
+    {
       try 
       { 
         await LocalNotifications.cancel({ notifications: [{ id: this.restNotificationId }] }); 
@@ -42,44 +32,49 @@ export class RestTimerService {
       { 
         console.error( '[RestTimer] Eroare la anularea notificării anterioare:', error ); 
       } 
-
-      this.restNotificationId = null; 
+      this.restNotificationId = null;
     }
 
     this.isResting = true;
     this.restEndsAt = Date.now() + seconds * 1000;
     this.updateRestDisplay();
 
-    this.restInterval = setInterval(() => {
-      this.ngZone.run(() => {
-        this.updateRestDisplay();
+
+
+    clearInterval(this.restInterval);
+    this.restInterval = setInterval(() => {this.ngZone.run(() => { this.updateRestDisplay();});}, 1000)
+
+    const channelId = this.preferencesService.soundEnabled ? 'rest_sound_1' : 'rest_silent';
+    this.restNotificationId = Math.floor(Math.random() * 1000000);
+    const notificationId = this.restNotificationId;
+
+   try 
+   {
+    await LocalNotifications.schedule({
+        notifications: [{
+          id: notificationId,
+          title: 'Rest complete!',
+          body: 'Time to start your next set.',
+          channelId,
+          autoCancel: true,
+          schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
+        }],
       });
-    }, 1000);
-
-    if (this.preferencesService.alertEnabled) 
+      setTimeout(async () => {
+        try 
+        {
+          await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
+          await LocalNotifications.removeDeliveredNotifications({notifications: [{ id: notificationId, title: '', body: '' }]});
+        } 
+        catch (error) 
+        {
+          console.error('[RestTimer] Eroare la auto-curatarea notificarii:', error);
+        }
+      }, (seconds + 10) * 1000);
+    } 
+    catch (error) 
     {
-      const channelId = this.preferencesService.soundEnabled ? 'rest_sound_1' : 'rest_silent';
-
-      this.restNotificationId = Math.floor(Math.random() * 1000000);
-      const notificationId = this.restNotificationId;
-
-      try 
-      {
-        await LocalNotifications.schedule({
-          notifications: [{
-            id: notificationId,
-            title: 'Rest complete!',
-            body: 'Time to start your next set.',
-            channelId,
-            autoCancel: true,
-            schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true }
-          }]
-        });
-      } 
-      catch (error) 
-      {
-        console.error('[RestTimer] Eroare la programarea notificării:', error);
-      }
+      console.error('[RestTimer] Eroare la programarea notificarii:', error);
     }
   }
 
@@ -100,7 +95,6 @@ export class RestTimerService {
 
   private finishRestTimer() 
   {
-    this.recordActualDuration();
     clearInterval(this.restInterval);
     this.isResting = false;
     this.restEndsAt = null;
@@ -127,16 +121,5 @@ export class RestTimerService {
       }
       this.restNotificationId = null;
     }
-  }
-
-  private recordActualDuration() 
-  {
-    if (this.restStartedAt && this.onRestEndCallback) 
-    {
-      const actualSeconds = Math.round((Date.now() - this.restStartedAt) / 1000);
-      this.onRestEndCallback(actualSeconds);
-    }
-  this.restStartedAt = null;
-  this.onRestEndCallback = null;
   }
 }

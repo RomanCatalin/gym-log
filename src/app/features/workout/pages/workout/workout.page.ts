@@ -34,7 +34,6 @@ export class WorkoutPage implements OnInit, OnDestroy
   newExerciseName = '';
   newReps: number | null = null;
   newWeight: number | null = null;
-  newActualSeconds: number | null = null;
   newUnilateralSide: 'left' | 'right' | null = null;
 
   timerInterval: any;
@@ -262,12 +261,21 @@ export class WorkoutPage implements OnInit, OnDestroy
   {
     if (this.newReps != null && this.newWeight != null && this.activeExercise) 
     {
-      const newSet = { reps: this.newReps, weight: this.newWeight, actualRestSeconds: 0, unilateralSide: this.newUnilateralSide || undefined  };
-      this.activeExercise.sets.push(newSet);
-      await this.workoutService.saveActiveWorkout();
-      this.newUnilateralSide = null;
+
+      const now = Date.now();
+      const sets = this.activeExercise.sets;
+
+      const previousSet = sets[sets.length - 1];
+      if (previousSet?.loggedAt) 
+      {
+        previousSet.actualRestSeconds = Math.round((now - previousSet.loggedAt) / 1000);
+      }
       
-      this.restTimerService.startRestTimer((actualSeconds) => {newSet.actualRestSeconds = actualSeconds; this.workoutService.saveActiveWorkout();});
+      sets.push({reps: this.newReps, weight: this.newWeight, unilateralSide: this.newUnilateralSide || undefined, loggedAt: now,});
+      this.newUnilateralSide = null;
+      await this.workoutService.saveActiveWorkout();
+
+      this.restTimerService.startRestTimer();
    
     }
   }
