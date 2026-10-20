@@ -359,7 +359,8 @@ export class StatisticsPage {
     {
       const todayMidnight = new Date();
       todayMidnight.setHours(0, 0, 0, 0);
-      await this.workoutService.saveCycle({ slots: data.slots, anchorDate: todayMidnight.getTime() });
+      const anchorDate = this.workoutService.cycle?.anchorDate ?? todayMidnight.getTime();
+      await this.workoutService.saveCycle({slots: data.slots,anchorDate});
     }
   }
 

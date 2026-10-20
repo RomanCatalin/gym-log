@@ -34,23 +34,9 @@ export class DatabackupPage implements OnInit {
   private ngZone = inject(NgZone);
   private toastController = inject(ToastController);
   
-  dataIntervalOptions = 
-  [
-    { label: 'DAILY', value: 1 },
-    { label: 'WEEKLY', value: 7 },
-    { label: 'MONTHLY', value: 30 },
-    { label: 'QUARTERLY', value: 90 },
-    { label: 'YEARLY', value: 365 },
-  ];
-
   goBack() 
   {
     this.router.navigate(['/settings']);
-  }
-
-  onDataIntervalChange(event: any) 
-  {
-    this.preferencesService.setDataIntervalDays(event.detail.value);
   }
 
   onDataBackupToggle(event: any) 

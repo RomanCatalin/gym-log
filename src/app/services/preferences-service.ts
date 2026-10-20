@@ -7,7 +7,6 @@ const KEYS = {
   theme: 'pref_theme',
   restTimeSeconds: 'pref_rest_time_seconds',
   dataBackupEnabled: 'pref_data_backup_enabled',
-  dataIntervalDays: 'pref_data_interval_days',
   lastBackupAt: 'pref_last_backup_at',
   alertEnabled: 'pref_alert_enabled',
   soundEnabled: 'pref_sound_enabled',
@@ -28,8 +27,6 @@ export class PreferencesService
   notificationEnabled = false;
   bestSetEnabled = false;
   unilateralEnabled = false;
-
-  dataIntervalDays = 7;
   dataBackupEnabled = true;
   lastBackupAt = 0;
 
@@ -44,11 +41,10 @@ export class PreferencesService
   {
     try 
     {
-      const [theme, restTime, dataInterval, dataBackup, lastBackupAt, alert, sound, notification, bestSet, unilateral] = await Promise.all
+      const [theme, restTime, dataBackup, lastBackupAt, alert, sound, notification, bestSet, unilateral] = await Promise.all
       ([
         Preferences.get({ key: KEYS.theme }),
         Preferences.get({ key: KEYS.restTimeSeconds }),
-        Preferences.get({ key: KEYS.dataIntervalDays}),
         Preferences.get({ key: KEYS.dataBackupEnabled}),
         Preferences.get({ key: KEYS.lastBackupAt }),
         Preferences.get({ key: KEYS.alertEnabled }),
@@ -64,12 +60,6 @@ export class PreferencesService
       const parsed = parseInt(restTime.value, 10);
       if (!isNaN(parsed)) this.restTimeSeconds = parsed;
     }
-
-    if (dataInterval.value !== null) {
-      const parsed = parseInt(dataInterval.value, 10);
-      if (!isNaN(parsed)) this.dataIntervalDays = parsed;
-    }
-
     if (dataBackup.value !== null) this.dataBackupEnabled = dataBackup.value === 'true';
 
     if (lastBackupAt.value !== null) {
@@ -98,11 +88,6 @@ export class PreferencesService
   async setRestTimeSeconds(value: number) {
     this.restTimeSeconds = value;
     await Preferences.set({ key: KEYS.restTimeSeconds, value: value.toString() });
-  }
-
-  async setDataIntervalDays(value: number) {
-    this.dataIntervalDays = value;
-    await Preferences.set({ key: KEYS.dataIntervalDays, value: value.toString() });
   }
 
   async setDataBackupEnabled(value: boolean) {
