@@ -303,11 +303,11 @@ export class WorkoutService {
       this.currentActiveWorkout = null;
       this.pendingActiveWorkout = null;
 
-      console.log('Toate datele au fost șterse.');
+      console.log('Toate datele au fost sterse.');
     } 
     catch (error) 
     {
-      console.error('Eroare la ștergerea tuturor datelor:', error);
+      console.error('Eroare la stergerea tuturor datelor:', error);
     }
   }
 

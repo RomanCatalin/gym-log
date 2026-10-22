@@ -44,31 +44,56 @@ export class RestTimerService {
     clearInterval(this.restInterval);
     this.restInterval = setInterval(() => {this.ngZone.run(() => { this.updateRestDisplay();});}, 1000)
 
+    let canNotify = false;
+    let canScheduleExact = false;
+
+    try 
+    {
+      const notifStatus = await LocalNotifications.checkPermissions();
+      canNotify = notifStatus.display === 'granted';
+      
+      if (canNotify) 
+      {
+        const exactStatus = await LocalNotifications.checkExactNotificationSetting();
+        canScheduleExact = exactStatus.exact_alarm === 'granted';
+      }
+    } 
+    catch (error) 
+    {
+      console.error('[RestTimer] Eroare la verificarea permisiunilor:', error);
+    }
+
+    if (!canNotify) return; 
+
     const channelId = this.preferencesService.soundEnabled ? 'rest_sound_1' : 'rest_silent';
     this.restNotificationId = Math.floor(Math.random() * 1000000);
     const notificationId = this.restNotificationId;
 
-   try 
-   {
-    await LocalNotifications.schedule({
+    try 
+    {
+      await LocalNotifications.schedule({
         notifications: [{
           id: notificationId,
           title: 'Rest complete!',
           body: 'Time to start your next set.',
           channelId,
           autoCancel: true,
+          isExactNotification: canScheduleExact,
           schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
         }],
       });
-      setTimeout(async () => {
+      setTimeout(async () => 
+      {
         try 
         {
           await LocalNotifications.cancel({ notifications: [{ id: notificationId }] });
-          await LocalNotifications.removeDeliveredNotifications({notifications: [{ id: notificationId, title: '', body: '' }]});
+          await LocalNotifications.removeDeliveredNotifications({
+            notifications: [{ id: notificationId, title: '', body: '' }]
+          });
         } 
-        catch (error) 
+        catch (error)
         {
-          console.error('[RestTimer] Eroare la auto-curatarea notificarii:', error);
+          console.error('[RestTimer] Eroare la auto-delete-ul notificarii:', error);
         }
       }, (seconds + 10) * 1000);
     } 

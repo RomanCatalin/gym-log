@@ -22,12 +22,12 @@
         </div>
         <div class="flex gap-0.75 items-stretch">
           <div class="flex-1 bg-[#5A818F] rounded-l-general rounded-r-none flex items-center justify-center shadow-sm/30">
-            <ion-button fill="clear" (click)="backupNow()" class="w-full h-full font-lexend text-white font-medium tracking-widest text-sm m-0">
+            <ion-button fill="clear" (click)="backupNow()" class="w-full h-full font-lexend text-white font-medium tracking-widest text-sm m-0" style="--border-radius: 10px 0 0 10px; overflow: hidden;"> 
               BACKUP NOW
             </ion-button>
           </div>
           <div class="w-[22%] bg-[#41616d] rounded-r-general rounded-l-none flex items-center justify-center shadow-sm/30">
-            <ion-button fill="clear" (click)="share()" class="w-full h-full m-0 text-primary">
+            <ion-button fill="clear" (click)="share()" class="w-full h-full m-0 text-primary" style="--border-radius: 0 10px 10px 0; overflow: hidden;">
               <ion-icon name="share-social-outline" slot="icon-only" class="text-primary text-[20px]"></ion-icon>
             </ion-button>
           </div>
@@ -39,7 +39,7 @@
           <span class="text-primary font-lexend uppercase tracking-wide">IMPORT DATA</span>
           
           <div class="bg-[#6561aa] rounded-general flex items-center justify-center shadow-sm/30">
-            <ion-button fill="clear" (click)="importData()" class="font-lexend text-[14px] font-medium text-primary m-0" style="--color: #ffffff; --ripple-color: #ffffff;">
+            <ion-button fill="clear" (click)="importData()" class="font-lexend text-[14px] font-medium text-primary m-0" style="--color: #ffffff; --ripple-color: #ffffff; --border-radius: 10px; overflow: hidden;">
               IMPORT
             </ion-button>
           </div>

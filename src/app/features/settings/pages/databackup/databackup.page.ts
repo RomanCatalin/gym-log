@@ -2,7 +2,7 @@ import { Component, inject, NgZone, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonContent, ToastController, IonButton, IonIcon, AlertController, IonToggle, IonSelect, IonSelectOption} from '@ionic/angular/standalone';
+import { IonContent, ToastController, IonButton, IonIcon, AlertController, IonToggle} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { returnUpBackOutline, shareSocialOutline } from 'ionicons/icons';
 import { WorkoutService } from 'src/app/services/workout-service';
@@ -15,7 +15,7 @@ import { FilePicker } from '@capawesome/capacitor-file-picker';
   templateUrl: './databackup.page.html',
   styleUrls: ['./databackup.page.scss'],
   standalone: true,
-  imports: [IonContent, CommonModule, FormsModule, IonButton, IonIcon, IonToggle, IonSelect, IonSelectOption]
+  imports: [IonContent, CommonModule, FormsModule, IonButton, IonIcon, IonToggle]
 })
 export class DatabackupPage implements OnInit {
 

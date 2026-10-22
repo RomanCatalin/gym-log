@@ -13,7 +13,7 @@
       </button>
   </div>
 
-  <div class="bg-musclegroup-card rounded-general p-3 overflow-y-auto mx-4 mb-4">
+  <div class="bg-musclegroup-card rounded-general p-3 overflow-y-auto mx-4 mb-4 shadow-sm/30">
     <ion-reorder-group [disabled]="deleteMode" (ionItemReorder)="handleReorder($event)">
       @for (slot of slots; track $index) {
         <ion-item lines="none" class="cycle-slot-item" (click)="onCardTap($index)">

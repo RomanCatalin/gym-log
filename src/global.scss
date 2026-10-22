@@ -399,14 +399,21 @@ ion-toggle.settings-toggle
   color: var(--color-text-primary);
   font-size: 14px;
   border: none;
-  transition: opacity 0.2s ease, background 0.2s ease;
+  transition: opacity 0.2s ease-out, background 0.2s ease-out;
+  transition: transform 0.1s ease-out, background 0.1s ease-out;
 
   &:active {
     background: var(--color-return-button-pressed);
+    transform: scale(1.10);
+    ion-icon 
+    {
+      transform: scale(1.35);
+    }
   }
 
   ion-icon {
     pointer-events: none;
+    transition: transform 100ms ease-out;
   }
 }
 
@@ -444,6 +451,8 @@ ion-item.cycle-slot-item {
   --inner-padding-end: 0;
   --border-width: 0;
   --box-shadow: none;
+  border-radius: var(--border-radius-general, 10px);
+  overflow: hidden;
 }
 
 ion-item.cycle-slot-item::part(native) {

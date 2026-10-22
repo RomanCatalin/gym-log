@@ -2,7 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonContent, IonIcon, IonButton, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { barChart, barChartOutline, calendar, calendarOutline, refresh, trendingUpOutline } from 'ionicons/icons';
+import { barChart, barChartOutline, calendar, calendarOutline, chevronBackOutline, refresh, chevronForwardOutline, trendingUpOutline } from 'ionicons/icons';
 import { WorkoutService } from 'src/app/services/workout-service';
 import { FormsModule } from '@angular/forms';
 import { ModalController, ActionSheetController } from '@ionic/angular/standalone';
@@ -25,6 +25,7 @@ export class StatisticsPage {
   selectedGroup = '';
   selectedExercise = '';
   activePointIndex: number | null = null;
+  tooltipPoint: any = null;
 
   private modalController = inject(ModalController);
   private actionSheetController = inject(ActionSheetController);
@@ -32,14 +33,18 @@ export class StatisticsPage {
   calendarMonth = new Date().getMonth();
   calendarYear = new Date().getFullYear();
 
+  typeChartPeriod: '1M' | '3M' | '6M' | 'ALL' = '3M';
+  chartPeriods: ('1M' | '3M' | '6M' | 'ALL')[] = ['1M','3M','6M','ALL'];
+
   constructor() {
-    addIcons({ trendingUpOutline, barChart, barChartOutline, calendar, calendarOutline, refresh });
+    addIcons({ trendingUpOutline, barChart, barChartOutline, calendar, calendarOutline, refresh, chevronBackOutline, chevronForwardOutline});
   }
 
   goToProgression() { this.viewState = 1; }
   goToWorkoutLog() { this.viewState = 2; }
 
-  get availableGroups(): string[] {
+  get availableGroups(): string[] 
+  {
     const history = this.workoutService.workoutHistory;
     const items = new Set<string>();
     history.forEach(workout => {
@@ -52,7 +57,8 @@ export class StatisticsPage {
     return Array.from(items);
   }
 
-  get availableExercises(): string[] {
+  get availableExercises(): string[] 
+  {
     if (!this.selectedGroup) return [];
     const history = this.workoutService.workoutHistory;
     const items = new Set<string>();
@@ -68,20 +74,202 @@ export class StatisticsPage {
     return Array.from(items);
   }
 
-  onGroupChange() {
+  setChartPeriod(period: '1M' | '3M' | '6M' | 'ALL'): void 
+  {
+    this.typeChartPeriod = period;
+    this.activePointIndex = null;
+  }
+
+  
+  changeChartPeriod(direction: number) 
+  {
+    const currentIndex = this.chartPeriods.indexOf(this.typeChartPeriod);
+    const nextIndex = currentIndex + direction;
+
+    if (nextIndex < 0 || nextIndex >= this.chartPeriods.length) 
+    {
+      return;
+    }
+
+    this.setChartPeriod(this.chartPeriods[nextIndex]);
+  }
+
+  onGroupChange() 
+  {
     this.selectedExercise = '';
     this.activePointIndex = null;
   }
 
-  onExerciseChange() {
+  onExerciseChange() 
+  {
     this.activePointIndex = null;
   }
 
-  selectPoint(index: number) {
+  selectPoint(index: number) 
+  {
     this.activePointIndex = this.activePointIndex === index ? null : index;
+
+    if (this.activePointIndex !== null) 
+    {
+      this.tooltipPoint = this.selectedChartPoint;
+    }
   }
 
-  private getExerciseMaxWeight(sets: { weight: number | null; reps: number | null }[]): number {
+  
+  get exerciseSessions(): { timestamp: number; date: string; maxWeight: number; bestSet: { weight: number; reps: number | null } | null;}[] 
+  {
+    if (!this.selectedGroup || !this.selectedExercise) 
+    {
+      return [];
+    }
+
+    const sessions: { timestamp: number; date: string; maxWeight: number; bestSet: { weight: number; reps: number | null } | null;}[] = [];
+
+    for (const workout of this.workoutService.workoutHistory) 
+    {
+      let maxWeight = 0;
+
+      let bestSet: { weight: number; reps: number | null; } | null = null;
+
+      for (const mg of workout.muscleGroups) 
+      {
+        if (mg.name.toUpperCase() !== this.selectedGroup) 
+        {
+          continue;
+        }
+
+        for (const exercise of mg.exercises) 
+        {
+          if (exercise.name.toUpperCase() !== this.selectedExercise) 
+          {
+            continue;
+          }
+
+          for (const set of exercise.sets) {
+            const weight = set.weight ?? 0;
+            const reps = set.reps ?? null;
+
+            if (weight > maxWeight) {
+              maxWeight = weight;
+              bestSet = { weight, reps };
+            } else if (
+              weight > 0 &&
+              weight === maxWeight &&
+              bestSet !== null &&
+              (reps ?? 0) > (bestSet.reps ?? 0)
+            ) {
+              bestSet = { weight, reps };
+            }
+          }
+        }
+      }
+
+      if (maxWeight > 0) {
+        sessions.push({
+          timestamp: workout.startTime,
+          date: this.formatDate(workout.startTime),
+          maxWeight,
+          bestSet
+        });
+      }
+    }
+
+    return sessions.sort((a, b) => b.timestamp - a.timestamp);
+  }
+
+  get latestSession() 
+  {
+    return this.exerciseSessions[0] ?? null;
+  }
+
+  get previousSession() 
+  {
+    return this.exerciseSessions[1] ?? null;
+  }
+
+  get latestWeightChange(): number | null 
+  {
+    if (!this.latestSession || !this.previousSession) 
+    {
+      return null;
+    }
+
+    return this.latestSession.maxWeight - this.previousSession.maxWeight;
+  }
+
+  get personalBest() 
+  {
+    const sessions = this.exerciseSessions;
+
+    if (!sessions.length) { return null; }
+
+    return sessions.reduce((best, session) =>
+      session.maxWeight > best.maxWeight ? session : best
+    );
+  }
+
+
+  get bestSet(): { weight: number; reps: number | null; date: string; timestamp: number;} | null 
+  {
+    let best: { weight: number; reps: number | null; date: string; timestamp: number; } | null = null;
+
+    for (const session of this.exerciseSessions) 
+    {
+      const currentSet = session.bestSet;
+
+      if (currentSet === null) 
+        {
+        continue;
+      }
+
+      if (best === null || currentSet.weight > best.weight) 
+      {
+        best = { weight: currentSet.weight, reps: currentSet.reps, date: session.date, timestamp: session.timestamp};
+      }
+    }
+
+    return best;
+  }
+
+
+  get recentSessions() 
+  {
+    return this.exerciseSessions.slice(0, 5).map((session, index, sessions) => 
+    {
+      const olderSession = sessions[index + 1];
+
+      return { ...session, change: olderSession ? session.maxWeight - olderSession.maxWeight : null
+      };
+    });
+  }
+
+  get filteredChartData(): { date: string;value: number; timestamp: number; }[] 
+  {
+    const data = this.rawChartData;
+
+    if (this.typeChartPeriod === 'ALL') 
+    {
+      return data;
+    }
+
+    const months = Number.parseInt(this.typeChartPeriod, 10);
+    const cutoff = new Date();
+    cutoff.setMonth(cutoff.getMonth() - months);
+
+    return data.filter(point => point.timestamp >= cutoff.getTime());
+  }
+
+  get selectedChartPoint() 
+  {
+    if (this.activePointIndex === null) 
+    {
+      return null;
+    }
+    return this.chartConfig.points[this.activePointIndex] ?? null;
+  }
+  
+  private getExerciseMaxWeight(sets: { weight: number | null; reps: number | null }[]): number 
+  {
     let max = 0;
     sets.forEach(s => {
       if (s.weight && s.weight > max) max = s.weight;
@@ -132,46 +320,64 @@ export class StatisticsPage {
     return result;
   }
 
-  get chartConfig() {
-    const rawData = this.rawChartData;
-    const svgWidth = 400;
-    const svgHeight = 400;
+  get chartConfig() 
+  {
+    const rawData = this.filteredChartData;
 
-    if (rawData.length === 0) return { points: [], segments: [], viewBox: `0 0 ${svgWidth} ${svgHeight}` };
+    const svgWidth = 430;
+    const svgHeight = 170;
 
-    const maxVal = Math.max(...rawData.map(d => d.value));
-    const minVal = Math.min(...rawData.map(d => d.value));
-    const range = maxVal === minVal ? 10 : maxVal - minVal;
+    const paddingLeft = 8;
+    const paddingRight = 8;
+    const paddingTop = 10;
+    const paddingBottom = 10;
 
-    const paddingX = 25;
-    const topPadding = 40;
-    const bottomPadding = 40;
-    const usableWidth = svgWidth - paddingX * 2;
-    const usableHeight = svgHeight - topPadding - bottomPadding;
+    const plotWidth = svgWidth - paddingLeft - paddingRight;
+    const plotHeight = svgHeight - paddingTop - paddingBottom;
 
-    const points = rawData.map((data, index) => {
-      const x = rawData.length > 1 ? paddingX + (index / (rawData.length - 1)) * usableWidth : svgWidth / 2;
-      const normalizedY = (data.value - minVal) / range;
-      const y = topPadding + usableHeight - (normalizedY * usableHeight);
+    const gridLines = [0, 1, 2, 3].map(index => ({y: paddingTop + (plotHeight / 3) * index}));
 
-      let textAnchor = 'middle';
-      if (index === 0 && rawData.length > 1) textAnchor = 'start';
-      else if (index === rawData.length - 1) textAnchor = 'end';
+    if (!rawData.length) {
+      return { points: [], segments: [], gridLines, areaPath: '', viewBox: `0 0 ${svgWidth} ${svgHeight}`};
+    }
 
-      return { ...data, x, y, textAnchor };
+    const values = rawData.map(point => point.value);
+    const minValue = Math.min(...values);
+    const maxValue = Math.max(...values);
+
+    const range = maxValue === minValue ? Math.max(maxValue * 0.1, 1) : maxValue - minValue;
+    const chartMin = minValue === maxValue ? Math.max(0, minValue - range / 2) : minValue - range * 0.1;
+    const chartMax = maxValue === minValue ? maxValue + range / 2 : maxValue + range * 0.1;
+    const chartRange = chartMax - chartMin;
+
+    const points = rawData.map((data, index) => 
+    {
+
+      const x = rawData.length === 1 ? paddingLeft + plotWidth / 2 : paddingLeft + (index / (rawData.length - 1)) * plotWidth;
+      const y = paddingTop + plotHeight - ((data.value - chartMin) / chartRange) * plotHeight;
+
+      return { ...data, x,  y,  shortDate: data.date.slice(0, 5)
+      };
     });
 
     const segments = [];
-    for (let i = 0; i < points.length - 1; i++) {
-      const p1 = points[i];
-      const p2 = points[i + 1];
-      let lineColor = '#9ca3af';
-      if (p2.value > p1.value) lineColor = '#4ade80';
-      else if (p2.value < p1.value) lineColor = '#f87171';
-      segments.push({ x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y, color: lineColor });
+
+    for (let i = 0; i < points.length - 1; i++) 
+    {
+      const current = points[i];
+      const next = points[i + 1];
+
+      segments.push({ x1: current.x, y1: current.y, x2: next.x, y2: next.y });
     }
 
-    return { points, segments, viewBox: `0 0 ${svgWidth} ${svgHeight}` };
+    const firstPoint = points[0];
+    const lastPoint = points[points.length - 1];
+    const baselineY = paddingTop + plotHeight;
+
+    const areaPath = [ `M ${firstPoint.x} ${baselineY}`, ...points.map(point => `L ${point.x} ${point.y}`),  `L ${lastPoint.x} ${baselineY}`,  'Z' ].join(' ');
+
+    return { points, segments, gridLines, areaPath, viewBox: `0 0 ${svgWidth} ${svgHeight}`
+    };
   }
 
   get calendarMonthLabel(): string {

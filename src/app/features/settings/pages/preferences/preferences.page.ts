@@ -52,18 +52,32 @@ export class PreferencesPage implements OnInit {
     const enabled = event.detail.checked;
     this.preferencesService.setAlertEnabled(enabled);
 
-    if (enabled) {
-      const result = await LocalNotifications.requestPermissions();
-      if (result.display !== 'granted') {
-        this.preferencesService.setAlertEnabled(false);
-        await this.showPermissionDeniedAlert();
+    if (enabled) 
+    {
+      const granted = await this.requestRestTimerPermissions();
+      
+      if (!granted) 
+      {
+      this.preferencesService.setAlertEnabled(false);
+      await this.showPermissionDeniedAlert();
       }
     }
   }
 
-  onSoundToggle(event: any)
+  async onSoundToggle(event: any)
   {
+    const enabled = event.detail.checked;
     this.preferencesService.setSoundEnabled(event.detail.checked);
+    
+    if (enabled) 
+    {
+      const granted = await this.requestRestTimerPermissions();
+
+      if (!granted) 
+      {
+        await this.showPermissionDeniedAlert();
+      }
+    }
   }
 
   onBestSetToggle(event: any)
@@ -118,5 +132,33 @@ export class PreferencesPage implements OnInit {
     const seconds = this.restSeconds ?? 0;
     this.preferencesService.setRestTimeSeconds(minutes * 60 + seconds);
   }
+
+  private async requestRestTimerPermissions(): Promise<boolean> 
+  {
+    try 
+    {
+      let notifStatus = await LocalNotifications.checkPermissions();
+
+      if (notifStatus.display !== 'granted') 
+      {
+        notifStatus = await LocalNotifications.requestPermissions();
+      }
+      
+      if (notifStatus.display !== 'granted') return false;
+
+      const status = await LocalNotifications.checkExactNotificationSetting();
+      
+      if (status.exact_alarm !== 'granted') 
+      {
+        await LocalNotifications.changeExactNotificationSetting();
+      }
+      return true;
+    } 
+    catch (error) 
+    {
+      console.error('[Preferences] Eroare la cererea permisiunilor:', error);
+      return false;
+    }
+}
 
 }

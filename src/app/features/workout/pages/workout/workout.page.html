@@ -164,14 +164,14 @@
                               <ion-icon name="chevron-down-outline"></ion-icon>
                             </button>
                           </div>
-                          <input inputmode="decimal" step="0.1" min="0" max="999" [(ngModel)]="newWeight" (input)="restrictInput($event, 'newWeight')" class="bg-set-input-background rounded-general rounded-l-none w-14 h-19 outline-none text-center text-primary" />
+                          <input inputmode="decimal" step="0.1" min="0" max="999" [(ngModel)]="newWeight" (input)="restrictInput($event, 'newWeight')" class="bg-set-input-background rounded-general rounded-l-none w-14 h-19 outline-none text-center text-primary transition-all duration-150 ease-out focus:scale-105 focus:bg-(--color-return-button-pressed)"/>
                         </div>
                       </div>
 
                       <div class="flex flex-col items-center gap-2">
                         <span class="uppercase tracking-wide text-xs text-primary/70 mb-1">Reps</span>
                         <div class="flex items-center gap-2">
-                          <input inputmode="decimal" step="any" min="0" max="999" [(ngModel)]="newReps" (input)="restrictInput($event, 'newReps')" class="bg-set-input-background rounded-general rounded-r-none w-14 h-19 outline-none text-center text-primary" />
+                          <input inputmode="decimal" step="any" min="0" max="999" [(ngModel)]="newReps" (input)="restrictInput($event, 'newReps')" class="bg-set-input-background rounded-general rounded-r-none w-14 h-19 outline-none text-center text-primary transition-all duration-150 ease-out focus:scale-105 focus:bg-(--color-return-button-pressed)"/>
                           <div class="flex flex-col gap-1">
                             <button type="button" (click)="incrementReps()" class="stepper-btn rounded-tr-general!">
                               <ion-icon name="chevron-up-outline"></ion-icon>

@@ -1,17 +1,21 @@
 <ion-content [fullscreen]="true" [scrollY]="false">
   <div class="min-h-full bg-main-background p-5 pt-general font-lexend text-primary flex flex-col">
-    <div class="bg-workout-background rounded-general shadow-md relative overflow-hidden flex-1 flex flex-col">
+    <div class="bg-workout-background rounded-general shadow-md relative overflow-hidden flex flex-col h-[85vh]">
 
       <div class="flex-1 overflow-y-auto">
+
         @if (viewState === 1) 
         {
           <div class="p-4 flex flex-col gap-4">
+
             <div class="text-[28px] text-primary font-lexend uppercase tracking-wide">
               Progression
             </div>
-            <div class="bg-musclegroup-card p-0 rounded-general">
-              <div class="flex gap-1 items-stretch bg-statistics-header p-1 rounded-general rounded-b-none">
-                <div class="flex-1 min-w-0 bg-statistics-button rounded-l-general rounded-r-none flex items-center shadow-sm/30">
+
+            <div class="flex flex-col gap-3">
+              <div class="flex flex-col gap-1">
+                <span class="text-[10px] text-primary uppercase tracking-wide opacity-60">MUSCLE GROUP</span>
+                <div class="bg-musclegroup-card rounded-general shadow-sm/30">
                   <ion-select
                     interface="popover"
                     fill="none"
@@ -21,13 +25,15 @@
                     (ionChange)="onGroupChange()"
                     class="w-full text-primary uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
                     @for (group of availableGroups; track group) {
-                      <ion-select-option [value]="group">
-                        {{ group }}
-                      </ion-select-option>
+                      <ion-select-option [value]="group">{{ group }}</ion-select-option>
                     }
                   </ion-select>
                 </div>
-                <div class="flex-1 min-w-0 bg-statistics-button rounded-none flex items-center shadow-sm/30">
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <span class="text-[10px] text-primary uppercase tracking-wide opacity-60">EXERCISE</span>
+                <div class="bg-musclegroup-card rounded-general shadow-sm/30">
                   <ion-select
                     interface="popover"
                     fill="none"
@@ -38,84 +44,267 @@
                     [disabled]="!selectedGroup"
                     class="w-full text-primary uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend">
                     @for (exercise of availableExercises; track exercise) {
-                      <ion-select-option [value]="exercise">
-                        {{ exercise }}
-                      </ion-select-option>
+                      <ion-select-option [value]="exercise">{{ exercise }}</ion-select-option>
                     }
                   </ion-select>
                 </div>
-                <div class="rounded-r-general rounded-l-none items-center flex justify-center bg-statistics-button shadow-sm/30">
-                  <ion-button fill="clear" class="trending-icon-btn shrink-0">
-                    <ion-icon name="trending-up-outline" slot="icon-only"></ion-icon>
-                  </ion-button>
+              </div>
+            </div>
+
+            @if (!selectedGroup || !selectedExercise) 
+            {
+              <div class="bg-musclegroup-card rounded-general p-6 text-center shadow-sm/30">
+                <ion-icon name="bar-chart-outline" class="text-3xl text-primary/50"></ion-icon>
+                <p class="text-sm text-primary/60 font-lexend">
+                  Select a muscle group and exercise to see your progression.
+                </p>
+              </div>
+            } 
+            @else if (exerciseSessions.length === 0) 
+            {
+              <div class="bg-musclegroup-card rounded-general p-6 text-center shadow-sm/30">
+                <ion-icon name="bar-chart-outline" class="text-3xl text-primary/50"></ion-icon>
+                <p class="text-sm text-primary/60 font-lexend">
+                  No progression data yet. Complete a workout with this exercise first.
+                </p>
+              </div>
+            } 
+            @else 
+            {
+
+              <div class="flex flex-col gap-1">
+                <span class="text-[12px] text-primary uppercase tracking-wide opacity-60">LATEST WORKOUT</span>
+
+                <div class="text-3xl font-bold text-primary font-lexend">
+                  {{ latestSession!.maxWeight }} kg
+                </div>
+
+                @if (latestWeightChange !== null) 
+                {
+                  <div class="flex gap-0 items-center">
+                    <div
+                      class="text-[14px] font-lexend"
+                      [class.text-green-400]="latestWeightChange > 0"
+                      [class.text-red-400]="latestWeightChange < 0"
+                      [class.text-primary]="latestWeightChange === 0">
+                      @if (latestWeightChange > 0) 
+                      {
+                        + {{ latestWeightChange | number:'1.0-2' }} kg
+                      }
+                      @else if(latestWeightChange < 0)
+                      {
+                        - {{ (latestWeightChange * -1) | number:'1.0-2' }} kg
+                      }
+                    </div>
+                    @if(latestWeightChange != 0)
+                    {
+                      <div class="text-[10px] text-primary opacity-60 font-lexend ml-2 pt-1">
+                        compared to {{ latestSession!.date }} session
+                      </div>
+                    }
+                    @else
+                    {
+                      <div class="text-[10px] text-primary opacity-60 font-lexend pt-1">
+                        No changes since last session
+                      </div>
+                    }
+                  </div>
+                } 
+              </div>
+
+              <div class="grid grid-cols-2 gap-3">
+                <div class="bg-musclegroup-card p-2 rounded-general flex flex-col gap-1 shadow-sm/30">
+                  <span class="text-[10px] text-primary uppercase tracking-wide opacity-60">PERSONAL BEST</span>
+                  <span class="text-lg font-bold text-primary font-lexend">
+                    {{ personalBest?.maxWeight ?? 0 }} kg
+                  </span>
+                  <span class="text-[10px] text-primary opacity-50">
+                    {{ personalBest?.date ?? 'No data' }}
+                  </span>
+                </div>
+
+                <div class="bg-musclegroup-card p-2 rounded-general flex flex-col gap-1 shadow-sm/30">
+                  <span class="text-[10px] text-primary uppercase tracking-wide opacity-60">BEST SET</span>
+                  <span class="text-lg font-bold text-primary font-lexend">
+                    {{ bestSet?.weight ?? 0 }}
+                    @if (bestSet) 
+                    {
+                      @if (bestSet.reps !== null) 
+                      {
+                        × {{ bestSet.reps }}
+                      } 
+                      @else 
+                      {
+                        kg
+                      }
+                    } 
+                    @else 
+                    {
+                      kg
+                    }
+                  </span>
+                  <span class="text-[10px] text-primary opacity-50">
+                    @if (bestSet) 
+                    {
+                      {{ bestSet.date }}
+                    } 
+                    @else 
+                    {
+                      Reps not recorded
+                    }
+                  </span>
                 </div>
               </div>
-              <div class="bg-statistics-content rounded-general mt-2 mx-1 mb-2 p-3 flex flex-col" style="min-height: 56vh;">
-                @if (!selectedGroup || !selectedExercise) {
-                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm uppercase tracking-wide text-center px-6">
-                    Select a muscle group and exercise to see progress
-                  </div>
-                } @else if (rawChartData.length === 0) {
-                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm uppercase tracking-wide text-center px-6">
-                    No recorded sets yet for this exercise
-                  </div>
-                } @else {
-                  <div class="text-[14px] text-primary/90 font-lexend uppercase text-center tracking-widest pb-2">
-                    {{ selectedExercise }}
-                  </div>
-                  <div class="w-full overflow-hidden">
-                     <svg
-                      [attr.viewBox]="chartConfig.viewBox"
-                      class="w-full h-full drop-shadow-md"
-                      preserveAspectRatio="none">
-                      <line x1="20" y1="40" x2="380" y2="40" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
-                      <line x1="20" y1="110" x2="380" y2="110" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
-                      <line x1="20" y1="180" x2="380" y2="180" stroke="rgba(255,255,255,0.05)" stroke-width="1" />
 
-                      @for (seg of chartConfig.segments; track $index) {
-                        <line [attr.x1]="seg.x1" [attr.y1]="seg.y1" [attr.x2]="seg.x2" [attr.y2]="seg.y2"
-                              [attr.stroke]="seg.color" stroke-width="3" stroke-linecap="round"
-                              class="transition-all duration-300" />
-                      }
+              <div class="flex flex-col -mt-1">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="text-sm font-bold text-primary font-lexend">WEIGHT PROGRESSION</span>
+                  <div class="flex items-center justify-center gap-0.5">
+                      <button type="button" class="w-6 h-7 flex items-center justify-center rounded-general text-primary/70 active:scale-160 transition-transform duration-100 ease-out"
+                        (click)="changeChartPeriod(-1)">
+                        <ion-icon name="chevron-back-outline" class="text-sm">
+                        </ion-icon>
+                      </button>
 
-                      @for (pt of chartConfig.points; track pt.date; let i = $index) {
-                        <g (click)="selectPoint(i)" class="cursor-pointer">
-                          <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="25" fill="transparent" />
-                          <circle [attr.cx]="pt.x" [attr.cy]="pt.y" [attr.r]="activePointIndex === i ? 7 : 5"
-                                  [attr.fill]="activePointIndex === i ? '#ffffff' : '#2b3036'"
-                                  stroke="#9ca3af" stroke-width="2.5" class="transition-all duration-300" />
-                          <text [attr.x]="pt.x" [attr.y]="pt.y - 15"
-                                [attr.fill]="activePointIndex === i ? '#ffffff' : 'rgba(255,255,255,0.7)'"
-                                font-size="12" font-family="Lexend, sans-serif" font-weight="bold"
-                                [attr.text-anchor]="pt.textAnchor" class="transition-all duration-300">
-                            {{ pt.value }}kg
-                          </text>
-                          @if (activePointIndex === i) {
-                            <text [attr.x]="pt.x" [attr.y]="pt.y + 22" fill="#9ca3af" font-size="11"
-                                  font-family="Lexend, sans-serif" font-weight="bold" [attr.text-anchor]="pt.textAnchor">
-                              {{ pt.date }}
-                            </text>
-                          }
-                        </g>
+                      <span class="min-w-[32px] text-center text-[12px] font-bold text-primary uppercase font-lexend">
+                        {{ typeChartPeriod === 'ALL' ? 'ALL' : typeChartPeriod }}
+                      </span>
+
+                      <button type="button" class="w-6 h-7 flex items-center justify-center rounded-general text-primary/70 active:scale-135 transition-transform duration-100 ease-out"
+                        (click)="changeChartPeriod(1)">
+                        <ion-icon name="chevron-forward-outline" class="text-sm">
+                        </ion-icon>
+                      </button>
+                    </div>
+                </div>
+
+                @if (filteredChartData.length === 0) 
+                {
+                  <div class="bg-musclegroup-card rounded-general p-4 text-center text-xs text-primary/60">
+                    No sessions in this period.
+                  </div>
+                } 
+                @else 
+                {
+                  <div class="bg-musclegroup-card rounded-general px-2 relative shadow-sm/30">
+                  <svg
+                    class="w-full h-auto block"
+                    [attr.viewBox]="chartConfig.viewBox"
+                    preserveAspectRatio="xMidYMid meet"
+                    role="img"
+                    (click)="activePointIndex = null">
+                    >
+
+                    <defs>
+                      <linearGradient id="progressionFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#C49A50" stop-opacity="0.28"/>
+                        <stop offset="100%" stop-color="#C49A50" stop-opacity="0.01"/>
+                      </linearGradient>
+                    </defs>
+
+                    @for (line of chartConfig.gridLines; track $index) 
+                    {
+                      <line
+                        x1="42"
+                        [attr.y1]="line.y"
+                        x2="388"
+                        [attr.y2]="line.y"
+                        stroke="#444444"
+                        stroke-width="1"/>
+                    }
+
+                    @if (chartConfig.points.length > 1) 
+                    {
+                      <path [attr.d]="chartConfig.areaPath" fill="url(#progressionFill)"/>
+                    }
+
+                    @for (segment of chartConfig.segments; track $index) 
+                    {
+                      <line
+                        [attr.x1]="segment.x1"
+                        [attr.y1]="segment.y1"
+                        [attr.x2]="segment.x2"
+                        [attr.y2]="segment.y2"
+                        stroke="#C49A50"
+                        stroke-width="3"
+                        stroke-linecap="round"/>
+                    }
+
+                    @for (point of chartConfig.points; track point.timestamp; let i = $index) 
+                    {
+                      <circle
+                        [attr.cx]="point.x"
+                        [attr.cy]="point.y"
+                        [attr.r]="activePointIndex === i ? 8 : 6.5"
+                        [attr.fill]="activePointIndex === i ? '#ffffff' : '#202020'"
+                        stroke="#C49A50"
+                        stroke-width="2.5"
+                        (click)="$event.stopPropagation(); selectPoint(i)"/>
+                    }
+
+                    @if (selectedChartPoint; as point) {
+                      <g>
+
+                      </g>
+                    }
+
+                    @if (chartConfig.points.length > 0) 
+                    {
+                      <text
+                        x="42" y="210"
+                        text-anchor="start"
+                        fill="#9ca3af"
+                        font-size="11">
+                        {{ chartConfig.points[0].shortDate }}
+                      </text>
+
+                      @if (chartConfig.points.length > 1) 
+                      {
+                        <text
+                          x="388" y="210"
+                          text-anchor="end"
+                          fill="#9ca3af"
+                          font-size="11">
+                          {{ chartConfig.points[chartConfig.points.length - 1].shortDate }}
+                        </text>
                       }
-                    </svg>
+                    }
+                  </svg>
+                  <div class="absolute bottom-2 right-2 z-10 pointer-events-none transition-all duration-200 ease-out origin-bottom-right"
+                    [class.opacity-0]="activePointIndex === null"
+                    [class.opacity-100]="activePointIndex !== null"
+                    [class.scale-75]="activePointIndex === null"
+                    [class.scale-100]="activePointIndex !== null"
+                  >
+                    <div class="box-border bg-[#252525]/95 border border-[#C49A50]/50 rounded-lg px-2 py-1.5 flex flex-col items-end justify-center shadow-md">
+                      <span class="text-[10px] text-primary/60 uppercase tracking-wider">
+                        {{ tooltipPoint?.shortDate || tooltipPoint?.date }}
+                      </span>
+
+                      <span class="text-base font-bold text-[#C49A50] font-lexend">
+                        {{ tooltipPoint?.value }} kg
+                      </span>
+                    </div>
+                  </div>
+
                   </div>
                 }
               </div>
-            </div>
+
+            }
           </div>
-        } 
+        }
         @else 
         {
           <div class="p-4 flex flex-col gap-4">
             <div class="text-[28px] text-primary font-lexend uppercase tracking-wide">
               WORKOUT LOG
             </div>
-            <div class="bg-musclegroup-card p-0 rounded-general">
+            <div class="bg-musclegroup-card p-0 rounded-general shadow-sm/30">
               <div class="flex gap-1 items-stretch bg-statistics-header p-1 rounded-general rounded-b-none">
                 
                 <div class="flex-1 bg-statistics-button rounded-l-general rounded-r-none flex items-center justify-center">
-                  <ion-button fill="clear" (click)="openSplitEditor()" class="modify-cycle-btn w-full h-full font-lexend text-primary font-medium tracking-widest text-base m-0">
+                  <ion-button fill="clear" (click)="openSplitEditor()" class="modify-cycle-btn w-full h-full font-lexend text-primary font-medium tracking-widest text-base m-0" style="--border-radius: 10px 0 0 10px; overflow: hidden;">
                     MODIFY SPLIT
                   </ion-button>
                 </div>
@@ -127,13 +316,17 @@
                 </div>
               </div>
 
-              <div class="bg-statistics-content rounded-general mt-2 mx-1 mb-2 p-3 flex flex-col justify-between" style="min-height: 56vh;">
+              <div class="bg-statistics-content rounded-general mt-2 mx-1 mb-2 p-3 flex flex-col justify-between" style="height: 56vh;">
             
                 <div class="flex flex-col w-full">
                   <div class="flex justify-between items-center px-1 pb-3 pt-1">
-                    <button (click)="prevMonth()" class="text-primary text-xl px-2">‹</button>
+                    <button (click)="prevMonth()" class="text-primary px-2 active:scale-135 transition-transform duration-100 ease-out">
+                      <ion-icon name="chevron-back-outline" class="text-base block"></ion-icon>
+                    </button>
                     <span class="text-primary font-lexend uppercase tracking-widest text-base">{{ calendarMonthLabel }}</span>
-                    <button (click)="nextMonth()" class="text-primary text-xl px-2">›</button>
+                    <button (click)="nextMonth()" class="text-primary px-2 active:scale-135 transition-transform duration-100 ease-out">
+                      <ion-icon name="chevron-forward-outline" class="text-base block"></ion-icon>
+                    </button>
                   </div>
                   
                   <div class="grid grid-cols-7 gap-1.5 px-1 pb-3">
@@ -218,8 +411,8 @@
                     </div>
                   </div>
                 } @else {
-                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm uppercase tracking-wide text-center px-6">
-                    No split defined yet tap Modify Split to create one
+                  <div class="flex-1 flex items-center justify-center text-primary/40 text-sm tracking-wide text-center px-6">
+                    No split defined yet, use Modify Split to create one.
                   </div>
                 }
 

@@ -53,7 +53,7 @@
                   (input)="onRestMinutesInput($event)"
                   (blur)="onRestTimeBlur()"
                   placeholder="00"
-                  class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-primary! font-lexend text-sm" />
+                  class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-primary! font-lexend text-sm transition-all duration-150 ease-out focus:scale-105 focus:bg-(--color-return-button-pressed)"/>
                 <span class="text-white font-lexend text-sm">:</span>
                 <input
                   type="text"
@@ -62,7 +62,7 @@
                   (input)="onRestSecondsInput($event)"
                   (blur)="onRestTimeBlur()"
                   placeholder="00"
-                  class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-primary! font-lexend text-sm" />
+                  class="bg-set-input-background rounded-general w-10 h-9 outline-none text-center text-primary! font-lexend text-sm transition-all duration-150 ease-out focus:scale-105 focus:bg-(--color-return-button-pressed)"/>
               </div>
             </div>
           </div>
