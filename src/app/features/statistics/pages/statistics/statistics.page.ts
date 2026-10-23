@@ -337,7 +337,8 @@ export class StatisticsPage {
 
     const gridLines = [0, 1, 2, 3].map(index => ({y: paddingTop + (plotHeight / 3) * index}));
 
-    if (!rawData.length) {
+    if (!rawData.length) 
+    {
       return { points: [], segments: [], gridLines, areaPath: '', viewBox: `0 0 ${svgWidth} ${svgHeight}`};
     }
 
@@ -380,17 +381,20 @@ export class StatisticsPage {
     };
   }
 
-  get calendarMonthLabel(): string {
+  get calendarMonthLabel(): string 
+  {
     const names = ['JANUARY','FEBRUARY','MARCH','APRIL','MAY','JUNE','JULY','AUGUST','SEPTEMBER','OCTOBER','NOVEMBER','DECEMBER'];
     return `${names[this.calendarMonth]} ${this.calendarYear}`;
   }
 
-  prevMonth() {
+  prevMonth() 
+  {
     this.calendarMonth--;
     if (this.calendarMonth < 0) { this.calendarMonth = 11; this.calendarYear--; }
   }
 
-  nextMonth() {
+  nextMonth() 
+  {
     this.calendarMonth++;
     if (this.calendarMonth > 11) { this.calendarMonth = 0; this.calendarYear++; }
   }
@@ -404,11 +408,13 @@ export class StatisticsPage {
 
     const cells: ({ day: number; date: Date; color: string; hasHistory: boolean; isOutsideMonth: boolean; isPast: boolean; isToday: boolean } | null)[] = [];
 
-    // 1. Zilele din luna anterioară (completare grilă)
-    if (leadingBlanks > 0) {
+
+    if (leadingBlanks > 0) 
+    {
       const previousMonthDays = new Date(this.calendarYear, this.calendarMonth, 0).getDate();
 
-      for (let i = leadingBlanks; i > 0; i--) {
+      for (let i = leadingBlanks; i > 0; i--) 
+      {
         const day = previousMonthDays - i + 1;
         const date = new Date(this.calendarYear, this.calendarMonth - 1, day);
         date.setHours(0, 0, 0, 0);
@@ -428,8 +434,9 @@ export class StatisticsPage {
     const todayMidnight = new Date();
     todayMidnight.setHours(0, 0, 0, 0);
 
-    // 2. Zilele lunii curente
-    for (let d = 1; d <= daysInMonth; d++) {
+
+    for (let d = 1; d <= daysInMonth; d++) 
+    {
       const date = new Date(this.calendarYear, this.calendarMonth, d);
       date.setHours(0, 0, 0, 0);
       
@@ -440,20 +447,27 @@ export class StatisticsPage {
 
       const history = this.workoutService.getHistoryForDate(date);
 
-      if (isPast) {
-        // TRECUT: Dacă există antrenament, folosește culoarea lui. Dacă nu, folosește REST_DAY_COLOR.
-        if (history.length > 0) {
+      if (isPast) 
+      {
+        if (history.length > 0) 
+        {
           color = this.workoutService.getWorkoutColor(history[0].name);
           hasHistory = true;
-        } else {
+        } 
+        else 
+        {
           color = REST_DAY_COLOR;
         }
-      } else {
-        // ASTĂZI ȘI VIITOR: Aplicăm logica bazată pe Split
-        if (history.length > 0) {
+      } 
+      else 
+      {
+        if (history.length > 0) 
+        {
           color = this.workoutService.getWorkoutColor(history[0].name);
           hasHistory = true;
-        } else {
+        } 
+        else 
+          {
           const slot = this.workoutService.getCycleSlotForDate(date);
           color = !slot 
             ? REST_DAY_COLOR 
@@ -472,8 +486,7 @@ export class StatisticsPage {
       });
     }
 
-    // 3. Zilele din luna următoare (completare grilă)
-    const trailingDays = (7 - (cells.length % 7)) % 7;
+    const trailingDays = 42 - cells.length;
     for (let i = 1; i <= trailingDays; i++) {
       const date = new Date(this.calendarYear, this.calendarMonth + 1, i);
       date.setHours(0, 0, 0, 0);
@@ -510,7 +523,8 @@ export class StatisticsPage {
     const history = this.workoutService.getHistoryForDate(cell.date);
     if (history.length === 0) return;
 
-    if (history.length === 1) {
+    if (history.length === 1) 
+      {
       this.openWorkoutDetailModal(history[0]);
       return;
     }
@@ -541,7 +555,8 @@ export class StatisticsPage {
     await actionSheet.present();
   }
 
-  private async openWorkoutDetailModal(workout: any) {
+  private async openWorkoutDetailModal(workout: any) 
+  {
     const modal = await this.modalController.create({
       component: WorkoutHistoryDetailComponent,
       componentProps: { workout },
@@ -590,4 +605,102 @@ export class StatisticsPage {
     });
     await actionSheet.present();
   }
+
+  get muscleGroupCoverage() 
+  {
+    const monday = new Date();
+    monday.setHours(0, 0, 0, 0);
+
+    const day = monday.getDay();
+    monday.setDate(monday.getDate() - (day === 0 ? 6 : day - 1));
+
+    const nextMonday = new Date(monday);
+    nextMonday.setDate(nextMonday.getDate() + 7);
+
+    const cycleWorkoutIds = new Set(
+      (this.workoutService.cycle?.slots ?? [])
+        .filter(slot => slot.type === 'workout' && slot.workoutId)
+        .map(slot => slot.workoutId!)
+    );
+
+    const templates = cycleWorkoutIds.size > 0
+      ? this.workoutService.workouts.filter(
+          workout => cycleWorkoutIds.has(workout.id)
+        )
+      : this.workoutService.workouts;
+
+    const plannedGroups = new Map<string, string>();
+
+    templates.forEach(workout => {
+      workout.muscleGroups.forEach(group => {
+        const name = group.name.trim();
+        const key = name.toUpperCase();
+
+        if (key) {
+          plannedGroups.set(key, name);
+        }
+      });
+    });
+
+    const groupWorkoutCounts = new Map<string, number>();
+
+    this.workoutService.workoutHistory.forEach(workout => 
+    {
+      const timestamp = workout.startTime;
+
+      if 
+      (
+        timestamp < monday.getTime() ||
+        timestamp >= nextMonday.getTime()
+      ) 
+      {
+        return;
+      }
+
+      const groupsInWorkout = new Set<string>();
+
+      workout.muscleGroups.forEach(group => {
+        const hasLoggedSets = group.exercises.some(
+          exercise => exercise.sets.length > 0
+        );
+
+        if (hasLoggedSets) {
+          const key = group.name.trim().toUpperCase();
+
+          if (key) {
+            groupsInWorkout.add(key);
+          }
+        }
+      });
+
+
+      groupsInWorkout.forEach(key => {
+        groupWorkoutCounts.set(
+          key,
+          (groupWorkoutCounts.get(key) ?? 0) + 1
+        );
+      });
+    });
+
+    const groups = Array.from(plannedGroups.entries())
+      .map(([key, name]) => {
+        const workoutCount = groupWorkoutCounts.get(key) ?? 0;
+
+        return {
+          key,
+          name,
+          workoutCount,
+          trained: workoutCount >= 1
+        };
+      })
+      .sort((a, b) => a.name.localeCompare(b.name));
+
+    return {
+      groups,
+      trainedCount: groups.filter(group => group.workoutCount >= 1).length,
+      total: groups.length
+    };
+  }
+
+
 }

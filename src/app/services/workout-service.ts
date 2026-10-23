@@ -203,13 +203,24 @@ export class WorkoutService {
   {
     if (this.currentActiveWorkout) 
     {
-      this.currentActiveWorkout.endTime = Date.now();
-      this.currentActiveWorkout.durationSeconds = Math.floor((this.currentActiveWorkout.endTime - this.currentActiveWorkout.startTime) / 1000);
-    
+      const completedWorkout = this.currentActiveWorkout;
+
+      completedWorkout.endTime = Date.now();
+      completedWorkout.durationSeconds = Math.floor((completedWorkout.endTime - completedWorkout.startTime) / 1000);
+        
       this.workoutHistory.push(this.currentActiveWorkout);
       await this.addWorkoutToHistoryDB(this.currentActiveWorkout);
       await this.clearActiveWorkout();
 
+      try 
+      {
+        await this.autoAdjustCycleForWorkout(completedWorkout);
+      } 
+      catch (error) 
+      {
+        console.error('Eroare la ajustarea automata a split-ului:', error);
+      }
+      
       if (this.preferencesService.dataBackupEnabled) 
       {
         await this.createBackup();
@@ -297,6 +308,8 @@ export class WorkoutService {
       await this.db.execute('DELETE FROM templates');
       await this.db.execute('DELETE FROM history');
       await this.db.execute('DELETE FROM active_workout');
+      await Preferences.remove({key: 'workout_cycle'});
+      this.cycle = null;
 
       this.workouts = [];
       this.workoutHistory = [];
@@ -372,6 +385,9 @@ export class WorkoutService {
     this.workoutHistory = backupData.workoutHistory || [];;
     await this.saveTemplates();
     await this.saveHistory();
+
+    this.cycle = null;
+    await Preferences.remove({key:'workout_cycle'});
     
     if (backupData.cycle) 
     {
@@ -474,6 +490,54 @@ export class WorkoutService {
     const newAnchor = todayMidnight.getTime() - slotIndex * 24 * 60 * 60 * 1000;
     this.cycle.anchorDate = newAnchor;
     await this.saveCycle(this.cycle);
+  }
+
+  private async autoAdjustCycleForWorkout(completedWorkout: ActiveWorkout): Promise<void> 
+  {
+    if (!this.preferencesService.autoAdjustSplitEnabled) return;
+    if (!this.cycle || this.cycle.slots.length === 0) return;
+
+    const today = new Date();
+    const currentIndex = this.getCycleSlotIndexForDate(today);
+
+    if (currentIndex === null) return;
+
+    const normalizeName = (name: string | undefined): string =>
+      (name ?? '').trim().toLocaleLowerCase();
+
+    const completedName = normalizeName(completedWorkout.name);
+
+    if (!completedName) return;
+
+    const currentSlot = this.cycle.slots[currentIndex];
+
+    const currentWorkoutName =
+      currentSlot.type === 'workout'
+        ? this.workouts.find(w => w.id === currentSlot.workoutId)?.name
+        : undefined;
+
+    if (normalizeName(currentWorkoutName) === completedName) return;
+
+    const slots = this.cycle.slots;
+    const length = slots.length;
+
+    for (let offset = 0; offset < length; offset++) 
+    {
+      const index = (currentIndex + offset) % length;
+      const slot = slots[index];
+
+      if (slot.type !== 'workout' || !slot.workoutId) continue;
+
+      const template = this.workouts.find(
+        workout => workout.id === slot.workoutId
+      );
+
+      if (normalizeName(template?.name) !== completedName) continue;
+
+      await this.restartCycleAtSlot(index);
+      return;
+    }
+
   }
 
   getCycleSlotIndexForDate(date: Date): number | null 

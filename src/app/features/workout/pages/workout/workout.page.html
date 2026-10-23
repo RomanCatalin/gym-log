@@ -3,9 +3,210 @@
 
     <div class="bg-workout-background rounded-general p-4 pb-10 shadow-md">
       
-      @if (!workoutService.currentActiveWorkout) {
+      @if (!workoutService.currentActiveWorkout) 
+      {
         <div class="flex flex-col gap-4">
           <div class="text-[28px] text-primary font-lexend px-1.5 pb-2">START A WORKOUT</div>
+        </div>
+
+        @if (showSetupChecklist) 
+        {
+          <div class="mt-2 rounded-general bg-musclegroup-card p-4 shadow-sm/30">
+
+            <div class="flex items-center justify-between">
+              <div class="mt-1 mb-4 px-1 text-[22px] uppercase tracking-wide text-primary font-lexend">
+                GETTING STARTED
+              </div>
+
+              <button
+                type="button"
+                (click)="dismissSetupChecklist()"
+                aria-label="Dismiss setup checklist"
+                class="mb-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-full active:opacity-60">
+                <ion-icon name="close-outline" class="text-3xl text-primary/50"></ion-icon>
+              </button>
+            </div>
+
+            <p class="mt-1 px-1 text-xs leading-relaxed text-primary/60">
+              Set things up your way. You can always change these later.
+            </p>
+
+            @if (workoutService.workouts.length === 0) {
+              <div class="mt-5 rounded-general bg-workout-background p-3">
+                <div class="flex items-start gap-3">
+                  <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-general bg-return-button text-primary">
+                    <ion-icon name="barbell-outline" class="text-xl text-primary/70"></ion-icon>
+                  </div>
+
+                  <div class="min-w-0 flex-1">
+                    <div class="text-sm uppercase tracking-wide text-primary font-lexend">
+                      Workout templates
+                    </div>
+                    <p class="mt-1 text-xs leading-relaxed text-primary/50">
+                      Set up your workout templates with muscle groups and exercises you choose.
+                    </p>
+                  </div>
+                </div>
+
+                <ion-button
+                  (click)="goToWorkoutTemplates()"
+                  expand="block"
+                  class="mt-3 font-lexend">
+                  CREATE TEMPLATES
+                </ion-button>
+              </div>
+            }
+
+            @if (!preferencesVisited || !workoutService.cycle) 
+            {
+              <div class="mt-4 px-1">
+                <div class="text-[10px] uppercase tracking-[0.2em] text-primary/40">
+                  OPTIONAL
+                </div>
+
+                @if (!preferencesVisited) 
+                {
+                  <button
+                    type="button"
+                    (click)="goToPreferences()"
+                    class="mt-3 flex w-full items-center gap-3 text-left active:opacity-70">
+
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-general bg-workout-background">
+                      <ion-icon name="options-outline" class="text-xl text-primary/70"></ion-icon>
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                      <div class="text-sm uppercase tracking-wide text-primary font-lexend">
+                        Preferences
+                      </div>
+                      <div class="mt-0.5 text-xs text-primary/50">
+                        Personalize your workout experience
+                      </div>
+                    </div>
+                  </button>
+                }
+
+
+
+                @if (!workoutService.cycle) 
+                {
+                  <button
+                    type="button"
+                    (click)="goToStatistics()"
+                    class="flex w-full items-center gap-3 mt-5 text-left active:opacity-70">
+
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-general bg-workout-background">
+                      <ion-icon name="calendar-outline" class="text-xl text-primary/70"></ion-icon>
+                    </div>
+
+                    <div class="min-w-0 flex-1">
+                      <div class="text-sm uppercase tracking-wide text-primary font-lexend">
+                        Your split
+                      </div>
+                      <div class="mt-0.5 text-xs text-primary/50">
+                        Plan your training sessions in Statistics
+                      </div>
+                    </div>
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      
+        @if (nextWorkoutInfo; as next) 
+        {
+          <div class="mt-2 flex overflow-hidden rounded-general bg-musclegroup-card shadow-sm/30">
+
+            <div class="flex flex-1 min-w-0 flex-col justify-between px-3 py-2">
+              <span class="text-primary/50 text-[10px] uppercase tracking-widest">
+                {{
+                  next.isRest
+                    ? 'TAKE A BREAK :)'
+                    : isWorkoutCompletedToday(next.workout)
+                      ? 'COMPLETED TODAY'
+                      : 'NEXT WORKOUT'
+                }}
+              </span>
+
+              <div class="mt-1 text-[24px] uppercase tracking-wide text-primary font-lexend">
+                {{ next.isRest ? 'REST' : next.workout?.name }}
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="flex w-[25%] shrink-0 items-center justify-center text-white transition-colors duration-200"
+              [style.background]="
+                isWorkoutCompletedToday(next.workout)
+                  ? 'var(--color-workout-finish)'
+                  : next.isRest
+                    ? 'var(--color-exercise-card)'
+                    : (next.workout?.color || '#C49A50')
+              "
+              [disabled]="
+                next.isRest ||
+                !next.workout ||
+                isWorkoutCompletedToday(next.workout)
+              "
+              [class.cursor-not-allowed]="
+                next.isRest ||
+                !next.workout ||
+                isWorkoutCompletedToday(next.workout)
+              "
+              [class.active:opacity-70]="
+                !next.isRest &&
+                !!next.workout &&
+                !isWorkoutCompletedToday(next.workout)
+              "
+              (click)="startNextWorkout()">
+
+              <ion-icon [name]="isWorkoutCompletedToday(next.workout) ? 'checkmark-outline' : next.isRest ? 'pause' : 'play'" aria-hidden="true" class="text-3xl">
+              </ion-icon>
+            </button>
+
+          </div>
+        }
+
+
+        @if (cycleBarSlots.length > 0) 
+        {
+          <div class="mt-2 px-1">
+            <div class="mb-2">
+              <span class="text-primary/50 text-[10px] uppercase tracking-widest">
+                YOUR SPLIT
+              </span>
+            </div>
+            <div class="flex items-center gap-1.5 bg">
+              @for (slot of cycleBarSlots; track $index) 
+              {
+                <div class="flex-1 min-w-0 flex flex-col items-center gap-1 bg-musclegroup-card" [class.rounded-l-general]="$first" [class.rounded-r-general]="$last">
+                  <div
+                    class="w-full h-2.5"
+                    [class.rounded-l-full]="$first"
+                    [class.rounded-r-full]="$last"
+                    [style.background]="slot.color"
+                    [class.ring-1]="slot.isToday"
+                    [class.ring-white]="slot.isToday"
+                    [class.ring-offset-1]="slot.isToday">
+                  </div>
+
+                  <span class="text-primary/50 text-[8px] uppercase truncate w-full text-center" [class.!text-primary]="slot.isToday">
+                    {{ slot.label }}
+                  </span>
+                </div>
+              }
+            </div>
+          </div>
+        }
+
+        <div class="flex flex-col mt-6 gap-2 bg-musclegroup-card p-2 pb-3 rounded-general shadow-sm/30">
+            @if (nextWorkoutInfo) 
+            {
+              <span class="text-primary/80 text-[10px] uppercase tracking-widest px-1">
+              OR CHOOSE ANOTHER WORKOUT
+               </span>
+            } 
           <div class="bg-return-button rounded-general relative flex items-center shadow-sm/30">
             <ion-select 
               [(ngModel)]="selectedTemplateId" 
@@ -14,7 +215,7 @@
               fill="none"
               [interfaceOptions]="{ cssClass: 'custom-template-popover' }"
               placeholder="SELECT TEMPLATE"
-              class="w-full bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-5 py-2 font-lexend rounded-general">
+              class="w-full bg-return-button text-primary uppercase text-sm tracking-wide outline-none px-3 py-0 font-lexend rounded-general">
 
               @for (wk of workoutService.workouts; track wk.id) {
                 <ion-select-option [value]="wk.id">{{ wk.name }}</ion-select-option>
@@ -22,8 +223,10 @@
             </ion-select>
           </div>
         </div>
-       @if (recentWorkouts.length > 0) {
-          <div class="flex flex-col gap-3 mt-9">
+
+       @if (recentWorkouts.length > 0) 
+       {
+          <div class="flex flex-col gap-3 mt-7">
            <div class="flex justify-between items-center px-1 pb-1">
               <div class="text-[18px] text-primary/80 font-lexend uppercase tracking-widest">
                 Recent Workouts

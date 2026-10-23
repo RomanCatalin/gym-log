@@ -48,7 +48,7 @@ export class DatabackupPage implements OnInit {
   {
     const alert = await this.alertController.create({
       header: 'Clear All Data',
-      message: 'This will permanently delete all workout templates, history, and any in-progress workout. This cannot be undone.',
+      message: 'This will permanently delete all workout templates, history, split and any in-progress workout. This cannot be undone.',
       cssClass: 'custom-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },
@@ -110,7 +110,7 @@ async importData() {
 
     const alert = await this.alertController.create({
       header: 'Import Data?',
-      message: 'This will replace all current templates and workout history with the data from this backup. This cannot be undone.',
+      message: 'This will replace all current templates, workout history and split with the data from this backup. This cannot be undone.',
       cssClass: 'custom-alert',
       buttons: [
         { text: 'Cancel', role: 'cancel' },

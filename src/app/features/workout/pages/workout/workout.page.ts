@@ -3,12 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonIcon, AlertController, IonButton, IonSelect, IonSelectOption, ModalController} from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { returnUpBackOutline, chevronDownOutline, add, chevronUpOutline } from 'ionicons/icons';
-import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise } from 'src/app/services/workout-service';
+import { returnUpBackOutline, chevronDownOutline, add, chevronUpOutline, play, pause, barbellOutline, calendarOutline, optionsOutline, closeOutline, checkmarkOutline } from 'ionicons/icons';
+import { WorkoutService, WorkoutMuscleGroup, WorkoutExercise, Workout } from 'src/app/services/workout-service';
 import { EXERCISES_BY_GROUP, ALL_MUSCLE_GROUPS } from 'src/app/shared/constants/exercise-database';
 import { PreferencesService } from 'src/app/services/preferences-service';
 import { IonAccordion, IonAccordionGroup, IonItem } from '@ionic/angular/standalone';
 import { RestTimerService } from 'src/app/services/rest-timer-service';
+import { REST_DAY_COLOR } from 'src/app/shared/constants/workout-colors';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-workout',
@@ -23,7 +25,7 @@ export class WorkoutPage implements OnInit, OnDestroy
   private cdr = inject(ChangeDetectorRef);
   private ngZone = inject(NgZone);
   readonly recentWorkoutsLimit = 6;
- preferencesService = inject(PreferencesService);
+  preferencesService = inject(PreferencesService);
 
   viewState: 1 | 2 | 3 = 1;
   activeMuscleGroup: WorkoutMuscleGroup | null = null;
@@ -42,11 +44,16 @@ export class WorkoutPage implements OnInit, OnDestroy
 
   private restTimerService = inject(RestTimerService);
 
-  private modalController = inject(ModalController);
+  private router = inject(Router);
 
+  preferencesVisited = localStorage.getItem('setupPreferencesDone') === 'true';
+  checklistDismissed = localStorage.getItem('setupChecklistDismissed') === 'true';
+
+
+  
   constructor() 
   {
-    addIcons({ returnUpBackOutline, chevronDownOutline, chevronUpOutline, add });
+    addIcons({ returnUpBackOutline, chevronDownOutline, chevronUpOutline, add, play, pause, barbellOutline, calendarOutline, optionsOutline, closeOutline, checkmarkOutline});
   }
 
   async ngOnInit() 
@@ -63,43 +70,94 @@ export class WorkoutPage implements OnInit, OnDestroy
     this.stopTimer();
   }
 
-  async confirmStartWorkout(event: any) 
+  goToWorkoutTemplates() {
+    this.router.navigate(['workout-templates']);
+  }
+
+  get showSetupChecklist(): boolean 
   {
-  const templateId = event?.detail?.value;
-  if (!templateId) return;
+    return !this.checklistDismissed &&
+      (
+        this.workoutService.workouts.length === 0 ||
+        !this.preferencesVisited ||
+        !this.workoutService.cycle
+      );
+  }
+  
+  goToPreferences() 
+  {
+    localStorage.setItem('setupPreferencesDone', 'true');
+    this.preferencesVisited = true;
+    this.router.navigate(['preferences']);
+  }
 
-  const template = this.workoutService.workouts.find(w => w.id === templateId);
-  if (!template) return;
+  goToStatistics()
+  {
+    this.router.navigate(['statistics']);   
+  }
 
-  const alert = await this.alertController.create({
-    header: 'Start Workout',
-    message: `Are you sure you want to start a ${template.name} workout?`,
-    cssClass: 'custom-alert', 
-    buttons: [
-      {
-        text: 'Cancel',
-        role: 'cancel',
-        handler: () => {
-          this.ngZone.run(() => {
-            this.selectedTemplateId = ''; 
-          });
+  dismissSetupChecklist() 
+  {
+    localStorage.setItem('setupChecklistDismissed', 'true');
+    this.checklistDismissed = true;
+  }
+
+  async confirmStartWorkout(event: any) {
+    const templateId = event?.detail?.value;
+    if (templateId) {
+      await this.confirmStartTemplate(templateId);
+    }
+  }
+
+  async startNextWorkout() 
+  {
+    const next = this.nextWorkoutInfo;
+
+    if (!next || next.isRest || !next.workout) 
+    {
+      return;
+    }
+    await this.confirmStartTemplate(next.workout.id);
+  }
+
+  private async confirmStartTemplate(templateId: string) {
+    const template = this.workoutService.workouts.find(
+      w => w.id === templateId
+    );
+    if (!template) return;
+
+    const alert = await this.alertController.create({
+      header: 'Start Workout',
+      message: `Are you sure you want to start a ${template.name} workout?`,
+      cssClass: 'custom-alert',
+      buttons: [
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          handler: () => {
+            this.ngZone.run(() => {
+              this.selectedTemplateId = '';
+            });
+          }
+        },
+        {
+          text: 'Start',
+          handler: () => {
+            this.ngZone.run(() => {
+              this.workoutService.startWorkout(
+                template.name,
+                template.muscleGroups
+              );
+              this.startTimer();
+              this.selectedTemplateId = '';
+              this.cdr.detectChanges();
+            });
+          }
         }
-      },
-      {
-        text: 'Start',
-        handler: () => {
-          this.ngZone.run(() => {
-            this.workoutService.startWorkout(template.name, template.muscleGroups);
-            this.startTimer();
-            this.selectedTemplateId = '';
-            this.cdr.detectChanges();
-          });
-        }
-      }
-    ]
-  });
+      ]
+    });
 
-  await alert.present();
+    await alert.present();
   }
 
   startTimer() 
@@ -444,6 +502,76 @@ export class WorkoutPage implements OnInit, OnDestroy
     });
   }
 
+  get cycleBarSlots() 
+  {
+    const cycle = this.workoutService.cycle;
+
+    if (!cycle?.slots.length) return [];
+
+    const todayIndex = this.workoutService.getCycleSlotIndexForDate(new Date());
+
+    return cycle.slots.map((slot, i) => {
+      const workout = slot.workoutId
+        ? this.workoutService.workouts.find(
+            w => w.id === slot.workoutId
+          )
+        : undefined;
+
+      return {
+        color: slot.type === 'rest'
+          ? REST_DAY_COLOR
+          : this.workoutService.getWorkoutColorById(slot.workoutId!),
+        label: slot.type === 'rest'
+          ? 'REST'
+          : workout?.name ?? 'WORKOUT',
+        isToday: i === todayIndex
+      };
+    });
+  }
+
+
+  get nextWorkoutInfo(): { workout: Workout | null; daysAway: number; label: string; isRest: boolean;} | null 
+  {
+    const cycle = this.workoutService.cycle;
+
+    if (!cycle?.slots.length) return null;
+
+    const today = new Date();
+
+    for (let daysAway = 0; daysAway < cycle.slots.length; daysAway++) {
+      const date = new Date(today);
+      date.setDate(today.getDate() + daysAway);
+
+      const slot = this.workoutService.getCycleSlotForDate(date);
+
+      if (!slot) continue;
+
+      const label = daysAway === 0
+        ? 'UP NEXT'
+        : daysAway === 1
+          ? 'TOMORROW'
+          : date.toLocaleDateString('en-US', {
+              weekday: 'short'
+            }).toUpperCase();
+
+      if (slot.type === 'rest') {
+        return { workout: null, daysAway, label, isRest: true };
+      }
+
+      if (!slot.workoutId) continue;
+
+      const workout = this.workoutService.workouts.find(
+        w => w.id === slot.workoutId
+      );
+
+      if (!workout) continue;
+
+      return { workout, daysAway, label, isRest: false };
+    }
+
+    return null;
+  }
+
   async promptResumeWorkout() 
   {
   const pending = this.workoutService.pendingActiveWorkout;
@@ -481,5 +609,36 @@ export class WorkoutPage implements OnInit, OnDestroy
 
   await alert.present();
   }
-  
+
+  isWorkoutCompletedToday(workout: Workout | null): boolean 
+  {
+    if (!workout) return false;
+
+    const now = new Date();
+
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const startOfTomorrow = new Date(startOfToday);
+    startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+
+    return this.workoutService.workoutHistory.some(history => 
+    {
+      if 
+      (
+        history.name.trim().toLowerCase() !==
+        workout.name.trim().toLowerCase()
+      ) {
+        return false;
+      }
+
+      if (!history.endTime) return false;
+
+      return (
+        history.endTime >= startOfToday.getTime() &&
+        history.endTime < startOfTomorrow.getTime()
+      );
+    });
+  }
+
 }

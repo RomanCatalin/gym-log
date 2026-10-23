@@ -80,6 +80,11 @@ export class PreferencesPage implements OnInit {
     }
   }
 
+  onAutoAdjustSplitToggle(event: any)
+  {
+    this.preferencesService.setAutoAdjustSplitEnabled(event.detail.checked);
+  }
+
   onBestSetToggle(event: any)
   {
     this.preferencesService.setBestSetEnabled(event.detail.checked);

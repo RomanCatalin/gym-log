@@ -531,23 +531,6 @@ ion-action-sheet.custom-action-sheet-cycle {
   }
 }
 
-ion-button.trending-icon-btn {
-  --background: var(--color-statistics-button);
-  --background-activated: var(--color-return-button-pressed);
-  --border-radius: var(--radius-general);
-  --box-shadow: none;
-  --color: var(--color-text-primary);
-  --padding-start: 0;
-  --padding-end: 0;
-  width: 48px;
-  height: 48px;
-  margin: 0;
-
-  ion-icon {
-    font-size: 20px;
-  }
-}
-
 .modify-cycle-btn {
   --padding-start: 0;
   --padding-end: 0;
@@ -588,9 +571,7 @@ ion-button.trending-icon-btn {
   }
 }
 
-.modify-cycle-btn {
-  height: 48px; 
-}
+
 
 ion-popover.color-picker-popover {
   --width: 200px;

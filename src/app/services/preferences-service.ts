@@ -13,6 +13,7 @@ const KEYS = {
   bestSetEnabled: 'pref_best_set_enabled',
   unilateralEnabled: 'pref_unilateral_enabled',
   notificationEnabled: 'pref_notification_enabled',
+  autoAdjustSplitEnabled: 'pref_adjust_split_enabled',
 };
 
 @Injectable({ providedIn: 'root' })
@@ -29,6 +30,7 @@ export class PreferencesService
   unilateralEnabled = false;
   dataBackupEnabled = true;
   lastBackupAt = 0;
+  autoAdjustSplitEnabled = false;
 
   public ready: Promise<void>;
 
@@ -41,7 +43,7 @@ export class PreferencesService
   {
     try 
     {
-      const [theme, restTime, dataBackup, lastBackupAt, alert, sound, notification, bestSet, unilateral] = await Promise.all
+      const [theme, restTime, dataBackup, lastBackupAt, alert, sound, notification, bestSet, unilateral, autoAdjustSplit] = await Promise.all
       ([
         Preferences.get({ key: KEYS.theme }),
         Preferences.get({ key: KEYS.restTimeSeconds }),
@@ -52,6 +54,7 @@ export class PreferencesService
         Preferences.get({ key: KEYS.notificationEnabled }),
         Preferences.get({ key: KEYS.bestSetEnabled }),
         Preferences.get({ key: KEYS.unilateralEnabled }),
+        Preferences.get({ key: KEYS.autoAdjustSplitEnabled}),
       ]);
 
     if (theme.value) this.theme = theme.value as ThemeOption;
@@ -72,6 +75,7 @@ export class PreferencesService
     if (notification.value !== null) this.notificationEnabled = notification.value === 'true';
     if (bestSet.value !== null) this.bestSetEnabled = bestSet.value === 'true';
     if (unilateral.value !== null) this.unilateralEnabled = unilateral.value === 'true';
+    if (autoAdjustSplit.value !== null) this.autoAdjustSplitEnabled = autoAdjustSplit.value === 'true';
 
     } 
     catch (error) 
@@ -123,5 +127,10 @@ export class PreferencesService
   async setUnilateralEnabled(value: boolean) {
     this.unilateralEnabled = value;
     await Preferences.set({ key: KEYS.unilateralEnabled, value: value.toString() });
+  }
+
+  async setAutoAdjustSplitEnabled(value: boolean) {
+    this.autoAdjustSplitEnabled = value;
+    await Preferences.set({ key: KEYS.autoAdjustSplitEnabled, value: value.toString() });
   }
 }
