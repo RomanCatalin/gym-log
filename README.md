@@ -23,7 +23,7 @@ A workout tracking app built with Ionic, Angular, and Capacitor, packaged as a n
 - **Training cycles** — define a repeating workout pattern (e.g. Push/Pull/Legs/Rest) that the app tracks automatically, with manual resync support
 - **Crash recovery** — an in-progress workout is auto-saved and can be resumed if the app is closed or the phone restarts
 - **Local backup & restore** — export/import all data as a single file, and share it via any app (Drive, email, etc.)
-- **Customizable preferences** — rest duration, and alert settings
+- **Customizable preferences** — rest duration, additional set information, and alert settings
 
 ## Tech Stack
 
@@ -75,6 +75,6 @@ npx ionic cap run android
 
 - [ ] **Dark / Light Mode Toggle** — Dynamic theme switching based on user preference
 - [ ] **Insights and Recommended Workout** - Recommandations to help user hit muscle groups efficiently
-- [ ] **Revamping Progression Chart** - A more customizable and modern version
+- [x] **Revamping Progression Chart** - A more customizable and modern version
 - [ ] **IOS Testing and Compatibility**
 - [ ] **More UI consistency and layout Tweaks**
